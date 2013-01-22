@@ -28,7 +28,7 @@
 	</developers>
 	<issueManagement>
 		<system>Github Issue</system>
-		<url>https://github.com/laiweiwei/spiderman/issues</url>
+		<url>https://gitcafe.com/laiweiwei/Spiderman/tickets</url>
 	</issueManagement>
 	<licenses>
 		<license>
@@ -37,8 +37,8 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>git@github.com:laiweiwei/spiderman.git</connection>
-		<url>https://github.com/laiweiwei/spiderman.git</url>
+		<connection>git@gitcafe.com:laiweiwei/Spiderman.git</connection>
+		<url>git@gitcafe.com:laiweiwei/Spiderman.git</url>
 	</scm>
 	<reporting>
 		<plugins>
