@@ -4,8 +4,9 @@ Spiderman Core - Java开源Web数据抽取工具
     Spiderman主要是运用了像XPath,正则表达式等这些技术来实数据抽取。
     
 它包含了两部分（二者缺一不可）：
-* spiderman-core 内核
-* spiderman-plugin 插件
+-----------------------------
+	* spiderman-core 内核
+	* spiderman-plugin 插件
 
 主要特点
 ----------------------
@@ -21,7 +22,6 @@ Spiderman Core - Java开源Web数据抽取工具
 
 XPath获取技巧？
 --------------
-这里只说下Chrome浏览器，其他浏览器估计也差不多，只不过插件不同而已。
 * 首先，下载xpathonclick插件，[猛击这里](https://chrome.google.com/webstore/search/xpathonclick)
 * 安装完毕之后，打开Chrome浏览器，可以看到右上角有个“X Path” 图标。
 * 在浏览器打开你的目标网页，然后点击右上角的那个图片，然后点击网标上你想要获取XPath的地方，例如某个标题
