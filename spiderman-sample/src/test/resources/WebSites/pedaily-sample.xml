@@ -17,7 +17,7 @@
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	-->
-	<site name="kpbz" url="http://www.kpbz.net" reqDelay="0.1s" enable="0" charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
+	<site name="pedaily" url="http://research.pedaily.cn/List-c21" reqDelay="1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | HTTP Header
 		<headers>
@@ -47,7 +47,7 @@
 			<!--
 			  | name:目标名称	
 			-->
-			<target name="image">
+			<target name="question">
 				<!--
 				  | 目标URL匹配规则
 				-->
@@ -55,18 +55,18 @@
 					<!--
 					  | 同前面的队列规则
 					-->
-					<rule type="regex" value=".*uploads.*allimg.*\.jpg_\d+\.html" />
+					<rule type="equal" value="http://research.pedaily.cn/List-c21" />
 				</urls>
 				<!--
 				  | 目标网页的数据模型
 				-->
-				<model>
+				<model xpath="//ul[@class='list_14_b']//li" isArray="1">
 					<!--
 					  | 属性的配置
 					  | name:属性名称
 					  | parser:针对该属性的解析规则
 					-->
-					<field name="images" isArray="1">
+					<field name="title">
 						<!--
 						  | xpath: XPath规则，如果目标页面是XML，则可以使用2.0语法，否则HTML的话暂时只能1.0
 						  | attribute:当使用XPath解析后的内容不是文本而是一个Node节点对象的时候，可以给定一个属性名获取其属性值例如<img src="" />
@@ -87,7 +87,12 @@
 						  |            $Attrs.xml($this).rm('style').Tags().rm('p').ok()
 						-->
 						<parsers>
-							<parser xpath="//div[@id='pic_show']//img[@src]" attribute="src" />
+							<parser xpath="a/text()" />
+						</parsers>
+					</field>
+					<field name="url">
+						<parsers>
+							<parser xpath="a[@href]" attribute="href" />
 						</parsers>
 					</field>
 				</model>

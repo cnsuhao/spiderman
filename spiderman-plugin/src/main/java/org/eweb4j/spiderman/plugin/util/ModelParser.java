@@ -1,6 +1,7 @@
 package org.eweb4j.spiderman.plugin.util;
 
 import java.io.ByteArrayInputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -153,10 +154,15 @@ public class ModelParser extends DefaultHandler{
 		"<h2><font color=\"#0981be\"><img src=\"https://static.groupon.sg/48/23/1340603452348.jpg\" /></font></h2><img src=\"https://static.groupon.sg/55/32/1357876073255.jpg\" /> <map name=\"grouponsg_map\"> <area shape=\"rect\" coords=\" 355, 101, 462, 148\" href=\"http://www.groupon.sg/deals/singapore-exclusive?utm_source=banner&utm_medium=cp_sgx_side&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"rect\" coords=\" 137, 92, 244, 140\" href=\"http://www.groupon.sg/deals/shopping?utm_source=banner&utm_medium=cp_goods&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"rect\" coords=\" 211, 10, 319, 59\" href=\"http://www.groupon.sg/deals/singapore?utm_source=banner&utm_medium=cp_singapore&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"rect\" coords=\" 23, 73, 129, 121\" href=\"http://www.groupon.sg/deals/deals-near-me?utm_source=banner&utm_medium=cp_nearme&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"rect\" coords=\" 3, 4, 110, 53\" href=\"http://www.groupon.sg/deals/travel-deals?utm_source=banner&utm_medium=cp_travel&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"default\" /> </map></div>";
 
         HtmlCleaner cleaner = new HtmlCleaner();
-		TagNode tagNode = cleaner.clean(html);
-		Object[] nodeVals = tagNode.evaluateXPath("//div[1]");
-		String rs = ParserUtil.xml(nodeVals[0],false);
-		System.out.println(rs);
+		TagNode tagNode = cleaner.clean(new URL("http://research.pedaily.cn/List-c21"));
+		Object[] nodeVals = tagNode.evaluateXPath("//ul[@class='list_14_b']//li");
+		for (Object tag : nodeVals){
+			TagNode _tag = (TagNode)tag;
+			Object[] vals = _tag.evaluateXPath("a/text()");
+//			String rs = ParserUtil.xml(vals[0],false);
+			System.out.println(vals[0]);
+		}
+		
 		
 //		//第一步：获得解析工厂的实例  
 //        SAXParserFactory spf = SAXParserFactory.newInstance();  
@@ -177,13 +183,15 @@ public class ModelParser extends DefaultHandler{
 		//解析xml
 		if (isXml) 
 			return parseXml(page);
-		
+		//解析html
+		else
+			return parseHtml(page);
 		// TODO 解析 JSON
 		
-		//解析html
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		list.add(parseHtml(page));
-		return list;
+		
+//		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+//		list.add(parseHtml(page));
+//		return list;
 	}
 
 	private List<Map<String, Object>> parseXml(Page page) throws Exception{
@@ -206,17 +214,17 @@ public class ModelParser extends DefaultHandler{
 		        NodeList nodes = (NodeList) result;
 		        if (nodes.getLength() > 0){
 			        for (int i = 0; i < nodes.getLength(); i++) {
-						list.add(parse2Map(nodes.item(i), xpathParser, fields));
+						list.add(parseXmlMap(nodes.item(i), xpathParser, fields));
 			        }
 		        }
 	        }
 		}else{
-			list.add(parse2Map(doc, xpathParser, fields));
+			list.add(parseXmlMap(doc, xpathParser, fields));
 		}
 		return list;
 	}
 	
-	private Map<String, Object> parse2Map(Object item, XPath xpathParser, final List<Field> fields) {
+	private Map<String, Object> parseXmlMap(Object item, XPath xpathParser, final List<Field> fields) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		fel.getContext().set("$fields", map);
 		for (Field field : fields){
@@ -367,12 +375,32 @@ public class ModelParser extends DefaultHandler{
 		return map;
 	}
 	
-	private Map<String, Object> parseHtml(Page page){
-		Map<String, Object> map = new HashMap<String, Object>();
-		fel.getContext().set("$fields", map);
-		final List<Field> fields = target.getModel().getField();
+	private List<Map<String, Object>> parseHtml(Page page) throws Exception{
 		HtmlCleaner cleaner = new HtmlCleaner();
 		TagNode rootNode = cleaner.clean(page.getContent());
+		
+        final List<Field> fields = target.getModel().getField();
+		String isModelArray = target.getModel().getIsArray();
+		String modelXpath = target.getModel().getXpath();
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		if ("1".equals(isModelArray) || "tre".equals(isModelArray)){
+			Object[] nodeVals = rootNode.evaluateXPath(modelXpath);
+	        if (nodeVals != null && nodeVals.length > 0){
+		        for (int i = 0; i < nodeVals.length; i++) {
+					list.add(parseHtmlMap(nodeVals[i], fields));
+		        }
+	        }
+		}else{
+			list.add(parseHtmlMap(rootNode, fields));
+		}
+		
+		return list;
+	}
+	
+	private Map<String, Object> parseHtmlMap(Object item, final List<Field> fields){
+		Map<String, Object> map = new HashMap<String, Object>();
+		fel.getContext().set("$fields", map);
+		
 		for (Field field : fields){
 			String key = field.getName();
 			String isArray = field.getIsArray();
@@ -397,7 +425,8 @@ public class ModelParser extends DefaultHandler{
 				String skipRgxFail = parser.getSkipRgxFail();
 				try {
 					if (xpath != null && xpath.trim().length() > 0) {
-						Object[] nodeVals = rootNode.evaluateXPath(xpath);
+						TagNode tag = (TagNode)item;
+						Object[] nodeVals = tag.evaluateXPath(xpath);
 						if (nodeVals == null || nodeVals.length == 0)
 							continue;
 						

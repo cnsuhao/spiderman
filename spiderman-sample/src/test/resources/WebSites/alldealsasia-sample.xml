@@ -154,7 +154,7 @@
 						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TargetPointImpl" sort="0"/>
 					</extension>
 					<extension point="parse">
-						<impl type="" value="org.eweb4j.piderman.plugin.impl.ParsePointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
 					</extension>
 					<extension point="end">
 						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>
