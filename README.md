@@ -230,7 +230,7 @@ Spiderman Sample | 案例
 					</field>
 					<field name="answers" isArray="1">
 						<parsers>
-							<parser xpath="//li[@class='Answer']//div[@class='detail']/text()" regex="\d+\.\d+"/>
+							<parser xpath="//li[@class='Answer']//div[@class='detail']/text()" />
 						</parsers>
 					</field>
 				</model>
