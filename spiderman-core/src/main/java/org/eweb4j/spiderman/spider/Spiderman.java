@@ -75,6 +75,8 @@ public class Spiderman {
 	}
 	
 	public Spiderman init(){
+		if (this.listener == null)
+			this.listener = new SpiderListenerAdaptor();
 		isStop = false;
 		isShutdownNow = false;
 		sites = null;
@@ -92,8 +94,6 @@ public class Spiderman {
 	
 	public Spiderman listen(SpiderListener listener){
 		this.listener = listener;
-		if (this.listener == null)
-			this.listener = new SpiderListenerAdaptor();
 		return this;
 	}
 	
