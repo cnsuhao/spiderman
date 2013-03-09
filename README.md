@@ -193,10 +193,12 @@ Spiderman Sample | 案例
 						  | 定义如何在来源页面上挖掘新的 URL
 						-->
 						<!--
-						<digUrls isArray="1">
-							<parsers>
-								<parser xpath="" attribute="" exp="" regex="" />
-							</parsers>
+						<digUrls>
+							<field name="target_url" isArray="1">
+								<parsers>
+									<parser xpath="" attribute="" exp="" regex="" />
+								</parsers>
+							</field>
 						</digUrls>-->
 					<!--</rule>
 				</sourceRules>-->
