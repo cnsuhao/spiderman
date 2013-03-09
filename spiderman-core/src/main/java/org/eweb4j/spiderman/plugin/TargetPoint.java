@@ -6,7 +6,7 @@ import org.eweb4j.spiderman.xml.Target;
 
 public interface TargetPoint extends Point{
 
-	void context(Task task) throws Exception;
-	Target confirmTarget(Target target) throws Exception;
+//	void context(Task task) throws Exception;
+	Target confirmTarget(Task task, Target target) throws Exception;
 
 }

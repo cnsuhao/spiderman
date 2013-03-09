@@ -6,9 +6,10 @@ import org.eweb4j.spiderman.xml.Site;
 
 public class Task {
 
-	public Task(String url, Site site, int sort) {
+	public Task(String url, String sourceUrl, Site site, int sort) {
 		super();
 		this.url = url;
+		this.sourceUrl = sourceUrl;
 		this.site = site;
 		this.sort = sort;
 	}
@@ -16,8 +17,9 @@ public class Task {
 	public Site site ;
 	public int sort = 10;
 	public String url;
+	public String sourceUrl;//task.url的来源
 	
 	public String toString() {
-		return "Task [site=" + site.getName() + ", sort=" + sort + ", url=" + url + "]";
+		return "Task [site=" + site.getName() + ", sort=" + sort + ", url=" + url + ", sourceUrl=" + sourceUrl + "]";
 	}
 }

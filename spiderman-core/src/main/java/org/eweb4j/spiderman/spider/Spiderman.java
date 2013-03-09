@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,6 +38,8 @@ import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.spiderman.task.TaskQueue;
 import org.eweb4j.spiderman.xml.Plugin;
 import org.eweb4j.spiderman.xml.Plugins;
+import org.eweb4j.spiderman.xml.Seed;
+import org.eweb4j.spiderman.xml.Seeds;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.spiderman.xml.Target;
 import org.eweb4j.util.CommonUtil;
@@ -48,7 +51,6 @@ import org.eweb4j.util.xml.XMLWriter;
 public class Spiderman {
 
 	public final SpiderIOC ioc = SpiderIOCs.create();
-	public Boolean isStop = false;
 	public Boolean isShutdownNow = false;
 	private ExecutorService pool = null;
 	private Collection<Site> sites = null;
@@ -77,7 +79,6 @@ public class Spiderman {
 	public Spiderman init(){
 		if (this.listener == null)
 			this.listener = new SpiderListenerAdaptor();
-		isStop = false;
 		isShutdownNow = false;
 		sites = null;
 		pool = null;
@@ -111,15 +112,21 @@ public class Spiderman {
 						//阻塞，判断之前所有的网站是否都已经停止完全
 						//加个超时
 						long start = System.currentTimeMillis();
-						long timeout = 10*60*1000;
+						long timeout = 1*60*1000;
 						while (true) {
-							if ((System.currentTimeMillis() - start) > timeout){
-								_this.listener.onError(Thread.currentThread(), null, "timeout of restart blocking check...", new Exception());
-								break;
-							}
-							if (_this.sites == null || _this.sites.isEmpty())
-								break;
 							try {
+								if ((System.currentTimeMillis() - start) > timeout){
+									_this.listener.onError(Thread.currentThread(), null, "timeout of restart blocking check...", new Exception());
+									for (Site site : _this.sites) {
+										if (!site.isStop){
+											site.destroy(_this.listener, _this.isShutdownNow);
+										}
+									}
+									break;
+								}
+								if (_this.sites == null || _this.sites.isEmpty())
+									break;
+								
 								Thread.sleep(1*1000);
 								boolean canBreak = true;
 								for (Site site : _this.sites) {
@@ -131,9 +138,9 @@ public class Spiderman {
 								
 								if (canBreak)
 									break;
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-								break;
+							} catch (Exception e) {
+								_this.listener.onError(Thread.currentThread(), null, "", e);
+								throw new RuntimeException("Spiderman can not schedule", e);
 							}
 						}
 						
@@ -161,6 +168,31 @@ public class Spiderman {
 			listener.onInfo(Thread.currentThread(), null, "spider tasks of site[" + site.getName() + "] start... ");
 		}
 		return this;
+	}
+	
+	public void shutdown(){
+		if (sites != null) {
+			for (Site site : sites){
+				site.destroy(listener, false);
+				listener.onInfo(Thread.currentThread(), null, "Site[" + site.getName() + "] destroy... ");
+			}
+		}
+		if (pool != null)
+			pool.shutdown();
+	}
+	
+	public void shutdownNow(){
+		if (sites != null) {
+			for (Site site : sites){
+				site.destroy(listener, true);
+				listener.onInfo(Thread.currentThread(), null, "Site[" + site.getName() + "] destroy... ");
+			}
+		}
+		
+		if (pool != null)
+			pool.shutdownNow();
+		
+		isShutdownNow = true;
 	}
 	
 	//-------- Schedule ------------
@@ -233,19 +265,6 @@ public class Spiderman {
 		return this;
 	}
 	
-	public void shutdown(){
-		pool.shutdown();
-		pool = null;
-		isStop = true;
-	}
-	
-	public void shutdownNow(){
-		pool.shutdownNow();
-		pool = null;
-		isStop = true;
-		isShutdownNow = true;
-	}
-	
 	private void loadPlugins() throws Exception{
 		File siteFolder = new File(Settings.website_xml_folder());
 		if (!siteFolder.exists())
@@ -286,6 +305,7 @@ public class Spiderman {
 				throw new Exception("site xml file error -> " + file.getAbsolutePath());
 			if ("1".equals(site.getEnable())){
 				sites.add(site);
+				listener.onInfo(Thread.currentThread(), null, "site.xmlfile->"+file.getAbsolutePath() + " loading... -> ok");
 			}
 		}
 	}
@@ -405,40 +425,6 @@ public class Spiderman {
 		}
 	}
 	
-	private void destroyPoint(Collection<? extends Point> points){
-		if (points == null)
-			return ;
-		for (Point point : points){
-			try {
-				point.destroy();
-			} catch (DoneException e){
-				continue;
-			}
-			point = null;
-		}
-	}
-	
-	private void destroySite(Site site) {
-		destroyPoint(site.beginPointImpls);
-		destroyPoint(site.digPointImpls);
-		destroyPoint(site.dupRemovalPointImpls);
-		destroyPoint(site.endPointImpls);
-		destroyPoint(site.fetchPointImpls);
-		destroyPoint(site.parsePointImpls);
-		destroyPoint(site.pojoPointImpls);
-		destroyPoint(site.targetPointImpls);
-		destroyPoint(site.taskPollPointImpls);
-		destroyPoint(site.taskPushPointImpls);
-		destroyPoint(site.taskSortPointImpls);
-		site.queue.stop();
-		site.isStop = true;
-		if (isShutdownNow) {
-			site.counter = null;
-			site.fetcher = null;
-			site = null;
-		}
-	}
-	
 	private void initPool(){
 		if (pool == null){
 			int size = sites.size();
@@ -454,7 +440,6 @@ public class Spiderman {
 	
 	private class _Executor implements Runnable{
 		private Site site = null;
-		private ExecutorService _pool = null;
 		
 		public _Executor(Site site){
 			this.site = site;
@@ -478,40 +463,48 @@ public class Spiderman {
 			};
 			
 			if (size > 0)
-				this._pool = new ThreadPoolExecutor(size, size,
+				this.site.pool = new ThreadPoolExecutor(size, size,
 						60L, TimeUnit.SECONDS,
 	                    new LinkedBlockingQueue<Runnable>(),
 	                    rejectedHandler);
 			else
-				this._pool = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+				this.site.pool = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 	                    60L, TimeUnit.SECONDS,
 	                    new SynchronousQueue<Runnable>(),
 	                    rejectedHandler);
 		}
 		
 		public void run() {
+			if (site.isStop)
+				return ;
+			
+			// 获取种子url
+			Seeds seeds = site.getSeeds();
+			Collection<String> seedUrls = new HashSet<String>();
+			if (seeds == null || seeds.getSeed() == null || seeds.getSeed().isEmpty()) {
+				seedUrls.add(this.site.getUrl());
+			}else{
+				for (Seed s : seeds.getSeed()){
+					seedUrls.add(s.getUrl());
+				}
+			}
+			
 			// 运行种子任务
-			Task feedTask = new Task(new String(this.site.getUrl()), this.site, 10);
-			Spider feedSpider = new Spider();
-			feedSpider.init(feedTask, listener);
-			feedSpider.run();
+			for (String url : seedUrls) {
+				Task seedTask = new Task(new String(url), null, this.site, 10);
+				Spider seedSpider = new Spider();
+				seedSpider.init(seedTask, listener);
+//				this.site.pool.execute(seedSpider);
+				seedSpider.run();
+			}
 			
 			final float times = CommonUtil.toSeconds(this.site.getSchedule()) * 1000;
 			long start = System.currentTimeMillis();
 			while(true){
+				if (site.isStop)
+					break;
+				
 				try {
-					if (isStop) {
-						if (isShutdownNow) 
-							_pool.shutdownNow(); 
-						else 
-							_pool.shutdown();
-						
-						_pool = null;
-						listener.onInfo(Thread.currentThread(), null, site.getName() + ".Spider shutdown...");
-						destroySite(this.site);
-						return ;
-					}
-					
 					//扩展点：TaskPoll
 					Task task = null;
 					Collection<TaskPollPoint> taskPollPoints = site.taskPollPointImpls;
@@ -536,19 +529,29 @@ public class Spiderman {
 					
 					Spider spider = new Spider();
 					spider.init(task, listener);
-					_pool.execute(spider);
 					
+					this.site.pool.execute(spider);
 				}catch (DoneException e) {
 					listener.onInfo(Thread.currentThread(), null, e.toString());
 					return ;
 				} catch (Exception e) {
 					listener.onError(Thread.currentThread(), null, e.toString(), e);
 				}finally{
+					if (site.isStop)
+						break;
+					if (site.pool == null)
+						break;
+					
 					long cost = System.currentTimeMillis() - start;
 					if (cost >= times){ 
-						// 运行种子任务
-						feedSpider.run();
-						listener.onInfo(Thread.currentThread(), null, " shcedule FeedSpider per "+times+", now cost time ->"+cost);
+//						 运行种子任务
+						for (String url : seedUrls) {
+							Task seedTask = new Task(new String(url), null, this.site, 10);
+							Spider seedSpider = new Spider();
+							seedSpider.init(seedTask, listener);
+							seedSpider.run();
+						}
+						listener.onInfo(Thread.currentThread(), null, " shcedule FeedSpider of Site->"+site.getName()+" per "+times+", now cost time ->"+cost);
 						start = System.currentTimeMillis();//重新计时
 					}
 				}

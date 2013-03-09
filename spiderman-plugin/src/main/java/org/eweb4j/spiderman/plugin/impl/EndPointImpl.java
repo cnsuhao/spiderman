@@ -11,18 +11,12 @@ import org.eweb4j.spiderman.xml.Site;
 public class EndPointImpl implements EndPoint{
 	
 	public void init(Site site, SpiderListener listener) {
-		
 	}
 
 	public void destroy() {
 	}
 
-	public void context(Task task, List<Map<String, Object>> models) throws Exception {
-		
-	}
-	
-	public List<Map<String, Object>> complete(List<Map<String, Object>> dataMap) throws Exception {
-		
+	public List<Map<String, Object>> complete(Task task, List<Map<String, Object>> dataMap) throws Exception {
 		return dataMap;
 	}
 

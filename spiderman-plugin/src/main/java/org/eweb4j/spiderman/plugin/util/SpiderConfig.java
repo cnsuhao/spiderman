@@ -45,7 +45,7 @@ public class SpiderConfig {
 	 */
 	private int maxPagesToFetch = -1;
 
-	private String userAgentString = "spiderman (https://github.com/laiweiwei/spiderman)";
+	private String userAgentString = "Spiderman[https://github.com/laiweiwei/spiderman]";
 
 	/**
 	 * Politeness delay in milliseconds (delay between sending two requests to
@@ -66,22 +66,22 @@ public class SpiderConfig {
 	/**
 	 * Maximum Connections per host
 	 */
-	private int maxConnectionsPerHost = 100;
+	private int maxConnectionsPerHost = 9999;
 
 	/**
 	 * Maximum total connections
 	 */
-	private int maxTotalConnections = 100;
+	private int maxTotalConnections = 9999;
 
 	/**
 	 * Socket timeout in milliseconds
 	 */
-	private int socketTimeout = 20000;
+	private int socketTimeout = 60000;
 
 	/**
 	 * Connection timeout in milliseconds
 	 */
-	private int connectionTimeout = 30000;
+	private int connectionTimeout = 60000;
 
 	/**
 	 * Max number of outgoing links which are processed from a page

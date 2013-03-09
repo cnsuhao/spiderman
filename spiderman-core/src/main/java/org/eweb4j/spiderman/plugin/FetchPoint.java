@@ -6,8 +6,8 @@ import org.eweb4j.spiderman.task.Task;
 
 public interface FetchPoint extends Point{
 
-	void context(Task task) throws Exception;
+//	void context(Task task) throws Exception;
 	
-	FetchResult fetch(FetchResult result) throws Exception;
+	FetchResult fetch(Task task, FetchResult result) throws Exception;
 
 }

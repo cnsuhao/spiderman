@@ -17,6 +17,7 @@ public class SpiderListenerAdaptor implements SpiderListener{
 	public void onFetch(Thread thread, Task task, FetchResult result) {}
 	public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {}
 	public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {}
+	public void onTaskSort(Thread currentThread, Task task, Collection<Task> afterSortTasks) {}
 	public void onNewTasks(Thread thread, Task task, Collection<Task> newTasks) {}
 	public void onTargetPage(Thread thread, Task task, Page page) {}
 	public void onParse(Thread thread, Task task, List<Map<String, Object>> models) {}

@@ -1,9 +1,9 @@
 package org.eweb4j.spiderman.plugin.duplicate;
-
 import java.io.File;
 
 import org.eweb4j.spiderman.spider.Settings;
 import org.eweb4j.spiderman.spider.SpiderListener;
+import org.eweb4j.spiderman.task.TaskDbServer;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.FileUtil;
 
@@ -15,12 +15,12 @@ import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.OperationStatus;
 
-public class DocIDServer {
+public class DocIDServer implements TaskDbServer{
 	
 	private String name = null;
 	public Environment env = null;
 	public Database db = null;
-	private final Object mutex = new Object();
+//	private final Object mutex = new Object();
 	private int lastDocID = 0;
 	
 	public DocIDServer(String name, SpiderListener listener) {
@@ -64,63 +64,57 @@ public class DocIDServer {
 	 * @return the docid of the url if it is seen before. Otherwise -1 is
 	 *         returned.
 	 */
-	public int getDocId(String url) {
-		synchronized (mutex) {
-			OperationStatus result;
-			DatabaseEntry value = new DatabaseEntry();
-			try {
-				DatabaseEntry key = new DatabaseEntry(url.getBytes());
-				result = db.get(null, key, value, null);
+	public synchronized int getDocId(String url) {
+		OperationStatus result;
+		DatabaseEntry value = new DatabaseEntry();
+		try {
+			DatabaseEntry key = new DatabaseEntry(url.getBytes());
+			result = db.get(null, key, value, null);
 
-				if (result == OperationStatus.SUCCESS
-						&& value.getData().length > 0) {
-					return CommonUtil.byteArray2Int(value.getData());
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+			if (result == OperationStatus.SUCCESS
+					&& value.getData().length > 0) {
+				return CommonUtil.byteArray2Int(value.getData());
 			}
-			return -1;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return -1;
 	}
 
-	public int getNewDocID(String url) {
-		synchronized (mutex) {
-			try {
-				// Make sure that we have not already assigned a docid for this
-				// URL
-				int docid = getDocId(url);
-				if (docid > 0) {
-					return docid;
-				}
-
-				lastDocID++;
-				db.put(null, new DatabaseEntry(url.getBytes()), new DatabaseEntry(CommonUtil.int2ByteArray(lastDocID)));
-				return lastDocID;
-			} catch (Exception e) {
-				e.printStackTrace();
+	public synchronized int newDocID(String url) {
+		try {
+			// Make sure that we have not already assigned a docid for this
+			// URL
+			int docid = getDocId(url);
+			if (docid > 0) {
+				return docid;
 			}
-			return -1;
+
+			lastDocID++;
+			db.put(null, new DatabaseEntry(url.getBytes()), new DatabaseEntry(CommonUtil.int2ByteArray(lastDocID)));
+			return lastDocID;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return -1;
 	}
 
-	public void addUrlAndDocId(String url, int docId) throws Exception {
-		synchronized (mutex) {
-			if (docId <= lastDocID) {
-				throw new Exception("Requested doc id: " + docId + " is not larger than: " + lastDocID);
-			}
-			
-			// Make sure that we have not already assigned a docid for this URL
-			int prevDocid = getDocId(url);
-			if (prevDocid > 0) {
-				if (prevDocid == docId) {
-					return;
-				}
-				throw new Exception("Doc id: " + prevDocid + " is already assigned to URL: " + url);
-			}
-			
-			db.put(null, new DatabaseEntry(url.getBytes()), new DatabaseEntry(CommonUtil.int2ByteArray(docId)));
-			lastDocID = docId;
+	public synchronized void addUrlAndDocId(String url, int docId) throws Exception {
+		if (docId <= lastDocID) {
+			throw new Exception("Requested doc id: " + docId + " is not larger than: " + lastDocID);
 		}
+		
+		// Make sure that we have not already assigned a docid for this URL
+		int prevDocid = getDocId(url);
+		if (prevDocid > 0) {
+			if (prevDocid == docId) {
+				return;
+			}
+			throw new Exception("Doc id: " + prevDocid + " is already assigned to URL: " + url);
+		}
+		
+		db.put(null, new DatabaseEntry(url.getBytes()), new DatabaseEntry(CommonUtil.int2ByteArray(docId)));
+		lastDocID = docId;
 	}
 	
 	public boolean isSeenBefore(String url) {

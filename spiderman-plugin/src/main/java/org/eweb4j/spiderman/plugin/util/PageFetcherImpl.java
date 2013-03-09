@@ -21,10 +21,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
@@ -56,11 +58,13 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParamBean;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.fetcher.PageFetcher;
 import org.eweb4j.spiderman.fetcher.Status;
 import org.eweb4j.spiderman.xml.Site;
+import org.eweb4j.util.CommonUtil;
 
 /**
  * Web 页面内容获取器
@@ -75,6 +79,7 @@ public class PageFetcherImpl implements PageFetcher{
 	private long lastFetchTime = 0;
 	private SpiderConfig config;
 	private Map<String, String> headers = new Hashtable<String, String>();
+	private Site site;
 	
 	public PageFetcherImpl(){
 	}
@@ -121,14 +126,7 @@ public class PageFetcherImpl implements PageFetcher{
 	 * @param aconfig
 	 * @param cookies
 	 */
-	public void init(Site site) {
-		for (org.eweb4j.spiderman.xml.Header header : site.getHeaders().getHeader()){
-			this.addHeader(header.getName(), header.getValue());
-		}
-		for (org.eweb4j.spiderman.xml.Cookie cookie : site.getCookies().getCookie()){
-			this.addCookie(cookie.getName(), cookie.getValue(), cookie.getHost(), cookie.getPath());
-		}
-		
+	public void init(Site _site) {
 		//设置HTTP参数
 		HttpParams params = new BasicHttpParams();
 		params.setParameter(CoreProtocolPNames.USER_AGENT, config.getUserAgentString());
@@ -149,9 +147,9 @@ public class PageFetcherImpl implements PageFetcher{
 		connectionManager = new ThreadSafeClientConnManager(schemeRegistry);
 		connectionManager.setMaxTotal(config.getMaxTotalConnections());
 		connectionManager.setDefaultMaxPerRoute(config.getMaxConnectionsPerHost());
-		
 		httpClient = new DefaultHttpClient(connectionManager, params);
-		httpClient.getParams().setIntParameter("http.socket.timeout", 15000);
+		
+		httpClient.getParams().setIntParameter("http.socket.timeout", 60000);
 		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BEST_MATCH);
 
 		//设置响应拦截器
@@ -171,6 +169,20 @@ public class PageFetcherImpl implements PageFetcher{
                 }
             }
         });
+        
+		if (_site != null) {
+			this.site = _site;
+			if (this.site.getHeaders() != null && this.site.getHeaders().getHeader() != null){
+				for (org.eweb4j.spiderman.xml.Header header : this.site.getHeaders().getHeader()){
+					this.addHeader(header.getName(), header.getValue());
+				}
+			}
+			if (this.site.getCookies() != null && this.site.getCookies().getCookie() != null){
+				for (org.eweb4j.spiderman.xml.Cookie cookie : this.site.getCookies().getCookie()){
+					this.addCookie(cookie.getName(), cookie.getValue(), cookie.getHost(), cookie.getPath());
+				}
+			}
+		}
 	}
 
 	/**
@@ -179,10 +191,11 @@ public class PageFetcherImpl implements PageFetcher{
 	 * @param toFetchURL
 	 * @return
 	 */
-	public FetchResult fetch(String toFetchURL) throws Exception{
+	public FetchResult fetch(FetchRequest req) throws Exception{
 		FetchResult fetchResult = new FetchResult();
 		HttpGet get = null;
 		HttpEntity entity = null;
+		String toFetchURL = req.getUrl();
 		try {
 			get = new HttpGet(toFetchURL);
 			//设置请求GZIP压缩，注意，前面必须设置GZIP解压缩处理
@@ -204,8 +217,32 @@ public class PageFetcherImpl implements PageFetcher{
 				lastFetchTime = (new Date()).getTime();
 			}
 			
+			//记录get请求信息
+			Header[] headers = get.getAllHeaders();
+			for (Header h : headers){
+				Map<String, List<String>> hs = req.getHeaders();
+				String key = h.getName();
+				List<String> val = hs.get(key);
+				if (val == null)
+					val = new ArrayList<String>();
+				val.add(h.getValue());
+				
+				hs.put(key, val);
+			}
+			fetchResult.setReq(req);
 			//执行get访问，获取服务端返回内容
 			HttpResponse response = httpClient.execute(get);
+			headers = response.getAllHeaders();
+			for (Header h : headers){
+				Map<String, List<String>> hs = fetchResult.getHeaders();
+				String key = h.getName();
+				List<String> val = hs.get(key);
+				if (val == null)
+					val = new ArrayList<String>();
+				val.add(h.getValue());
+				
+				hs.put(key, val);
+			}
 			//设置已访问URL
 			fetchResult.setFetchedUrl(toFetchURL);
 			String uri = get.getURI().toString();
@@ -224,19 +261,31 @@ public class PageFetcherImpl implements PageFetcher{
 						fetchResult.setMovedToUrl(URLCanonicalizer.getCanonicalURL(locationHeader.getValue(), toFetchURL));
 				}
 				//只要不是OK的除了设置跳转URL外设置statusCode即可返回
+				//判断是否有忽略状态码的设置
+				if (this.site.getSkipStatusCode() != null && this.site.getSkipStatusCode().trim().length() > 0){
+					String[] scs = this.site.getSkipStatusCode().split(",");
+					for (String code : scs){
+						int c = CommonUtil.toInt(code);
+						//忽略此状态码，依然解析entity
+						if (statusCode == c){
+							assemPage(fetchResult, entity);
+							break;
+						}
+					}
+				}
 				fetchResult.setStatusCode(statusCode);
 				return fetchResult;
 			}
 
 			//处理服务端返回的实体内容
 			if (entity != null) {
-				fetchResult.setStatusCode(HttpStatus.SC_OK);
-				Page page = load(entity);
-				page.setUrl(fetchResult.getFetchedUrl());
-				fetchResult.setPage(page);
+				fetchResult.setStatusCode(statusCode);
+				assemPage(fetchResult, entity);
 				return fetchResult;
 			}
 		} catch (Throwable e) {
+			e.printStackTrace();
+			fetchResult.setFetchedUrl(e.toString());
 			fetchResult.setStatusCode(Status.INTERNAL_SERVER_ERROR.ordinal());
 			return fetchResult;
 		} finally {
@@ -250,6 +299,13 @@ public class PageFetcherImpl implements PageFetcher{
 		
 		fetchResult.setStatusCode(Status.UNSPECIFIED_ERROR.ordinal());
 		return fetchResult;
+	}
+
+	private void assemPage(FetchResult fetchResult, HttpEntity entity)
+			throws Exception {
+		Page page = load(entity);
+		page.setUrl(fetchResult.getFetchedUrl());
+		fetchResult.setPage(page);
 	}
 	
 	/**

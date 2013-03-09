@@ -1,7 +1,9 @@
 package org.eweb4j.spiderman.plugin.util;
 
 import java.io.ByteArrayInputStream;
-import java.net.URL;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,6 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -16,15 +20,19 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import net.sf.saxon.lib.NamespaceConstant;
 import net.sf.saxon.xpath.XPathFactoryImpl;
 
 import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.spiderman.xml.Field;
+import org.eweb4j.spiderman.xml.NSMap;
+import org.eweb4j.spiderman.xml.Namespaces;
 import org.eweb4j.spiderman.xml.Parsers;
 import org.eweb4j.spiderman.xml.Target;
 import org.eweb4j.util.CommonUtil;
+import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.xml.Attrs;
 import org.eweb4j.util.xml.Tags;
 import org.htmlcleaner.HtmlCleaner;
@@ -83,28 +91,49 @@ public class ModelParser extends DefaultHandler{
 	}
 	
 	public static void main(String[] args) throws Exception{
-//		File file = new File("d:\\xml.xml");
-//		String xml = FileUtil.readFile(file);
-//		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
-//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//        factory.setNamespaceAware(true); // never forget this!
-//        DocumentBuilder builder = factory.newDocumentBuilder();
-//        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-//        XPathFactory xfactory = XPathFactoryImpl.newInstance();
-//        XPath xpath = xfactory.newXPath();
-//        XPathExpression expr = xpath.compile("//node");
-//        Object result = expr.evaluate(doc, XPathConstants.NODESET);
-//        NodeList nodes = (NodeList) result;
-//        FelEngine fel = new FelEngineImpl();
-//        int count = 0;
-//        String regex = "\\w+\\.(gif|png|jpg|jpeg|bmp)";
-//        for (int i = 0; i < nodes.getLength(); i++) {
-//        	if (i > 0)
-//        		break;
-//            
-//        	NodeList subs = (NodeList)xpath.compile("Description").evaluate(nodes.item(i), XPathConstants.NODESET);
-//        	
-//        	Node node = subs.item(0);
+		File file = new File("C:/Users/vivi/Downloads/9000425.xml");
+		String xml = FileUtil.readFile(file);
+		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true); // never forget this!
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+        XPathFactory xfactory = XPathFactoryImpl.newInstance();
+        XPath xpath = xfactory.newXPath();
+        //设置命名空间
+        xpath.setNamespaceContext(new NamespaceContext() {
+            public String getPrefix(String uri) {
+                throw new UnsupportedOperationException();
+            }
+            public Iterator<?> getPrefixes(String uri) {
+                throw new UnsupportedOperationException();
+            }
+			public String getNamespaceURI(String prefix) {
+				System.out.println("prefix->"+prefix);
+				if (prefix == null) throw new NullPointerException("Null prefix");
+		        else if ("deal".equals(prefix)) return "http://www.streetdeal.sg/";
+		        return XMLConstants.NULL_NS_URI;
+			}
+		});
+        
+        XPathExpression expr = xpath.compile("//item");
+        Object result = expr.evaluate(doc, XPathConstants.NODESET);
+        NodeList nodes = (NodeList) result;
+        
+        FelEngine fel = new FelEngineImpl();
+        for (int i = 0; i < nodes.getLength(); i++) {
+        	if (i > 0)
+        		break;
+            
+        	NodeList subs = (NodeList)xpath.compile("deal:image/text()").evaluate(nodes.item(i), XPathConstants.NODESET);
+        	if (subs == null || subs.getLength() == 0)
+             	continue;
+            for (int j = 0; j < subs.getLength(); j++) {
+            	Node item = subs.item(j);
+             	String value = item.getNodeValue();
+             	System.out.println(value);
+            }
+             
 //        	FelContext ctx = fel.getContext();
 //        	ctx.set("$this", node);
 //        	Tags $Tags = Tags.me();
@@ -115,55 +144,42 @@ public class ModelParser extends DefaultHandler{
 //			System.out.println($Attrs.xml(ParserUtil.xml(node, false)).rm("style").Tags().kp("p").ok());
 //    		
 //    		System.out.println(fel.eval("$Attrs.xml($output($this)).rm('style').Tags().kp('p').ok()"));
-    		
+//    		
 //    		Object newVal =  MVEL.eval("org.eweb4j.util.CommonUtil.toXml($this, false)", ctx);
 //    		System.out.println(newVal);
-//        }
+        }
 
 //        	
-//            NodeList subs = (NodeList)xpath.compile("*[matches(text(),'"+regex+"')]/text()").evaluate(nodes.item(i), XPathConstants.NODESET);
-//            if (subs == null || subs.getLength() == 0)
-//            	continue;
-//            for (int j = 0; j < subs.getLength(); j++) {
-//            	Node item = subs.item(j);
-//            	String value = item.getNodeValue();
-//            	List<String> imgs = CommonUtil.findByRegex(value, "[^\\s'=\"]+\\.(gif|png|jpg|jpeg|bmp)(?=[\"']?)");
-//            	System.out.println(item.getParentNode().getNodeName()+"->"+imgs);
-//            	count++;
-//            }
+           
 //        }
 //        System.out.println("count->"+count);
         
 //        String html = FileUtil.readFile(new File("d:/html.html"));
 		
-		String html = "<div><p><strong>What You Get</strong></p>For $38 per pax, you get a 5D4N Beijing Guided Tour with International 5-Star Hotel Stays, Meals and 2 way Airport Transfer (worth $888).	"+
+//		String html = "<p>‘Relaxation is a state of mind’ sounded good until people tried keeping up 15-hour days and simultaneously thinking of the Maldives. Get the real deal with today’s Voucherlicious deal: $23.00 instead of $156.00 for a 60-minute Dermalogica Facial, including an Eye Paraffin Treatment, Eye Massage and Shoulder Massage at Colour Couture.</p><p> </p><p><img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C1.jpg\" /></p><p> </p><p><img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C2.jpg\" /></p><p> </p><p>Since its inception in 1986, the brand Dermalogica has quickly become the number-one choice for aestheticians worldwide. It is based around the concept of skin care as a health issue instead of a cosmetic concern. Extol the merits of Dermalogica facial treatment at Colour Couture as experienced therapists determine the best products for your skin type in a skin analysis before applying the appropriate products.</p><p> </p><p><img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C3.jpg\" /></p><p>"+	
+//"<img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C4.jpg\" /></p><p> </p><p>The eye paraffin treatment causes dark circles to diminish. This is due to the change of temperatures caused by the heating of the wax that stimulates nerve endings and improves blood circulation as well as gives a healthy glow to the delicate skin around the eyes.</p><p> </p><p><img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C5.jpg\" /></p><p> </p><p>Enjoy your hour-long treatment being concluded by a relaxing shoulder massage that will unload most tension. Providing deep relaxation to stressed shoulder muscles, shoulder massage stimulates blood flow and improves the lymph system as well as releasing endorphins! </p>                        <!-- <img src=\"img/pic01.png\" />"+	
+//"                        <img src=\"img/pic02.png\" /> -->";
+//		HtmlCleaner cleaner = new HtmlCleaner();
+//		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
+//		TagNode tagNode = cleaner.clean("<div class='myclass'>I Love <u>OSChina.net</u>nothing.<u></u></div>");
+//		Object[] nodeVals = tagNode.evaluateXPath("//div[@class='myclass']");
+//		for (Object tag : nodeVals){
+//		    TagNode _tag = (TagNode)tag;
+//		    String rs = ParserUtil.xml(_tag,false);
+//		    System.out.println(rs);
+//		}
 		
-		"<a href=\"https://static.groupon.sg/97/77/1357554037797.jpg\" target=\"_blank\">View tour itinerary</a>.	"+
-		"<p><strong>Deal Attractions</strong></p><p>Jump headfirst into the middle of the Middle Kingdom for the full experience – be filled to the gills with offerings of traditional Chinese cuisine and a bounty of sightseeing opportunities unique to the East.	"+
-			
-		"<img src=\"https://static.groupon.sg/60/36/1346664173660.jpg\" /></p>Enjoy a feast for the senses as well, with a tour around iconic attractions such as Tiananmen Square, The Forbidden City, Summer Place and the Great Wall of China. Tourists will trot through Tiananmen Square, a large city square at the center of Beijing named after the Tiananmen Gate that separates the Forbidden City with the rest of China."+ 	
-			
-		"<img src=\"https://static.groupon.sg/15/67/1312803396715.jpg\" /> 	"+
-			
-		"he Forbidden City is the historic Chinese imperial palace that housed China’s ancient dynasties: Juyongguan Great Wall, a series of stone fortifications that protected China from conquering nomadic tribes, and Olympic Village, an accommodation built for the premier athletes of the world during the 2008 Olympics."+	
-			
-		"<img src=\"https://static.groupon.sg/62/88/1340596698862.jpg\" />	"+
-		"<p>Indulge in a spot of retail therapy at Donghuamen night market and large departmental stores if conditions permit, and rest travel-weary feet in comfort at the 5-Star Xinyuan Hotel, with a coach and guide to keep from straying off the Great Wall into unfamiliar territory.</p><p><img src=\"https://static.groupon.sg/35/87/1340596698735.jpg\" />"+	
-			
-		"<img src=\"https://static.groupon.sg/30/91/1340596699130.jpg\" /></p>Before and after the guided tours, Groupon holders may walk at their own pace to visit the splendor of Beijing’s streets or ride vintage sidecars to cover more land and see more sightseeables. Eating authentic Chinese cuisine and more shopping adventures may also be done along the way."+	
-		"<h2><font color=\"#0981be\"><img src=\"https://static.groupon.sg/48/23/1340603452348.jpg\" /></font></h2><img src=\"https://static.groupon.sg/55/32/1357876073255.jpg\" /> <map name=\"grouponsg_map\"> <area shape=\"rect\" coords=\" 355, 101, 462, 148\" href=\"http://www.groupon.sg/deals/singapore-exclusive?utm_source=banner&utm_medium=cp_sgx_side&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"rect\" coords=\" 137, 92, 244, 140\" href=\"http://www.groupon.sg/deals/shopping?utm_source=banner&utm_medium=cp_goods&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"rect\" coords=\" 211, 10, 319, 59\" href=\"http://www.groupon.sg/deals/singapore?utm_source=banner&utm_medium=cp_singapore&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"rect\" coords=\" 23, 73, 129, 121\" href=\"http://www.groupon.sg/deals/deals-near-me?utm_source=banner&utm_medium=cp_nearme&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"rect\" coords=\" 3, 4, 110, 53\" href=\"http://www.groupon.sg/deals/travel-deals?utm_source=banner&utm_medium=cp_travel&utm_campaign=fbanners\" target=\"_blank\" /> <area shape=\"default\" /> </map></div>";
-
-        HtmlCleaner cleaner = new HtmlCleaner();
-		TagNode tagNode = cleaner.clean(new URL("http://research.pedaily.cn/List-c21"));
-		Object[] nodeVals = tagNode.evaluateXPath("//ul[@class='list_14_b']//li");
-		for (Object tag : nodeVals){
-			TagNode _tag = (TagNode)tag;
-			Object[] vals = _tag.evaluateXPath("a/text()");
-//			String rs = ParserUtil.xml(vals[0],false);
-			System.out.println(vals[0]);
-		}
-		
-		
+//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        factory.setNamespaceAware(true); // never forget this!
+//        DocumentBuilder builder = factory.newDocumentBuilder();
+//        Document doc = builder.parse("http://www.streetdeal.sg/deals/view/4575/0/51_percent_off_JOHOR_Premium_Outlets_Shopping_Trip_Return_Coach_by_Transtar_Travel.html?utm_source=ilovedeals&utm_medium=referral&utm_campaign=cpc");
+//        XPathFactory xfactory = XPathFactoryImpl.newInstance();
+//        XPath xpath = xfactory.newXPath();
+//        XPathExpression expr = xpath.compile("//div[@class='highlights']");
+//        Object result = expr.evaluate(doc, XPathConstants.NODESET);
+//        NodeList nodes = (NodeList) result;
+//		String rs = ParserUtil.xml(nodes.item(0), false);
+//		System.out.println(rs);
 //		//第一步：获得解析工厂的实例  
 //        SAXParserFactory spf = SAXParserFactory.newInstance();  
 //        //第二部：获得工厂解析器  
@@ -175,23 +191,18 @@ public class ModelParser extends DefaultHandler{
 	
 	public List<Map<String, Object>> parse(Page page) throws Exception{
 		listener.onInfo(Thread.currentThread(), task, "parse Page->[cType:" + page.getContentType()+",charset:"+page.getCharset()+",encoding:"+page.getEncoding()+",url->"+page.getUrl());
-		String contentType = page.getContentType();
+		String contentType = this.target.getCType();
+		if (contentType == null || contentType.trim().length() == 0)
+			contentType = page.getContentType();
 		if (contentType == null)
 			contentType = "text/html";
-		boolean isXml = contentType.contains("text/xml") || contentType.contains("application/rss+xml") || contentType.contains("application/xml");
 		
-		//解析xml
+		boolean isXml = "xml".equalsIgnoreCase(contentType) || contentType.contains("text/xml") || contentType.contains("application/rss+xml") || contentType.contains("application/xml");
+		
 		if (isXml) 
 			return parseXml(page);
-		//解析html
 		else
 			return parseHtml(page);
-		// TODO 解析 JSON
-		
-		
-//		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-//		list.add(parseHtml(page));
-//		return list;
 	}
 
 	private List<Map<String, Object>> parseXml(Page page) throws Exception{
@@ -201,6 +212,38 @@ public class ModelParser extends DefaultHandler{
         Document doc = builder.parse(new ByteArrayInputStream(page.getContentData()));
         XPathFactory xfactory = XPathFactoryImpl.newInstance();
         XPath xpathParser = xfactory.newXPath();
+        //设置命名空间
+        xpathParser.setNamespaceContext(new NamespaceContext() {
+            public String getPrefix(String uri) {
+                throw new UnsupportedOperationException();
+            }
+            public Iterator<?> getPrefixes(String uri) {
+                throw new UnsupportedOperationException();
+            }
+			public String getNamespaceURI(String prefix) {
+				if (prefix == null) 
+					throw new NullPointerException("Null prefix");
+				else {
+		        	Namespaces nss = target.getNamespaces();
+		        	if (nss != null) {
+			        	List<NSMap> nsList = nss.getNamespace();
+			        	if (nsList != null) {
+				        	for (NSMap ns : nsList){
+				        		if (prefix.equals(ns.getPrefix()))
+				        			return ns.getUri();
+				        	}
+			        	}
+		        	}
+		        }
+				
+				try {
+					return "http://www." + new URI(task.site.getUrl()).getHost();
+				} catch (URISyntaxException e) {
+					return task.site.getUrl();
+				}
+//		        return XMLConstants.NULL_NS_URI;
+			}
+		});
         
         final List<Field> fields = target.getModel().getField();
 		String isModelArray = target.getModel().getIsArray();
@@ -377,6 +420,7 @@ public class ModelParser extends DefaultHandler{
 	
 	private List<Map<String, Object>> parseHtml(Page page) throws Exception{
 		HtmlCleaner cleaner = new HtmlCleaner();
+		cleaner.getProperties().setTreatUnknownTagsAsContent(true);
 		TagNode rootNode = cleaner.clean(page.getContent());
 		
         final List<Field> fields = target.getModel().getField();

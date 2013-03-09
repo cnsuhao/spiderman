@@ -18,6 +18,8 @@ public interface SpiderListener {
     
     void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks);
     
+    public void onTaskSort(Thread currentThread, Task task, Collection<Task> afterSortTasks);
+    
 	void onNewTasks(Thread thread, Task task, Collection<Task> newTasks);
 	
 	void onTargetPage(Thread thread, Task task, Page page);

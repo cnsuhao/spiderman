@@ -78,7 +78,7 @@ public class PluginManager {
 			
 			Collection<Extension> extensions = plugin.getExtensions().getExtension();
 			if (extensions == null || extensions.isEmpty()){
-				listener.onInfo(Thread.currentThread(), null, "plugin["+plugin.getName()+"] has no extentions to load");
+				listener.onInfo(Thread.currentThread(), null, "plugin["+plugin.getName()+"] has no extensions to load");
 				continue;
 			}
 			

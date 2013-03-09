@@ -9,6 +9,8 @@ public class Rule {
 	
 	@AttrTag
 	private String value;
+	
+	private Field digUrls;
 
 	public String getType() {
 		return type;
@@ -24,6 +26,14 @@ public class Rule {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public Field getDigUrls() {
+		return this.digUrls;
+	}
+
+	public void setDigUrls(Field digUrls) {
+		this.digUrls = digUrls;
 	}
 
 	@Override

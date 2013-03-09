@@ -12,8 +12,8 @@ import org.eweb4j.spiderman.task.Task;
  */
 public interface PojoPoint extends Point{
 
-	void context(Task task, Class<?> mappingClass, List<Map<String, Object>> models);
+//	void context(Task task, Class<?> mappingClass, List<Map<String, Object>> models);
 
-	List<Object> mapping(List<Object> pojo);
+	List<Object> mapping(Task task, Class<?> mappingClass, List<Map<String, Object>> models, List<Object> pojo);
 
 }

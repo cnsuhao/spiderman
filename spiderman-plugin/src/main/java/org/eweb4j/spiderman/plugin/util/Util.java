@@ -14,8 +14,9 @@ public class Util {
 	
 	public static Target isTargetUrl(Task task) throws Exception{
 		for (Target target : task.site.getTargets().getTarget()){
-			if (UrlRuleChecker.check(task.url, target.getUrls().getRule()))
+			if (UrlRuleChecker.check(task.url, target.getUrlRules().getRule())){
 				return target;
+			}
 		}
 		
 		return null;

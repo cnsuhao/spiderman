@@ -8,8 +8,8 @@ import org.eweb4j.spiderman.task.Task;
 
 public interface DigPoint extends Point{
 
-	void context(FetchResult result, Task task) throws Exception;
+//	void context(FetchResult result, Task task) throws Exception;
 	
-	Collection<String> digNewUrls(Collection<String> urls) throws Exception;
+	Collection<String> digNewUrls(FetchResult result, Task task, Collection<String> urls) throws Exception;
 
 }

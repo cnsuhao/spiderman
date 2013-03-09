@@ -10,8 +10,8 @@ import org.eweb4j.spiderman.xml.Target;
 
 public interface ParsePoint extends Point{
 
-	void context(Task task, Target target, Page page) throws Exception;
+//	void context(Task task, Target target, Page page) throws Exception;
 	
-	List<Map<String, Object>> parse(List<Map<String, Object>> models) throws Exception;
+	List<Map<String, Object>> parse(Task task, Target target, Page page, List<Map<String, Object>> models) throws Exception;
 
 }

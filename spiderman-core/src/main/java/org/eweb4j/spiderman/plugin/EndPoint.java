@@ -8,8 +8,8 @@ import org.eweb4j.spiderman.task.Task;
 
 public interface EndPoint extends Point{
 
-	void context(Task task, List<Map<String, Object>> models) throws Exception;
+//	void context(Task task, List<Map<String, Object>> models) throws Exception;
 	
-	List<Map<String, Object>> complete(List<Map<String, Object>> models) throws Exception;
+	List<Map<String, Object>> complete(Task task, List<Map<String, Object>> models) throws Exception;
 
 }

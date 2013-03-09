@@ -24,11 +24,9 @@ public class TaskQueue {
 	
 	private Boolean isStop = false;
 	
-	public Task pollTask() throws Exception{
-		synchronized (isStop) {
-			if (isStop)
-				return null;
-		}
+	public synchronized Task pollTask() throws Exception{
+		if (isStop)
+			return null;
 		
 		return queue.poll();
 	}
@@ -39,32 +37,24 @@ public class TaskQueue {
 	 * @param task
 	 * @return
 	 */
-	public boolean pushTask(Task task){
-		synchronized (isStop) {
-			if (isStop)
-				return false;
-		}
+	public synchronized boolean pushTask(Task task){
+		if (isStop)
+			return false;
 		
-		synchronized (queue) {
-			if (task == null)
-				return false;
-			
-			if (null == task.url || task.url.trim().length() == 0)
-				return false;
-			
-			//检查是否匹配xml配置的url规则
-			if (!UrlRuleChecker.check(task.url, task.site.getQueueRules().getRule()))
-				return false;
-			return queue.add(task);
-		}
+		if (task == null)
+			return false;
+		
+		if (null == task.url || task.url.trim().length() == 0)
+			return false;
+		
+		//检查是否匹配xml配置的url规则
+		if (!UrlRuleChecker.check(task.url, task.site.getQueueRules().getRule()))
+			return false;
+		return queue.add(task);
 	}
 	
-	public void stop(){
-		synchronized (isStop) {
-			isStop = true;
-		}
-		synchronized (queue) {
-			this.queue.clear();
-		}
+	public synchronized void stop(){
+		this.queue.clear();
+		isStop = true;
 	}
 }

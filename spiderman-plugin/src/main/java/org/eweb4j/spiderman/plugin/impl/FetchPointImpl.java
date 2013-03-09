@@ -1,14 +1,18 @@
 package org.eweb4j.spiderman.plugin.impl;
 
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+
+import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.plugin.FetchPoint;
+import org.eweb4j.spiderman.plugin.util.PageFetcherImpl;
+import org.eweb4j.spiderman.plugin.util.SpiderConfig;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.util.CommonUtil;
-
-import org.eweb4j.spiderman.plugin.util.PageFetcherImpl;
-import org.eweb4j.spiderman.plugin.util.SpiderConfig;
 
 /**
  * 一个Host一个FetchPointImpl对象
@@ -18,26 +22,73 @@ import org.eweb4j.spiderman.plugin.util.SpiderConfig;
 public class FetchPointImpl implements FetchPoint{
 
 	private SpiderListener listener = null;
-	private Task task = null;
+	private Site site = null;
 	
 	public void init(Site site, SpiderListener listener) {
+		this.site = site;
 		this.listener = listener;
 	}
 
 	public void destroy() {
 	}
-
 	
-	public void context(Task task) throws Exception {
-		this.task = task;
+	public static void main(String[] args){
+		PageFetcherImpl fetcher = new PageFetcherImpl();
+		SpiderConfig config = new SpiderConfig();
+		config.setCharset("utf-8");
+		config.setPolitenessDelay(200);
+		fetcher.setConfig(config);
+		fetcher.init(null);
+		try {
+			String hostUrl = "http://alldeals.groupon.sg";
+			String url = "http://www.groupon.sg/deals/deals-near-me/sole-relax/716817728?utm_campaign=alldeals&utm_medium=cp_3303884&utm_source=mashup";
+			List<String> validHosts = Arrays.asList("www.groupon.sg", "alldeals.groupon.sg");
+			String taskHost = new URL(url).getHost();
+			System.out.println(validHosts.contains(taskHost));
+			
+			URL siteURL = new URL(hostUrl);
+			URL currURL = new URL(url);
+			String siteHost = siteURL.getHost();
+			System.out.println("site.host->"+siteURL.getHost());
+			String currHost = currURL.getHost();
+			System.out.println("curr.host->"+currHost);
+			System.out.println(currHost.endsWith(siteHost));
+			System.out.println(CommonUtil.isSameHost(hostUrl, url));
+//			FetchRequest req = new FetchRequest();
+//			req.setUrl("http://alldeals.groupon.sg");
+//			FetchResult rs = fetcher.fetch(req);
+//			System.out.println(rs);
+//			Collection<String> urls = Util.findAllLinkHref(rs.getPage().getContent(), "http://alldeals.groupon.sg");
+//			for (String u : urls){
+//				if (!u.startsWith("http://www.groupon.sg/deals/"))
+//					continue;
+//				
+//				System.out.println(u);
+//				req.setUrl(u);
+//				rs = fetcher.fetch(req);
+//				System.out.println(rs);
+//			}
+//			System.out.println(rs.getPage().getContent());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+//		String json = "{\"id\":12,\"name\":\"weiwei\"}";
+//		Map<String, Object> map = CommonUtil.parse(json, Map.class);
+//		System.out.println(map);
 	}
 	
-	public FetchResult fetch(FetchResult result) throws Exception {
-		synchronized (this.task.site) {
-			if (this.task.site.fetcher == null){
+	public FetchResult fetch(Task task, FetchResult result) throws Exception {
+		synchronized (site) {
+			if (site.fetcher == null){
 				PageFetcherImpl fetcher = new PageFetcherImpl();
 				SpiderConfig config = new SpiderConfig();
-				config.setCharset(task.site.getCharset());
+				if (task.site.getCharset() != null && task.site.getCharset().trim().length() > 0)
+					config.setCharset(task.site.getCharset());
+				if (task.site.getUserAgent() != null && task.site.getUserAgent().trim().length() > 0)
+					config.setUserAgentString(task.site.getUserAgent());
+				if ("1".equals(task.site.getIncludeHttps()) || "true".equals(task.site.getIncludeHttps()))
+					config.setIncludeHttpsPages(true);
+				
 				String sdelay = task.site.getReqDelay();
 				if (sdelay == null || sdelay.trim().length() == 0)
 					sdelay = "200";
@@ -49,10 +100,16 @@ public class FetchPointImpl implements FetchPoint{
 				config.setPolitenessDelay(delay);
 				fetcher.setConfig(config);
 				
-				fetcher.init(this.task.site);
-				this.task.site.fetcher = fetcher;
+				fetcher.init(site);
+				site.fetcher = fetcher;
 			}
-			FetchResult fr = this.task.site.fetcher.fetch(task.url.replace(" ", "%20"));
+			
+			String url = task.url.replace(" ", "%20");
+			
+			FetchRequest req = new FetchRequest();
+			req.setUrl(url);
+			
+			FetchResult fr = site.fetcher.fetch(req);
 			return fr;
 		}
 //		return fetch();
