@@ -30,8 +30,8 @@ public class TestSpider {
 		
 		SpiderListener listener = new SpiderListenerAdaptor(){
 			public void onFetch(Thread thread, Task task, FetchResult result) {
-//				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [FETCH] ~ ");
-//				System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
+				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [FETCH] ~ ");
+				System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
 			}
 			public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {
 //				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DIG] ~ ");
@@ -60,8 +60,8 @@ public class TestSpider {
 //				System.out.println(page.getUrl());
 			}
 			public void onInfo(Thread thread, Task task, String info) {
-//				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
-//				System.out.println(info);
+				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
+				System.out.println(info);
 			}
 			
 			public void onError(Thread thread, Task task, String err, Exception e) {
