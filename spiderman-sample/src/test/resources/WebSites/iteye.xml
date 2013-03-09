@@ -20,7 +20,7 @@
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	-->
-	<site name="iteye" includeHttps="1" url="http://www.iteye.com/news" reqDelay="1s" enable="0" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+	<site name="iteye" url="http://www.iteye.com/news" reqDelay="1s" enable="0" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | url:种子链接
