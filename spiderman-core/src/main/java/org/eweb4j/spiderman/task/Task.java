@@ -15,7 +15,7 @@ public class Task {
 	}
 
 	public Site site ;
-	public int sort = 10;
+	public double sort = 10;
 	public String url;
 	public String sourceUrl;//task.url的来源
 	

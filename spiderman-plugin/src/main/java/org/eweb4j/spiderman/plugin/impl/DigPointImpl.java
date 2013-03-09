@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -44,11 +43,6 @@ public class DigPointImpl implements DigPoint{
 	public void destroy() {
 	}
 
-//	public void context(FetchResult result, Task task) throws Exception {
-//		this.result = result;
-//		this.task = task;
-//	}
-	
 	public Collection<String> digNewUrls(FetchResult result, Task task, Collection<String> urls) throws Exception {
 		return this.digNewUrls(result, task);
 	}
@@ -57,7 +51,7 @@ public class DigPointImpl implements DigPoint{
 		if (result == null)
 			return null;
 		
-		Collection<String> urls = new HashSet<String>();
+		Collection<String> urls = new ArrayList<String>();
 		String moveUrl = result.getMovedToUrl();
 		if (moveUrl != null){
 			if (!moveUrl.equals(task.url))
@@ -70,8 +64,8 @@ public class DigPointImpl implements DigPoint{
 			for (Rule r : rules.getRule()){
 				//判断是否定义了digUrls
 				boolean isDigUrls = false;
-				Field digUrlField = r.getDigUrls();
-				if (digUrlField != null && digUrlField.getParsers() != null && !digUrlField.getParsers().getParser().isEmpty())
+				Model digModel = r.getDigUrls();
+				if (digModel != null && digModel.getField() != null && !digModel.getField().isEmpty())
 					isDigUrls = true;
 				
 				if (isDigUrls) {
@@ -80,29 +74,25 @@ public class DigPointImpl implements DigPoint{
 					if (isSourceUrl){
 						// 按照digUrlPaser的配置对页面进行解析得到URL
 						Target digTarget = new Target();
-						Model digModel = new Model();
-						digUrlField.setName("url");
-						digModel.setField(Arrays.asList(digUrlField));
 						digTarget.setModel(digModel);
 						digTarget.setNamespaces(site.getTargets().getTarget().get(0).getNamespaces());
 						ModelParser parser = new ModelParser(task, digTarget, listener);
 						Page sourcePage = result.getPage();
 						List<Map<String, Object>> models = parser.parse(sourcePage);
 						for (Field f : digTarget.getModel().getField()){
-							if ("url".equals(f.getName())){
-								for (Map<String, Object> model : models){
-									Object val = model.get("url");
-									//如果url是数组
-									if ("1".equals(f.getIsArray()) || "true".equals(f.getIsArray())){
-//										listener.onInfo(Thread.currentThread(), task, "dig new urls->"+(List<String>)val);
-										urls.addAll((List<String>)val);
-									}else{
-//										listener.onInfo(Thread.currentThread(), task, "dig new urls->"+val);
-										urls.add(String.valueOf(val));
-									}
+							for (Map<String, Object> model : models){
+								Object val = model.get(f.getName());
+								if (val == null)
+									continue;
+								//如果url是数组
+								if ("1".equals(f.getIsArray()) || "true".equals(f.getIsArray())){
+//									listener.onInfo(Thread.currentThread(), task, "dig new urls->"+(List<String>)val);
+									urls.addAll((List<String>)val);
+//									System.out.println(f.getName() + "\n\t"+(List<String>)val);
+								}else{
+//									listener.onInfo(Thread.currentThread(), task, "dig new urls->"+val);
+									urls.add(String.valueOf(val));
 								}
-								
-								break;
 							}
 						}
 					}
@@ -127,13 +117,27 @@ public class DigPointImpl implements DigPoint{
 		List<String> newUrls = new ArrayList<String>(urls.size());
 		for (String url : urls) {
 			LinkNormalizer ln = new DefaultLinkNormalizer(hostUrl);
-			String newUrl = URLCanonicalizer.getCanonicalURL(ln.normalize(url));
+			String newUrl = ln.normalize(url);
+//			String newUrl = URLCanonicalizer.getCanonicalURL(ln.normalize(url));
 			if (newUrl.startsWith("mailto:"))
 				continue;
+			//去重复
+			if (newUrls.contains(newUrl))
+				continue;
+			
 			newUrls.add(newUrl);
 		}
 		
 		return newUrls;
 	}
 	
+	public static void main(String[] args){
+		String s = "../../question?catalog=1&show=&p=1";
+		System.out.println(s.startsWith("http://www.oschina.net/question?catalog=1&show=&p="));
+		LinkNormalizer ln = new DefaultLinkNormalizer("http://www.oschina.net");
+		String ts = ln.normalize(s);
+		System.out.println(ts);
+		String newUrl = URLCanonicalizer.getCanonicalURL(ts);
+		System.out.println(newUrl);
+	}
 }

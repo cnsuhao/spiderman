@@ -20,7 +20,7 @@
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	-->
-	<site name="oschina" includeHttps="1" url="http://www.oschina.net/question" reqDelay="1s" enable="0" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+	<site name="oschina" includeHttps="1" url="http://www.oschina.net/question?catalog=1&amp;show=&amp;p=1" reqDelay="1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | url:种子链接
@@ -68,20 +68,26 @@
 				<!--
 				  | 限制目标URL的来源
 				-->
-				<!--
 				<sourceRules policy="and">
-					<rule type="equal" value="">-->
+					<rule type="regex" value="http://www\.oschina\.net/question\?catalog=1&amp;show=&amp;p=\d+">
 						<!--
 						  | 定义如何在来源页面上挖掘新的 URL
 						-->
-						<!--
-						<digUrls isArray="1">
-							<parsers>
-								<parser xpath="" attribute="" exp="" regex="" />
-							</parsers>
-						</digUrls>-->
-					<!--</rule>
-				</sourceRules>-->
+						<digUrls>
+							<field name="page_url" isArray="1">
+								<parsers>
+									<parser xpath="//div[@class='QuestionList']//ul[@class='pager']//li[@class='page']//a[@href]" attribute="href" />
+									<parser exp="'http://www.oschina.net/question'+$this" />
+								</parsers>
+							</field>
+							<field name="target_url" isArray="1"> 
+								<parsers>
+									<parser xpath="//div[@class='QuestionList']//ul//li[@class='question']//div[@class='qbody']/h2[1]//a[@href]" attribute="href" />
+								</parsers>
+							</field>
+						</digUrls>
+					</rule>
+				</sourceRules>
 				<!--
 				  | 目标URL的规则
 				-->
@@ -123,8 +129,14 @@
 					</field>
 					<field name="content">
 						<parsers>
-							<parser xpath="//div[@class='Content']//div[@class='detail']" 
-									exp="$Tags.xml($output($this)).rm('div').Attrs().rm('style').ok()" />
+							<parser xpath="//div[@class='Content']//div[@class='detail']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
 						</parsers>
 					</field>
 					<field name="author">
@@ -139,14 +151,7 @@
 					</field>
 					<field name="answers" isArray="1">
 						<parsers>
-							<parser xpath="//li[@class='Answer']//div[@class='detail']" exp="$output($this)" />
-							<!--attribute 黑名单-->
-							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
-							<!--tag 黑名单，去掉内嵌内容-->
-							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
-							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
-							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
-							<!--其他-->
+							<parser xpath="//li[@class='Answer']//div[@class='detail']/text()" />
 						</parsers>
 					</field>
 				</model>

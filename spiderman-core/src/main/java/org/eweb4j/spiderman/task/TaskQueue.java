@@ -15,10 +15,10 @@ public class TaskQueue {
 	public void init(){
 	}
 	
-	private PriorityBlockingQueue<Task> queue = new PriorityBlockingQueue<Task>(500, new Comparator<Task>(){
+	private PriorityBlockingQueue<Task> queue = new PriorityBlockingQueue<Task>(5000, new Comparator<Task>(){
 		public int compare(Task t1, Task t2) {
 			if (t1.sort == t2.sort) return 0;
-			return t1.sort < t2.sort ? 1 : -1;
+			return t1.sort > t2.sort ? 1 : -1;
 		}
 	});
 	

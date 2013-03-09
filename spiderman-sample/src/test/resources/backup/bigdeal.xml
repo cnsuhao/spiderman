@@ -69,10 +69,12 @@
 				-->
 				<sourceRules policy="and">
 					<rule type="equal" value="http://plus.bigdeal.sg/feed.php?ename=sg">
-						<digUrls isArray="1">
-							<parsers>
-								<parser xpath="//link/text()" />
-							</parsers>
+						<digUrls>
+							<field name="target_url" isArray="1">
+								<parsers>
+									<parser xpath="//link/text()" />
+								</parsers>
+							</field>
 						</digUrls>
 					</rule>
 				</sourceRules>

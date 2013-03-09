@@ -30,12 +30,12 @@ public class TestSpider {
 		
 		SpiderListener listener = new SpiderListenerAdaptor(){
 			public void onFetch(Thread thread, Task task, FetchResult result) {
-				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [FETCH] ~ ");
-				System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
+//				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [FETCH] ~ ");
+//				System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
 			}
 			public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {
-				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DIG] ~ ");
-				System.out.println(newUrls);
+//				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DIG] ~ ");
+//				System.out.println(newUrls);
 			}
 			public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {
 //				for (Task t : validTasks){
@@ -52,7 +52,7 @@ public class TestSpider {
 			public void onNewTasks(Thread thread, Task task, Collection<Task> newTasks) {
 //				for (Task t : newTasks){
 //					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [NEWTASK] ~ ");
-//					System.out.println(t.url+" from->"+t.sourceUrl);
+//					System.out.println(t.sort + ",,,," + t.url+" from->"+t.sourceUrl);
 //				}
 			}
 			public void onTargetPage(Thread thread, Task task, Page page) {
@@ -60,8 +60,8 @@ public class TestSpider {
 //				System.out.println(page.getUrl());
 			}
 			public void onInfo(Thread thread, Task task, String info) {
-				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
-				System.out.println(info);
+//				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
+//				System.out.println(info);
 			}
 			
 			public void onError(Thread thread, Task task, String err, Exception e) {

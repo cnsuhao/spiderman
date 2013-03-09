@@ -10,7 +10,7 @@ public class Rule {
 	@AttrTag
 	private String value;
 	
-	private Field digUrls;
+	private Model digUrls;
 
 	public String getType() {
 		return type;
@@ -28,11 +28,11 @@ public class Rule {
 		this.value = value;
 	}
 
-	public Field getDigUrls() {
+	public Model getDigUrls() {
 		return this.digUrls;
 	}
 
-	public void setDigUrls(Field digUrls) {
+	public void setDigUrls(Model digUrls) {
 		this.digUrls = digUrls;
 	}
 

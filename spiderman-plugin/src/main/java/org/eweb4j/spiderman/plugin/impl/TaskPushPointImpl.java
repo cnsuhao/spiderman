@@ -80,7 +80,7 @@ public class TaskPushPointImpl implements TaskPushPoint{
 					if (isOk)
 						newTasks.add(task);
 					
-//					listener.onInfo(Thread.currentThread(), task, "task->"+task+" push the queue ... result -> " + isOk);
+//					System.out.println("push task->"+task+" push the queue ... result -> " + isOk);
 				}
 			}catch(Exception e){
 				continue;
