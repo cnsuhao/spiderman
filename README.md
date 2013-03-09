@@ -114,7 +114,7 @@ Spiderman Sample | 案例
     #http连接超时，支持单位 s秒 m分 h时 d天，不写单位则表示s秒
     http.fetch.timeout=5s
 
-然后在#{ClassPath}/WebSites目录下有一份oschina-sample.xml
+然后在#{ClassPath}/WebSites目录下有一份oschina.xml
 
     <?xml version="1.0" encoding="UTF-8"?>
     <!--
@@ -127,6 +127,9 @@ Spiderman Sample | 案例
         <!--
     	  | name:名称
     	  | url:种子链接
+	  | skipStatusCode:设置哪些状态码需要忽略，多个用逗号隔开
+	  | userAgent:设置爬虫标识
+	  | includeHttps:是否抓取https页
     	  | reqDelay:{n}s|{n}m|{n}h|n每次请求之前延缓时间
     	  | enable:0|1是否开启本网站的抓取
     	  | charset:网站字符集
@@ -136,6 +139,20 @@ Spiderman Sample | 案例
     	-->
     	<site name="oschina" url="http://www.oschina.net/question" reqDelay="1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
     		<!--
+		  | 配置多个种子链接
+		  | url:种子链接
+		-->
+		<!--seeds>
+			<seed url="" />
+		</seeds-->
+		<!--
+		  | 告诉爬虫仅抓取以下这些host的链接，多数是应对二级或多级域名的情况
+		-->
+		<!--validHosts>
+			<validHost value="demo.eweb4j.org" />
+			<validHost value="wwww.eweb4j.org" />
+		</validHosts-->
+		<!--
     		  | HTTP Header
     		<headers>
     			<header name="" value="" />
@@ -167,14 +184,28 @@ Spiderman Sample | 案例
     			-->
     			<target name="deal" isArray="" >
     				<!--
-    				  | 目标URL匹配规则
-    				-->
-    				<urls policy="and">
-    					<!--
-    					  | 同前面的队列规则
-    					-->
-    					<rule type="regex" value="http://www\.oschina\.net/question/\d+_\d+" />
-    				</urls>
+				  | 限制目标URL的来源
+				-->
+				<!--
+				<sourceRules policy="and">
+					<rule type="equal" value="">-->
+						<!--
+						  | 定义如何在来源页面上挖掘新的 URL
+						-->
+						<!--
+						<digUrls isArray="1">
+							<parsers>
+								<parser xpath="" attribute="" exp="" regex="" />
+							</parsers>
+						</digUrls>-->
+					<!--</rule>
+				</sourceRules>-->
+				<!--
+				  | 目标URL的规则
+				-->
+				<urlRules policy="and">
+					<rule type="regex" value="http://www\.oschina\.net/question/\d+_\d+" />
+				</urlRules>
     				<!--
     				  | 目标网页的数据模型
 				  | isArray: 1|0 是否是多个model
