@@ -34,8 +34,8 @@ public class TestSpider {
 				System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
 			}
 			public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {
-//				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DIG] ~ ");
-//				System.out.println(newUrls);
+				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DIG] ~ ");
+				System.out.println(newUrls);
 			}
 			public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {
 //				for (Task t : validTasks){
@@ -131,7 +131,7 @@ public class TestSpider {
 		Spiderman.me()
 			.init(listener)//初始化
 			.startup()//启动
-			.keepStrict("20m");//存活时间，过了存活时间后马上关闭
+			.keepStrict("1h");//存活时间，过了存活时间后马上关闭
 		
 		//启动爬虫 + 调度定时重启
 //		Spiderman.me()

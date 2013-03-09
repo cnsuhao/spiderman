@@ -20,7 +20,7 @@
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	-->
-	<site name="iteye" url="http://www.iteye.com/news" reqDelay="1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+	<site name="iteye" url="http://www.iteye.com/news" reqDelay="10s" enable="1" charset="utf-8" schedule="1h" thread="1" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | url:种子链接
@@ -75,6 +75,12 @@
 						  | 定义如何在来源页面上挖掘新的 URL
 						-->
 						<digUrls>
+							<field name="source_url" isArray="1">
+								<parsers>
+									<parser xpath="//div[@class='pagination']//a[@href]" attribute="href"/>
+									<parser exp="'http://www.iteye.com'+$this" />
+								</parsers>
+							</field>
 							<field name="target_url" isArray="1">
 								<parsers>
 									<parser xpath="//div[@class='news clearfix']//h3//a[last()]" attribute="href"/>
