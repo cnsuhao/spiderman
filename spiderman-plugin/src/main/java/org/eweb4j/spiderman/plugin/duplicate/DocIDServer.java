@@ -71,8 +71,7 @@ public class DocIDServer implements TaskDbServer{
 			DatabaseEntry key = new DatabaseEntry(url.getBytes());
 			result = db.get(null, key, value, null);
 
-			if (result == OperationStatus.SUCCESS
-					&& value.getData().length > 0) {
+			if (result == OperationStatus.SUCCESS && value.getData().length > 0) {
 				return CommonUtil.byteArray2Int(value.getData());
 			}
 		} catch (Exception e) {
