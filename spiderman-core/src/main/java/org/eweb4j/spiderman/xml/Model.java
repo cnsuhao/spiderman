@@ -50,4 +50,36 @@ public class Model {
 		this.xpath = xpath;
 	}
 	
+	public boolean isArrayField(String fieldName){
+		for (Field f : this.field){
+			if (!fieldName.equals(f.getName()))
+				continue;
+			if ("1".equals(f.getIsArray()))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean isAlsoParseInNextPageField(String fieldName){
+		for (Field f : this.field){
+			if (!fieldName.equals(f.getName()))
+				continue;
+			if ("1".equals(f.getIsAlsoParseInNextPage()))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public List<Field> getIsAlsoParseInNextPageFields(){
+		List<Field> fields = new ArrayList<Field>();
+		for (Field f : this.field){
+			if (!"1".equals(f.getIsAlsoParseInNextPage()))
+				continue;
+			fields.add(f);
+		}
+		
+		return fields;
+	}
 }

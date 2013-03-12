@@ -2,6 +2,7 @@ package org.eweb4j.spiderman.plugin.impl;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,8 +18,8 @@ import org.eweb4j.spiderman.plugin.util.UrlUtils;
 import org.eweb4j.spiderman.plugin.util.Util;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.Task;
+import org.eweb4j.spiderman.url.UrlRuleChecker;
 import org.eweb4j.spiderman.xml.Model;
-import org.eweb4j.spiderman.xml.Namespaces;
 import org.eweb4j.spiderman.xml.Rule;
 import org.eweb4j.spiderman.xml.Rules;
 import org.eweb4j.spiderman.xml.Site;
@@ -58,12 +59,24 @@ public class DigPointImpl implements DigPoint{
 		Rules rules = target.getSourceRules();
 		if (rules != null && rules.getRule() != null && !rules.getRule().isEmpty()){
 			for (Rule r : rules.getRule()){
+				boolean isSourceUrl = UrlRuleChecker.check(task.url, Arrays.asList(r));
+				//判断当前url是否是sourceUrl
+				if (!isSourceUrl)
+					continue;
+				
 				//判断是否定义了digUrls
 				Model mdl = r.getDigUrls();
-				SpiderListener lst = listener;
-				Namespaces ns = site.getTargets().getTarget().get(0).getNamespaces();
+				Target tgt = new Target();
+				tgt.setCType(target.getCType());
+				tgt.setIsForceUseXmlParser(target.getIsForceUseXmlParser());
+				tgt.setName(target.getName());
+				tgt.setNamespaces(target.getNamespaces());
+				tgt.setModel(mdl);
+				Collection<String> newUrls = UrlUtils.digUrls(result.getPage(), task, r, tgt, listener);
+//				System.out.println("newUrls->"+newUrls);
+//				System.out.println("from->"+task.url);
 				//解析Model获得urls
-				urls.addAll(UrlUtils.digUrls(result, task, r, mdl, lst, ns));
+				urls.addAll(newUrls);
 			}
 			
 		}

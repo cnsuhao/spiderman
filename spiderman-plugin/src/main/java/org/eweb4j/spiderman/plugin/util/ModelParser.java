@@ -81,6 +81,7 @@ public class ModelParser extends DefaultHandler{
     	fel.getContext().set("$Tags", $Tags);
     	fel.getContext().set("$Attrs", $Attrs);
     	fel.getContext().set("$Util", CommonUtil.class);
+    	fel.getContext().set("$ParserUtil", ParserUtil.class);
 		fel.getContext().set("$target", this.target);
 		fel.getContext().set("$listener", this.listener);
 		fel.getContext().set("$task_url", this.task.url);
@@ -88,108 +89,6 @@ public class ModelParser extends DefaultHandler{
 	
 	public ModelParser(Task task, Target target, SpiderListener listener) {
 		init(task, target, listener);
-	}
-	
-	public static void main(String[] args) throws Exception{
-//		File file = new File("C:/Users/vivi/Downloads/9000425.xml");
-//		String xml = FileUtil.readFile(file);
-//		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
-//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//        factory.setNamespaceAware(true); // never forget this!
-//        DocumentBuilder builder = factory.newDocumentBuilder();
-//        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-//        XPathFactory xfactory = XPathFactoryImpl.newInstance();
-//        XPath xpath = xfactory.newXPath();
-//        XPathExpression expr = xpath.compile("//item");
-//        Object result = expr.evaluate(doc, XPathConstants.NODESET);
-//        NodeList nodes = (NodeList) result;
-//        
-//        FelEngine fel = new FelEngineImpl();
-//        for (int i = 0; i < nodes.getLength(); i++) {
-//        	if (i > 0)
-//        		break;
-//            
-//        	NodeList subs = (NodeList)xpath.compile("deal:image/text()").evaluate(nodes.item(i), XPathConstants.NODESET);
-//        	if (subs == null || subs.getLength() == 0)
-//             	continue;
-//            for (int j = 0; j < subs.getLength(); j++) {
-//            	Node item = subs.item(j);
-//             	String value = item.getNodeValue();
-//             	System.out.println(value);
-//            }
-             
-//        	FelContext ctx = fel.getContext();
-//        	ctx.set("$this", node);
-//        	Tags $Tags = Tags.me();
-//        	Attrs $Attrs = Attrs.me();
-//			ctx.set("$Tags", $Tags);
-//			ctx.set("$Attrs", $Attrs);
-//    		
-//			System.out.println($Attrs.xml(ParserUtil.xml(node, false)).rm("style").Tags().kp("p").ok());
-//    		
-//    		System.out.println(fel.eval("$Attrs.xml($output($this)).rm('style').Tags().kp('p').ok()"));
-//    		
-//    		Object newVal =  MVEL.eval("org.eweb4j.util.CommonUtil.toXml($this, false)", ctx);
-//    		System.out.println(newVal);
-//        }
-
-//        	
-           
-//        }
-//        System.out.println("count->"+count);
-        
-        String html = FileUtil.readFile(new File("d:/testtest.htm"));
-		HtmlCleaner cleaner = new HtmlCleaner();
-		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
-		TagNode tagNode = cleaner.clean(new URL("http://www.bestbargain.com.sg/team.php?id=430"));
-		String xml = ParserUtil.xml(tagNode,true);
-//		System.out.println(xml);
-//		Object[] nodes = tagNode.evaluateXPath("//div[@id='topic_tags']/following-sibling::*");
-//		for (Object n : nodes){
-//			System.out.println(ParserUtil.xml(n, false));
-//		}
-		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(false); // never forget this!
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-        XPathFactory xfactory = XPathFactoryImpl.newInstance();
-        XPath xpath = xfactory.newXPath();
-        XPathExpression expr = xpath.compile("//div[@class='blk cf']//p[@class='p0']/text()");
-        Object result = expr.evaluate(doc);
-        System.out.println(result);
-        NodeList nodes = (NodeList) result;
-        for (int i = 0; i < nodes.getLength(); i++) {
-        	Node item = nodes.item(i);
-        	System.out.println(item);
-//         	System.out.println(ParserUtil.xml(item, false));
-        }
-        
-//		Object[] nodeVals = tagNode.evaluateXPath("*");
-//		for (Object tag : nodeVals){
-//		    TagNode _tag = (TagNode)tag;
-//		    String rs = ParserUtil.xml(_tag,true);
-//		    System.out.println(rs);
-//		}
-//		
-//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//        factory.setNamespaceAware(true); // never forget this!
-//        DocumentBuilder builder = factory.newDocumentBuilder();
-//        Document doc = builder.parse("http://www.streetdeal.sg/deals/view/4575/0/51_percent_off_JOHOR_Premium_Outlets_Shopping_Trip_Return_Coach_by_Transtar_Travel.html?utm_source=ilovedeals&utm_medium=referral&utm_campaign=cpc");
-//        XPathFactory xfactory = XPathFactoryImpl.newInstance();
-//        XPath xpath = xfactory.newXPath();
-//        XPathExpression expr = xpath.compile("//div[@class='highlights']");
-//        Object result = expr.evaluate(doc, XPathConstants.NODESET);
-//        NodeList nodes = (NodeList) result;
-//		String rs = ParserUtil.xml(nodes.item(0), false);
-//		System.out.println(rs);
-//		//第一步：获得解析工厂的实例  
-//        SAXParserFactory spf = SAXParserFactory.newInstance();  
-//        //第二部：获得工厂解析器  
-//        SAXParser sp = spf.newSAXParser();  
-//        //第三部：对xml进行解析  
-//        sp.parse(file, new ModelParser());
-        
 	}
 	
 	public List<Map<String, Object>> parse(Page page) throws Exception{
@@ -218,7 +117,8 @@ public class ModelParser extends DefaultHandler{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(!isFromHtml); // never forget this!
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(page.getContent().getBytes()));
+        String validXml = ParserUtil.checkUnicodeString(page.getContent());
+    	Document doc = builder.parse(new ByteArrayInputStream(validXml.getBytes()));
         XPathFactory xfactory = XPathFactoryImpl.newInstance();
         XPath xpathParser = xfactory.newXPath();
         //设置命名空间
@@ -622,8 +522,12 @@ public class ModelParser extends DefaultHandler{
 		if (list == null || list.isEmpty()){
 			try {
 	    		Object newVal = fel.eval(exp);
-				if (newVal != null)
-					newValue.add(newVal);
+				if (newVal != null) {
+					if (newVal instanceof Collection)
+						newValue.addAll((Collection<?>)newVal);
+					else
+						newValue.add(newVal);
+				}
 			} catch (Exception e){
 //				listener.onError(Thread.currentThread(), task, "exp->"+exp+" eval failed", e);
 			}
@@ -639,8 +543,12 @@ public class ModelParser extends DefaultHandler{
 				}
 				try {
 		    		Object newVal = fel.eval(exp);
-					if (newVal != null)
-						newValue.add(newVal);
+					if (newVal != null) {
+						if (newVal instanceof Collection)
+							newValue.addAll((Collection<?>)newVal);
+						else
+							newValue.add(newVal);
+					}
 				} catch (Exception e){
 					if (!isValBlank)
 						listener.onError(Thread.currentThread(), task, "exp->"+exp+" eval failed", e);
@@ -695,4 +603,108 @@ public class ModelParser extends DefaultHandler{
 			list.addAll(newVals);
 		}
 	}
+
+	public static void main(String[] args) throws Exception{
+//		File file = new File("C:/Users/vivi/Downloads/9000425.xml");
+//		String xml = FileUtil.readFile(file);
+//		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
+//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        factory.setNamespaceAware(true); // never forget this!
+//        DocumentBuilder builder = factory.newDocumentBuilder();
+//        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+//        XPathFactory xfactory = XPathFactoryImpl.newInstance();
+//        XPath xpath = xfactory.newXPath();
+//        XPathExpression expr = xpath.compile("//item");
+//        Object result = expr.evaluate(doc, XPathConstants.NODESET);
+//        NodeList nodes = (NodeList) result;
+//        
+//        FelEngine fel = new FelEngineImpl();
+//        for (int i = 0; i < nodes.getLength(); i++) {
+//        	if (i > 0)
+//        		break;
+//            
+//        	NodeList subs = (NodeList)xpath.compile("deal:image/text()").evaluate(nodes.item(i), XPathConstants.NODESET);
+//        	if (subs == null || subs.getLength() == 0)
+//             	continue;
+//            for (int j = 0; j < subs.getLength(); j++) {
+//            	Node item = subs.item(j);
+//             	String value = item.getNodeValue();
+//             	System.out.println(value);
+//            }
+             
+//        	FelContext ctx = fel.getContext();
+//        	ctx.set("$this", node);
+//        	Tags $Tags = Tags.me();
+//        	Attrs $Attrs = Attrs.me();
+//			ctx.set("$Tags", $Tags);
+//			ctx.set("$Attrs", $Attrs);
+//    		
+//			System.out.println($Attrs.xml(ParserUtil.xml(node, false)).rm("style").Tags().kp("p").ok());
+//    		
+//    		System.out.println(fel.eval("$Attrs.xml($output($this)).rm('style').Tags().kp('p').ok()"));
+//    		
+//    		Object newVal =  MVEL.eval("org.eweb4j.util.CommonUtil.toXml($this, false)", ctx);
+//    		System.out.println(newVal);
+//        }
+
+//        	
+           
+//        }
+//        System.out.println("count->"+count);
+        
+		HtmlCleaner cleaner = new HtmlCleaner();
+		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
+		TagNode tagNode = cleaner.clean(new URL("http://travel.163.com/13/0311/20/8PNC374200063KE8.html"));
+		String xml = ParserUtil.xml(tagNode,true);
+//		System.out.println(xml);
+//		Object[] nodes = tagNode.evaluateXPath("//div[@id='topic_tags']/following-sibling::*");
+//		for (Object n : nodes){
+//			System.out.println(ParserUtil.xml(n, false));
+//		}
+		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(false); // never forget this!
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+        XPathFactory xfactory = XPathFactoryImpl.newInstance();
+        XPath xpath = xfactory.newXPath();
+        XPathExpression expr = xpath.compile("//div[@class='ep-pages']//a[@class='ep-pages-ctrl']");
+        Object result = expr.evaluate(doc, XPathConstants.NODESET);
+        NodeList nodes = (NodeList) result;
+        for (int i = 0; i < nodes.getLength(); i++) {
+        	Node item = nodes.item(i);
+        	System.out.println("node->"+item);
+        	System.out.println("text->"+item.getTextContent());
+        	Element e = (Element)item;
+        	System.out.println("href->"+e.getAttribute("href"));
+         	System.out.println("xml->"+ParserUtil.xml(item, false));
+        }
+        
+//		Object[] nodeVals = tagNode.evaluateXPath("*");
+//		for (Object tag : nodeVals){
+//		    TagNode _tag = (TagNode)tag;
+//		    String rs = ParserUtil.xml(_tag,true);
+//		    System.out.println(rs);
+//		}
+//		
+//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        factory.setNamespaceAware(true); // never forget this!
+//        DocumentBuilder builder = factory.newDocumentBuilder();
+//        Document doc = builder.parse("http://www.streetdeal.sg/deals/view/4575/0/51_percent_off_JOHOR_Premium_Outlets_Shopping_Trip_Return_Coach_by_Transtar_Travel.html?utm_source=ilovedeals&utm_medium=referral&utm_campaign=cpc");
+//        XPathFactory xfactory = XPathFactoryImpl.newInstance();
+//        XPath xpath = xfactory.newXPath();
+//        XPathExpression expr = xpath.compile("//div[@class='highlights']");
+//        Object result = expr.evaluate(doc, XPathConstants.NODESET);
+//        NodeList nodes = (NodeList) result;
+//		String rs = ParserUtil.xml(nodes.item(0), false);
+//		System.out.println(rs);
+//		//第一步：获得解析工厂的实例  
+//        SAXParserFactory spf = SAXParserFactory.newInstance();  
+//        //第二部：获得工厂解析器  
+//        SAXParser sp = spf.newSAXParser();  
+//        //第三部：对xml进行解析  
+//        sp.parse(file, new ModelParser());
+        
+	}
+
 }

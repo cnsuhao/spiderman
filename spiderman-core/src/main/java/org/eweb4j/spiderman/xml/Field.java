@@ -13,6 +13,12 @@ public class Field {
 	@AttrTag
 	private String isMergeArray;
 	
+	/**
+	 * 是否也在下一页里解析
+	 */
+	@AttrTag
+	private String isAlsoParseInNextPage;
+	
 	@AttrTag
 	private String isTrim;//是否去掉前后的空格字符
 	
@@ -57,4 +63,13 @@ public class Field {
 	public void setIsTrim(String isTrim) {
 		this.isTrim = isTrim;
 	}
+
+	public String getIsAlsoParseInNextPage() {
+		return isAlsoParseInNextPage;
+	}
+
+	public void setIsAlsoParseInNextPage(String isAlsoParseInNextPage) {
+		this.isAlsoParseInNextPage = isAlsoParseInNextPage;
+	}
+
 }

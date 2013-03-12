@@ -10,9 +10,8 @@
 	<!--
 	  | name:名称
 	  | url:种子链接
-	  | skipStatusCode:设置哪些状态码需要忽略，多个用逗号隔开
+	  | skipStatusCode:设置忽略哪些状态码，用英文逗号隔开
 	  | userAgent:设置爬虫标识
-	  | includeHttps:是否抓取https页
 	  | reqDelay:{n}s|{n}m|{n}h|n每次请求之前延缓时间
 	  | enable:0|1是否开启本网站的抓取
 	  | charset:网站字符集
@@ -20,7 +19,7 @@
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	-->
-	<site name="csdn" url="http://www.csdn.net/article/2013-03-11/2814424-chromeos-android-surface" reqDelay="10s" enable="0" charset="utf-8" schedule="1h" thread="1" waitQueue="10s">
+	<site name="bestbargain" url="http://www.bestbargain.com.sg/index.php?lang=en" reqDelay="0.1s" enable="0" charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
 		<!--
 		  | 配置多个种子链接
 		  | url:种子链接
@@ -32,13 +31,13 @@
 		  | 告诉爬虫仅抓取以下这些host的链接，多数是应对二级或多级域名的情况
 		-->
 		<!--validHosts>
-			<validHost value="news.csdn.net" />
-			<validHost value="wwww.csdn.net" />
+			<validHost value="demo.eweb4j.org" />
+			<validHost value="wwww.eweb4j.org" />
 		</validHosts-->
 		<!--
 		  | HTTP Header
 		<headers>
-			<header name="" value="" />
+			<header name="Referer" value="http://www.straitsdeal.com/deals/" />
 		</headers>-->
 		<!--
 		  | HTTP Cookie
@@ -64,47 +63,27 @@
 			<!--
 			  | name:目标名称	
 			-->
-			<target name="news">
+			<target name="deal">
 				<!--
 				  | 限制目标URL的来源
 				-->
-				
 				<sourceRules policy="and">
-					<!--rule type="regex" value="http://www\.csdn\.net/article/\d{4}\-\d{2}\-\d{2}/\d+\-.*">
-						  | 定义如何在来源页面上挖掘新的 URL
-						<digUrls>
-							<field name="source_url" isArray="1">
-								<parsers>
-									<parser xpath="//div[@class='pagination']//a[@href]" attribute="href"/>
-									<parser exp="'http://www.iteye.com'+$this" />
-								</parsers>
-							</field>
-							<field name="target_url" isArray="1">
-								<parsers>
-									<parser xpath="//div[@class='news clearfix']//h3//a[last()]" attribute="href"/>
-									<parser exp="'http://www.iteye.com'+$this" />
-								</parsers>
-							</field>
-						</digUrls>
-					</rule-->
+					<rule type="regex" value=".*/index\.php\?lang=en(&amp;page=\d+)?$" />
 				</sourceRules>
 				<!--
 				  | 目标URL的规则
 				-->
 				<urlRules policy="and">
-					<rule type="regex" value="http://www\.csdn\.net/article/\d{4}\-\d{2}\-\d{2}/\d+\-.*">
-						<!--
-						  | 递归抓取详细页的分页
-						-->
-						<nextPage>
-							<field name="next_url">
-								<parsers>
-									<parser xpath="//div[@class='detail']//div[@class='page_nav']//a[@class='next']" attribute="href" />
-								</parsers>
-							</field>
-						</nextPage>
-					</rule>
+					<rule type="regex" value=".*/team\.php\?id=\d+" />
 				</urlRules>
+				<!--
+				  | 目标网页的命名空间配置
+				  | prefix: 前缀
+				  | uri: 关联的URI
+				-->
+				<!--namespaces>
+					<namespace prefix="" uri="" />
+				</namespaces-->
 				<!--
 				  | 目标网页的数据模型
 				-->
@@ -114,7 +93,7 @@
 					  | name:属性名称
 					  | parser:针对该属性的解析规则
 					-->
-					<field name="title">
+					<field name="name" isTrim="1">
 						<!--
 						  | xpath: XPath规则，如果目标页面是XML，则可以使用2.0语法，否则HTML的话暂时只能1.0
 						  | attribute:当使用XPath解析后的内容不是文本而是一个Node节点对象的时候，可以给定一个属性名获取其属性值例如<img src="" />
@@ -135,12 +114,70 @@
 						  |            $Attrs.xml($this).rm('style').Tags().rm('p').ok()
 						-->
 						<parsers>
-							<parser xpath="//div[@class='detail']/h1[@class='title']/text()" />
+							<parser xpath="//div[@id='deal-intro']//h1/text()" />
+							<parser exp="$this.replace(&quot;Today&apos;s Deal:&quot;,'')" />
 						</parsers>
 					</field>
-					<field name="content">
+					<field name="url">
 						<parsers>
-							<parser xpath="//div[@class='detail']//div[@class='con news_content']" exp="$output($this)" />
+							<parser exp="$task_url" />
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="//div[@id='team_images']//img[@src]" attribute="src" />
+						</parsers>
+					</field>
+					<field name="descOldImg" isArray="1">
+						<parsers>
+							<parser xpath="//div[@class='blk detail']//img[@src]" attribute="src" />
+						</parsers>
+					</field>
+					<field name="cate">
+					</field>
+					<field name="price">
+						<parsers>
+							<parser xpath="//p[@class='deal-price']/text()" regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="originalPrice">
+						<parsers>
+							<parser xpath="//table[@class='deal-discount']//tr[last()]//td[1]/text()" regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="countBought">
+						<parsers>
+							<parser xpath="//p[@class='deal-buy-tip-top']//strong/text()" regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="expiryTime">
+						<parsers>
+							<parser xpath="//div[@class='deal-box deal-timeleft deal-on']" attribute="diff"
+									exp="$Util.addLong($Util.getNow(),$Util.toLong($this))" />
+							<parser exp="$Util.String($this).substring(0,10)" />
+						</parsers>
+					</field>
+					<field name="highlight" isTrim="1">
+					</field>
+					<field name="condition" isTrim="1">
+						<parsers>
+							<parser skipErr="1" xpath="//div[@class='blk cf']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+							<parser exp="$this.replace('Terms &amp; Conditions','')" />
+						</parsers>
+					</field>
+					<field name="description" isTrim="1">
+						<parsers>
+							<parser skipErr="1" xpath="//div[@class='blk detail']" exp="$output($this)" />
 							<!--attribute 黑名单-->
 							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
 							<!--tag 黑名单，去掉内嵌内容-->
@@ -150,14 +187,45 @@
 							<!--其他-->
 						</parsers>
 					</field>
-					<field name="author">
+					<field name="address" isTrim="1">
 						<parsers>
-							<parser xpath="//div[@class='detail']//div[@class='tit_bar']//span[last()]/text()"/>
+							<parser skipErr="1" xpath="//div[@class='blk cf']//p[@class='p0']/text()"
+									regex="(?&lt;=add:).*(?=(s|S)\(\d{6})" />
 						</parsers>
 					</field>
-					<field name="tags" isArray="1">
+					<field name="address" isTrim="1">
 						<parsers>
-							<parser xpath="//div[@class='detail']//div[@class='tag']//a/text()"/>
+							<parser skipErr="1" xpath="//div[@class='blk cf']//p[@class='p0']/text()"
+									regex="(?&lt;=Address:).*(?=(s|S)\(\d{6})" />
+						</parsers>
+					</field>
+					<field name="address" isTrim="1">
+						<parsers>
+							<parser skipErr="1" xpath="//div[@class='blk cf']//p[@class='p0']/text()"
+									regex="(?&lt;=Address:).*(?=Tel:)" />
+						</parsers>
+					</field>
+					<field name="postCode">
+						<parsers>
+							<parser skipErr="1" xpath="//div[@class='blk cf']/text()" 
+									regex="((?&lt;=(\D{1,255}))\d{6}(?=(\D{1,255})))" />
+						</parsers>
+					</field>
+					<field name="merchant" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@id='side-business']//h2/text()" />
+						</parsers>
+					</field>
+					<field name="phone">
+						<parsers>
+							<parser xpath="//div[@class='blk cf']/text()" 
+									regex="(?&lt;=Tel: )\d{4}[ -]?\d{4}" />
+						</parsers>
+					</field>
+					<field name="phone">
+						<parsers>
+							<parser xpath="//div[@class='blk cf']/text()" 
+									regex="\d{4}[ -]?\d{4}" />
 						</parsers>
 					</field>
 				</model>
@@ -214,14 +282,17 @@
 					<extension point="parse">
 						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
 					</extension>
+					<!--extension point="pojo">
+						<impl type="" value="sg.ilovedeals.shoplay.spiderman.PojoPointImpl" sort="0"/>
+					</extension-->
 					<extension point="end">
 						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>
 					</extension>
 				</extensions>
 				<providers>
 					<provider>
-						<orgnization name="CFuture" website="http://lurencun.com" desc="Color your future">
-							<author name="weiwei" website="http://laiweiweihi.iteye.com | http://my.oschina.net/laiweiwei" email="l.weiwei@163.com" weibo="http://weibo.com/weiweimiss" desc="一个喜欢自由、音乐、绘画的IT老男孩" />
+						<orgnization name="深圳优扣科技有限公司" website="" desc="致力于打造一流的社交分享购物社区!">
+							<author name="weiwei" website="http://laiweiweihi.iteye.com" email="l.weiwei@163.com" weibo="http://weibo.com/weiweimiss" desc="一个喜欢自由、音乐、绘画的IT老男孩" />
 						</orgnization>
 					</provider>
 				</providers>
