@@ -21,6 +21,7 @@ public class ParserUtil {
 		try{
 			if (node instanceof Node){
 				xml = CommonUtil.toXml((Node)node, keepHeader);
+				return CommonUtil.toHTML(xml);
 			}else if (node instanceof TagNode){
 				StringWriter sw = new StringWriter();
 				//TODO 从配置文件里加载这个CleanerProperties
@@ -37,7 +38,7 @@ public class ParserUtil {
 			e.printStackTrace();
 		}
 		
-		return CommonUtil.toHTML(xml);
+		return xml;
 	}
 	
 }

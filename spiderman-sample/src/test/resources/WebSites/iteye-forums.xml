@@ -20,7 +20,14 @@
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	-->
-	<site name="iteye" url="http://www.iteye.com/news" reqDelay="10s" enable="0" charset="utf-8" schedule="1h" thread="1" waitQueue="10s">
+	<site name="iteye-forums-Android"
+          url="http://www.iteye.com/forums/tag/Android" 
+	      reqDelay="2s" 
+	      enable="1" 
+	      charset="utf-8" 
+	      schedule="1h" 
+	      thread="1" 
+	      waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | url:种子链接
@@ -63,14 +70,15 @@
 		<targets>
 			<!--
 			  | name:目标名称	
+			  | isForceUseXmlParser:是否强制使用XML解析器解析HTML
 			-->
-			<target name="news">
+			<target name="Android" isForceUseXmlParser="1">
 				<!--
 				  | 限制目标URL的来源
 				-->
 				
 				<sourceRules policy="and">
-					<rule type="regex" value="http://www\.iteye\.com/news(\?page=\d+)">
+					<rule type="regex" value="http://www\.iteye\.com/forums/tag/Android(\?page=\d+)">
 						<!--
 						  | 定义如何在来源页面上挖掘新的 URL
 						-->
@@ -83,7 +91,7 @@
 							</field>
 							<field name="target_url" isArray="1">
 								<parsers>
-									<parser xpath="//div[@class='news clearfix']//h3//a[last()]" attribute="href"/>
+									<parser xpath="//td[@class='topic_title']//a[@href]" attribute="href"/>
 									<parser exp="'http://www.iteye.com'+$this" />
 								</parsers>
 							</field>
@@ -94,7 +102,7 @@
 				  | 目标URL的规则
 				-->
 				<urlRules policy="and">
-					<rule type="regex" value="http://www\.iteye\.com/news/\d+" />
+					<rule type="regex" value="http://www\.iteye\.com/topic/\d+" />
 				</urlRules>
 				<!--
 				  | 目标网页的数据模型
@@ -126,12 +134,12 @@
 						  |            $Attrs.xml($this).rm('style').Tags().rm('p').ok()
 						-->
 						<parsers>
-							<parser xpath="//div[@class='title']/h3//a[@title]/text()" />
+							<parser xpath="//th[@class='topic_title']//div[@class='wrapper']/a/text()" />
 						</parsers>
 					</field>
-					<field name="content">
+					<field name="content" isArray="1" isMergeArray="1" >
 						<parsers>
-							<parser xpath="//div[@id='news_content']" exp="$output($this)" />
+							<parser xpath="//div[@id='topic_tags']/following-sibling::*" exp="$output($this)" />
 							<!--attribute 黑名单-->
 							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
 							<!--tag 黑名单，去掉内嵌内容-->
@@ -143,17 +151,24 @@
 					</field>
 					<field name="author">
 						<parsers>
-							<parser xpath="//div[@class='news_info']//a[1]/text()"/>
+							<parser xpath="//tbody[@id='posts']//td[@class='postauthor']//li[@class='name']/text()"/>
 						</parsers>
 					</field>
 					<field name="tags" isArray="1">
 						<parsers>
-							<parser xpath="//div[@class='news_tag']//a/text()"/>
+							<parser xpath="//div[@id='topic_tags']//a/text()"/>
 						</parsers>
 					</field>
-					<field name="comments" isArray="1">
+					<field name="comments" isArray="1" isTrim="1">
 						<parsers>
-							<parser xpath="//div[@class='comments']//div[@id]/div[last()]/text()" />
+							<parser xpath="(//div[@class='postbody clearfix'])[position()>1]" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
 						</parsers>
 					</field>
 				</model>

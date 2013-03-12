@@ -1,5 +1,22 @@
 package org.eweb4j.spiderman.plugin.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import org.eweb4j.spiderman.fetcher.FetchResult;
+import org.eweb4j.spiderman.fetcher.Page;
+import org.eweb4j.spiderman.spider.SpiderListener;
+import org.eweb4j.spiderman.task.Task;
+import org.eweb4j.spiderman.url.UrlRuleChecker;
+import org.eweb4j.spiderman.xml.Field;
+import org.eweb4j.spiderman.xml.Model;
+import org.eweb4j.spiderman.xml.Namespaces;
+import org.eweb4j.spiderman.xml.Rule;
+import org.eweb4j.spiderman.xml.Target;
+
 /**
  * Code copied from HtmlUnit
  * (src/main/java/com/gargoylesoftware/htmlunit/util/UrlUtils.java)
@@ -14,6 +31,41 @@ public final class UrlUtils {
 		String baseUrl = "http://cheapcheap.sg/xom/";
 		String url = "cheap_n_deals_detail-Deal-20-for-Gelish-Manicure-+-Soak-Off-at-Specialist-Nail--Beauty-spa-@-Orchard--deal_id-1102-catid-5.htm";
 		System.out.println(resolveUrl(baseUrl, url));
+	}
+	
+	public static Collection<String> digUrls(FetchResult result, Task task, Rule r, Model mdl, SpiderListener lst, Namespaces ns) throws Exception {
+		Collection<String> urls = new ArrayList<String>();
+		boolean isOk = false;
+		if (mdl != null && mdl.getField() != null && !mdl.getField().isEmpty())
+			isOk = true;
+		
+		if (!isOk)
+			return urls;
+		//判断当前url是否是sourceUrl
+		boolean isSourceUrl = UrlRuleChecker.check(task.url, Arrays.asList(r));
+		if (isSourceUrl){
+			Target tgt = new Target();
+			tgt.setModel(mdl);
+			tgt.setNamespaces(ns);
+			ModelParser parser = new ModelParser(task, tgt, lst);
+			Page pg = result.getPage();
+			List<Map<String, Object>> models = parser.parse(pg);
+			for (Field f : tgt.getModel().getField()){
+				for (Map<String, Object> model : models){
+					Object val = model.get(f.getName());
+					if (val == null)
+						continue;
+					//如果url是数组
+					if ("1".equals(f.getIsArray()) || "true".equals(f.getIsArray())){
+						urls.addAll((List<String>)val);
+					}else{
+						urls.add(String.valueOf(val));
+					}
+				}
+			}
+		}
+		
+		return urls;
 	}
 	
 	public static String resolveUrl(final String baseUrl, final String relativeUrl) {

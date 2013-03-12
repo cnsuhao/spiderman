@@ -194,37 +194,37 @@
 			<plugin enable="1" name="spider_plugin" version="0.0.1" desc="这是一个官方实现的默认插件，实现了所有扩展点。">
 				<extensions>
 					<extension point="task_poll">
-						<impl type="" value="spiderman.plugin.impl.TaskPollPointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPollPointImpl" sort="0"/>
 					</extension>
 					<extension point="begin">
-						<impl type="" value="spiderman.plugin.impl.BeginPointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.BeginPointImpl" sort="0"/>
 					</extension>
 					<extension point="fetch">
-						<impl type="" value="spiderman.plugin.impl.FetchPointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.FetchPointImpl" sort="0"/>
 					</extension>
 					<extension point="dig">
-						<impl type="" value="spiderman.plugin.impl.DigPointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DigPointImpl" sort="0"/>
 					</extension>
 					<extension point="dup_removal">
-						<impl type="" value="spiderman.plugin.impl.DupRemovalPointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DupRemovalPointImpl" sort="0"/>
 					</extension>
 					<extension point="task_sort">
-						<impl type="" value="spiderman.plugin.impl.TaskSortPointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskSortPointImpl" sort="0"/>
 					</extension>
 					<extension point="task_push">
-						<impl type="" value="spiderman.plugin.impl.TaskPushPointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPushPointImpl" sort="0"/>
 					</extension>
 					<extension point="target">
-						<impl type="" value="spiderman.plugin.impl.TargetPointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TargetPointImpl" sort="0"/>
 					</extension>
 					<extension point="parse">
-						<impl type="" value="spiderman.plugin.impl.ParsePointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
 					</extension>
 					<!--extension point="pojo">
 						<impl type="" value="sg.ilovedeals.shoplay.spiderman.PojoPointImpl" sort="0"/>
 					</extension-->
 					<extension point="end">
-						<impl type="" value="spiderman.plugin.impl.EndPointImpl" sort="0"/>
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>
 					</extension>
 				</extensions>
 				<providers>

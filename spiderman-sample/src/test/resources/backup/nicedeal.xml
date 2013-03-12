@@ -152,7 +152,7 @@
 						<parsers>
 							<parser xpath="end_date/text()" 
 									exp="$Util.parse('yyyy-MM-dd HH:mm:ss', $this.replace('T',' ')).getTime()"/>
-							<parser exp="$this+$Util.toSeconds('8h').longValue()*1000" />
+							<parser exp="$Util.addLong($this,$Util.toSeconds('8h').longValue()*1000)" />
 							<parser exp="$Util.String($this).substring(0, 10)" />
 						</parsers>
 					</field>

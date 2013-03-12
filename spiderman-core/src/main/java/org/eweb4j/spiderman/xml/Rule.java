@@ -11,6 +11,8 @@ public class Rule {
 	private String value;
 	
 	private Model digUrls;
+	
+	private Model nextPage;
 
 	public String getType() {
 		return type;
@@ -34,6 +36,14 @@ public class Rule {
 
 	public void setDigUrls(Model digUrls) {
 		this.digUrls = digUrls;
+	}
+
+	public Model getNextPage() {
+		return nextPage;
+	}
+
+	public void setNextPage(Model nextPage) {
+		this.nextPage = nextPage;
 	}
 
 	@Override

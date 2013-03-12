@@ -2,27 +2,23 @@ package org.eweb4j.spiderman.plugin.impl;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.eweb4j.spiderman.fetcher.FetchResult;
-import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.infra.DefaultLinkFinder;
 import org.eweb4j.spiderman.infra.FrameLinkFinder;
 import org.eweb4j.spiderman.infra.IframeLinkFinder;
 import org.eweb4j.spiderman.plugin.DigPoint;
 import org.eweb4j.spiderman.plugin.util.DefaultLinkNormalizer;
 import org.eweb4j.spiderman.plugin.util.LinkNormalizer;
-import org.eweb4j.spiderman.plugin.util.ModelParser;
 import org.eweb4j.spiderman.plugin.util.URLCanonicalizer;
+import org.eweb4j.spiderman.plugin.util.UrlUtils;
 import org.eweb4j.spiderman.plugin.util.Util;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.Task;
-import org.eweb4j.spiderman.url.UrlRuleChecker;
-import org.eweb4j.spiderman.xml.Field;
 import org.eweb4j.spiderman.xml.Model;
+import org.eweb4j.spiderman.xml.Namespaces;
 import org.eweb4j.spiderman.xml.Rule;
 import org.eweb4j.spiderman.xml.Rules;
 import org.eweb4j.spiderman.xml.Site;
@@ -63,40 +59,11 @@ public class DigPointImpl implements DigPoint{
 		if (rules != null && rules.getRule() != null && !rules.getRule().isEmpty()){
 			for (Rule r : rules.getRule()){
 				//判断是否定义了digUrls
-				boolean isDigUrls = false;
-				Model digModel = r.getDigUrls();
-				if (digModel != null && digModel.getField() != null && !digModel.getField().isEmpty())
-					isDigUrls = true;
-				
-				if (isDigUrls) {
-					//判断当前url是否是sourceUrl
-					boolean isSourceUrl = UrlRuleChecker.check(task.url, Arrays.asList(r));
-					if (isSourceUrl){
-						// 按照digUrlPaser的配置对页面进行解析得到URL
-						Target digTarget = new Target();
-						digTarget.setModel(digModel);
-						digTarget.setNamespaces(site.getTargets().getTarget().get(0).getNamespaces());
-						ModelParser parser = new ModelParser(task, digTarget, listener);
-						Page sourcePage = result.getPage();
-						List<Map<String, Object>> models = parser.parse(sourcePage);
-						for (Field f : digTarget.getModel().getField()){
-							for (Map<String, Object> model : models){
-								Object val = model.get(f.getName());
-								if (val == null)
-									continue;
-								//如果url是数组
-								if ("1".equals(f.getIsArray()) || "true".equals(f.getIsArray())){
-//									listener.onInfo(Thread.currentThread(), task, "dig new urls->"+(List<String>)val);
-									urls.addAll((List<String>)val);
-//									System.out.println(f.getName() + "\n\t"+(List<String>)val);
-								}else{
-//									listener.onInfo(Thread.currentThread(), task, "dig new urls->"+val);
-									urls.add(String.valueOf(val));
-								}
-							}
-						}
-					}
-				}
+				Model mdl = r.getDigUrls();
+				SpiderListener lst = listener;
+				Namespaces ns = site.getTargets().getTarget().get(0).getNamespaces();
+				//解析Model获得urls
+				urls.addAll(UrlUtils.digUrls(result, task, r, mdl, lst, ns));
 			}
 			
 		}
@@ -130,7 +97,7 @@ public class DigPointImpl implements DigPoint{
 		
 		return newUrls;
 	}
-	
+
 	public static void main(String[] args){
 		String s = "../../question?catalog=1&show=&p=1";
 		System.out.println(s.startsWith("http://www.oschina.net/question?catalog=1&show=&p="));

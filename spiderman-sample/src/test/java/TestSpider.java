@@ -2,6 +2,7 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,11 @@ import org.junit.Test;
 public class TestSpider {
 	
 	private final Object mutex = new Object();
+	
+	public static void main(String[] args){
+		System.out.println(CommonUtil.getNow());
+		System.out.println(CommonUtil.formatTime(new Date(1363021265380L)));
+	}
 	
 	@Test
 	public void test() throws Exception {

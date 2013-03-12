@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -91,48 +91,32 @@ public class ModelParser extends DefaultHandler{
 	}
 	
 	public static void main(String[] args) throws Exception{
-		File file = new File("C:/Users/vivi/Downloads/9000425.xml");
-		String xml = FileUtil.readFile(file);
-		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true); // never forget this!
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-        XPathFactory xfactory = XPathFactoryImpl.newInstance();
-        XPath xpath = xfactory.newXPath();
-        //设置命名空间
-        xpath.setNamespaceContext(new NamespaceContext() {
-            public String getPrefix(String uri) {
-                throw new UnsupportedOperationException();
-            }
-            public Iterator<?> getPrefixes(String uri) {
-                throw new UnsupportedOperationException();
-            }
-			public String getNamespaceURI(String prefix) {
-				System.out.println("prefix->"+prefix);
-				if (prefix == null) throw new NullPointerException("Null prefix");
-		        else if ("deal".equals(prefix)) return "http://www.streetdeal.sg/";
-		        return XMLConstants.NULL_NS_URI;
-			}
-		});
-        
-        XPathExpression expr = xpath.compile("//item");
-        Object result = expr.evaluate(doc, XPathConstants.NODESET);
-        NodeList nodes = (NodeList) result;
-        
-        FelEngine fel = new FelEngineImpl();
-        for (int i = 0; i < nodes.getLength(); i++) {
-        	if (i > 0)
-        		break;
-            
-        	NodeList subs = (NodeList)xpath.compile("deal:image/text()").evaluate(nodes.item(i), XPathConstants.NODESET);
-        	if (subs == null || subs.getLength() == 0)
-             	continue;
-            for (int j = 0; j < subs.getLength(); j++) {
-            	Node item = subs.item(j);
-             	String value = item.getNodeValue();
-             	System.out.println(value);
-            }
+//		File file = new File("C:/Users/vivi/Downloads/9000425.xml");
+//		String xml = FileUtil.readFile(file);
+//		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
+//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        factory.setNamespaceAware(true); // never forget this!
+//        DocumentBuilder builder = factory.newDocumentBuilder();
+//        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+//        XPathFactory xfactory = XPathFactoryImpl.newInstance();
+//        XPath xpath = xfactory.newXPath();
+//        XPathExpression expr = xpath.compile("//item");
+//        Object result = expr.evaluate(doc, XPathConstants.NODESET);
+//        NodeList nodes = (NodeList) result;
+//        
+//        FelEngine fel = new FelEngineImpl();
+//        for (int i = 0; i < nodes.getLength(); i++) {
+//        	if (i > 0)
+//        		break;
+//            
+//        	NodeList subs = (NodeList)xpath.compile("deal:image/text()").evaluate(nodes.item(i), XPathConstants.NODESET);
+//        	if (subs == null || subs.getLength() == 0)
+//             	continue;
+//            for (int j = 0; j < subs.getLength(); j++) {
+//            	Node item = subs.item(j);
+//             	String value = item.getNodeValue();
+//             	System.out.println(value);
+//            }
              
 //        	FelContext ctx = fel.getContext();
 //        	ctx.set("$this", node);
@@ -147,28 +131,47 @@ public class ModelParser extends DefaultHandler{
 //    		
 //    		Object newVal =  MVEL.eval("org.eweb4j.util.CommonUtil.toXml($this, false)", ctx);
 //    		System.out.println(newVal);
-        }
+//        }
 
 //        	
            
 //        }
 //        System.out.println("count->"+count);
         
-//        String html = FileUtil.readFile(new File("d:/html.html"));
-		
-//		String html = "<p>‘Relaxation is a state of mind’ sounded good until people tried keeping up 15-hour days and simultaneously thinking of the Maldives. Get the real deal with today’s Voucherlicious deal: $23.00 instead of $156.00 for a 60-minute Dermalogica Facial, including an Eye Paraffin Treatment, Eye Massage and Shoulder Massage at Colour Couture.</p><p> </p><p><img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C1.jpg\" /></p><p> </p><p><img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C2.jpg\" /></p><p> </p><p>Since its inception in 1986, the brand Dermalogica has quickly become the number-one choice for aestheticians worldwide. It is based around the concept of skin care as a health issue instead of a cosmetic concern. Extol the merits of Dermalogica facial treatment at Colour Couture as experienced therapists determine the best products for your skin type in a skin analysis before applying the appropriate products.</p><p> </p><p><img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C3.jpg\" /></p><p>"+	
-//"<img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C4.jpg\" /></p><p> </p><p>The eye paraffin treatment causes dark circles to diminish. This is due to the change of temperatures caused by the heating of the wax that stimulates nerve endings and improves blood circulation as well as gives a healthy glow to the delicate skin around the eyes.</p><p> </p><p><img src=\"http://voucherlicious.com/app/webroot/images/12-12/colourcouture/C5.jpg\" /></p><p> </p><p>Enjoy your hour-long treatment being concluded by a relaxing shoulder massage that will unload most tension. Providing deep relaxation to stressed shoulder muscles, shoulder massage stimulates blood flow and improves the lymph system as well as releasing endorphins! </p>                        <!-- <img src=\"img/pic01.png\" />"+	
-//"                        <img src=\"img/pic02.png\" /> -->";
-//		HtmlCleaner cleaner = new HtmlCleaner();
-//		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
-//		TagNode tagNode = cleaner.clean("<div class='myclass'>I Love <u>OSChina.net</u>nothing.<u></u></div>");
-//		Object[] nodeVals = tagNode.evaluateXPath("//div[@class='myclass']");
+        String html = FileUtil.readFile(new File("d:/testtest.htm"));
+		HtmlCleaner cleaner = new HtmlCleaner();
+		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
+		TagNode tagNode = cleaner.clean(new URL("http://www.bestbargain.com.sg/team.php?id=430"));
+		String xml = ParserUtil.xml(tagNode,true);
+//		System.out.println(xml);
+//		Object[] nodes = tagNode.evaluateXPath("//div[@id='topic_tags']/following-sibling::*");
+//		for (Object n : nodes){
+//			System.out.println(ParserUtil.xml(n, false));
+//		}
+		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(false); // never forget this!
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+        XPathFactory xfactory = XPathFactoryImpl.newInstance();
+        XPath xpath = xfactory.newXPath();
+        XPathExpression expr = xpath.compile("//div[@class='blk cf']//p[@class='p0']/text()");
+        Object result = expr.evaluate(doc);
+        System.out.println(result);
+        NodeList nodes = (NodeList) result;
+        for (int i = 0; i < nodes.getLength(); i++) {
+        	Node item = nodes.item(i);
+        	System.out.println(item);
+//         	System.out.println(ParserUtil.xml(item, false));
+        }
+        
+//		Object[] nodeVals = tagNode.evaluateXPath("*");
 //		for (Object tag : nodeVals){
 //		    TagNode _tag = (TagNode)tag;
-//		    String rs = ParserUtil.xml(_tag,false);
+//		    String rs = ParserUtil.xml(_tag,true);
 //		    System.out.println(rs);
 //		}
-		
+//		
 //		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 //        factory.setNamespaceAware(true); // never forget this!
 //        DocumentBuilder builder = factory.newDocumentBuilder();
@@ -190,26 +193,32 @@ public class ModelParser extends DefaultHandler{
 	}
 	
 	public List<Map<String, Object>> parse(Page page) throws Exception{
-		listener.onInfo(Thread.currentThread(), task, "parse Page->[cType:" + page.getContentType()+",charset:"+page.getCharset()+",encoding:"+page.getEncoding()+",url->"+page.getUrl());
 		String contentType = this.target.getCType();
 		if (contentType == null || contentType.trim().length() == 0)
 			contentType = page.getContentType();
 		if (contentType == null)
 			contentType = "text/html";
-		
 		boolean isXml = "xml".equalsIgnoreCase(contentType) || contentType.contains("text/xml") || contentType.contains("application/rss+xml") || contentType.contains("application/xml");
-		
-		if (isXml) 
-			return parseXml(page);
-		else
-			return parseHtml(page);
+		if (isXml)
+			return parseXml(page, false);
+		else {
+			String isForceUseXmlParser = this.target.getIsForceUseXmlParser();
+			if (!"1".equals(isForceUseXmlParser))
+				return parseHtml(page);
+			HtmlCleaner cleaner = new HtmlCleaner();
+			cleaner.getProperties().setTreatUnknownTagsAsContent(true);
+			TagNode rootNode = cleaner.clean(page.getContent());
+			String xml = ParserUtil.xml(rootNode, true);
+			page.setContent(xml);
+			return parseXml(page, true);
+		}
 	}
 
-	private List<Map<String, Object>> parseXml(Page page) throws Exception{
+	private List<Map<String, Object>> parseXml(Page page, boolean isFromHtml) throws Exception{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true); // never forget this!
+        factory.setNamespaceAware(!isFromHtml); // never forget this!
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(page.getContentData()));
+        Document doc = builder.parse(new ByteArrayInputStream(page.getContent().getBytes()));
         XPathFactory xfactory = XPathFactoryImpl.newInstance();
         XPath xpathParser = xfactory.newXPath();
         //设置命名空间
@@ -252,7 +261,7 @@ public class ModelParser extends DefaultHandler{
 		if ("1".equals(isModelArray) || "tre".equals(isModelArray)){
 			XPathExpression expr = xpathParser.compile(modelXpath);
 	        Object result = expr.evaluate(doc, XPathConstants.NODESET);
-//		    listener.onInfo(Thread.currentThread(), "modelXpath -> " + modelXpath + " parse result -> " + result);
+//		    listener.onInfo(Thread.currentThread(), task, "modelXpath -> " + modelXpath + " parse result -> " + result);
 	        if (result != null){
 		        NodeList nodes = (NodeList) result;
 		        if (nodes.getLength() > 0){
@@ -272,7 +281,10 @@ public class ModelParser extends DefaultHandler{
 		fel.getContext().set("$fields", map);
 		for (Field field : fields){
 			String key = field.getName();
+			//是否数组
 			String isArray = field.getIsArray();
+			//是否合并数组
+			String isMergeArray = field.getIsMergeArray();
 			String isTrim = field.getIsTrim();
 			
 			Parsers parsers = field.getParsers();
@@ -329,7 +341,7 @@ public class ModelParser extends DefaultHandler{
 							parseByExp(exp, values);
 						} else {
 							for (int j = 0; j < nodes.getLength(); j++){
-								Node node = nodes.item(i);
+								Node node = nodes.item(j);
 								values.add(node);
 							}
 							// 此种方式获取到的Node节点大部分都不是字符串，因此先执行表达式后执行正则
@@ -405,9 +417,19 @@ public class ModelParser extends DefaultHandler{
 				
 				//最终完成
 				if ("1".equals(isArray)){
-					map.put(key, values);
+					if ("1".equals(isMergeArray)){
+						StringBuilder sb = new StringBuilder();
+						for (Object val : values){
+							sb.append(String.valueOf(val));
+						}
+						map.put(key, sb.toString());
+					}else
+						map.put(key, values);
 				} else {
-					map.put(key, new ArrayList<Object>(values).get(0));
+					if (values.isEmpty())
+						map.put(key, "");
+					else
+						map.put(key, new ArrayList<Object>(values).get(0));
 				}
 				
 			} catch (Exception e) {

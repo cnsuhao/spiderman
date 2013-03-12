@@ -184,7 +184,7 @@
 					<!-- end 临时变量-->
 					<field name="expiryTime">
 						<parsers>
-							<parser exp="$Util.getNow()+$Util.toSeconds($fields._expiryTime).longValue()*1000" />
+							<parser exp="$Util.addLong($Util.getNow(),$Util.toSeconds($fields._expiryTime).longValue()*1000)" />
 							<parser exp="$Util.String($this.substring(0, 10))" />
 						</parsers>
 					</field>

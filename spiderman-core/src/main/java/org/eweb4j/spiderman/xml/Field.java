@@ -11,6 +11,9 @@ public class Field {
 	private String isArray;
 	
 	@AttrTag
+	private String isMergeArray;
+	
+	@AttrTag
 	private String isTrim;//是否去掉前后的空格字符
 	
 	private Parsers parsers;
@@ -29,6 +32,14 @@ public class Field {
 
 	public void setIsArray(String isArray) {
 		this.isArray = isArray;
+	}
+
+	public String getIsMergeArray() {
+		return isMergeArray;
+	}
+
+	public void setIsMergeArray(String isMergeArray) {
+		this.isMergeArray = isMergeArray;
 	}
 
 	public Parsers getParsers() {

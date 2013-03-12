@@ -21,6 +21,12 @@ public class Target {
 	@AttrTag
 	private String cType;
 	
+	/**
+	 * 如果页面是html类型，是否强制使用XML的解析器来解析xpath
+	 */
+	@AttrTag
+	private String isForceUseXmlParser;
+	
 	private Namespaces namespaces;
 	
 	/**
@@ -76,6 +82,14 @@ public class Target {
 
 	public void setModel(Model model) {
 		this.model = model;
+	}
+
+	public String getIsForceUseXmlParser() {
+		return isForceUseXmlParser;
+	}
+
+	public void setIsForceUseXmlParser(String isForceUseXmlParser) {
+		this.isForceUseXmlParser = isForceUseXmlParser;
 	}
 
 	public String getCType() {

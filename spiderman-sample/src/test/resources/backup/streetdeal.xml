@@ -161,7 +161,7 @@
 					<field name="expiryTime">
 						<parsers>
 							<parser xpath="//input[@name='deal_time_left']" attribute="value"
-									exp="$Util.getNow()+$Util.toLong($this)*1000" />
+									exp="$Util.addLong($Util.getNow(),$Util.toLong($this)*1000)" />
 							<parser exp="$Util.String($this).substring(0, 10)" />
 						</parsers>
 					</field>

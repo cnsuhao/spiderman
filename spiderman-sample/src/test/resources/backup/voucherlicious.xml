@@ -159,7 +159,8 @@
 					<field name="expiryTime">
 						<parsers>
 							<parser xpath="//span[@class='js-time hide']/text()" exp="$this.trim()"/>
-							<parser exp="$Util.toLong($this)+$Util.getNow()+$Util.toSeconds('8h').longValue()*1000" />
+							<parser exp="$Util.addLong($this,$Util.getNow())" />
+							<parser exp="$Util.addLong($this,$Util.toSeconds('8h').longValue()*1000)" />
 							<parser exp="$Util.String($this.substring(0, 10))" />
 						</parsers>
 					</field>

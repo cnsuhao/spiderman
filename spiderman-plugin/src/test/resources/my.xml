@@ -1,0 +1,1211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xml:lang="zh-CN" dir="ltr" xmlns:xml="xml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>初体验Android的两个小不爽 - Android - mobile - ITeye论坛</title>
+		<meta name="description"
+			content="今天下午花了点时间来体验Android，本以为5分钟就可以完成的Helloworld，却用了将近1个半小时的时间，实在有些不爽。现在暂时记下一些不爽的地方，希望大家能指出问题在哪里？有什么更好的办法？ 前面按照安装文档，下载sdk和eclipse plugin，安装配置安装文档一路顺风。马上新建工程，编写Helloworld代码，启动运行。想着应该大工告成，看的到效果收工了。谁知道问题出来了。 代码 ..." />
+		<meta name="keywords" content="Android mobile" />
+		<link rel="shortcut icon" href="http://www.iteye.com/images/favicon.ico"
+			type="image/x-icon" />
+		<link href="http://www.iteye.com/rss/board/mobile" rel="alternate"
+			title="ITeye论坛" type="application/rss+xml" />
+		<link rel="search" type="application/opensearchdescription+xml"
+			href="http://www.iteye.com/open_search.xml" title="ITeye" />
+		<link href="./testtest_files/forum.css" media="screen" rel="stylesheet"
+			type="text/css" />
+		<script type="text/javascript" async="" src="./testtest_files/ga.js" />
+		<script src="./testtest_files/application.js" type="text/javascript" />
+		<script type="text/javascript"><![CDATA[  var _gaq = _gaq || [];  _gaq.push(['_setAccount', 'UA-535605-1']);  _gaq.push(['_setDomainName', 'iteye.com']);  _gaq.push(['_trackPageview']);  (function() {    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);  })();]]></script>
+		<link href="./testtest_files/SyntaxHighlighter.css" media="screen"
+			rel="stylesheet" type="text/css" />
+		<script src="./testtest_files/shCoreCommon.js" type="text/javascript" />
+		<script src="./testtest_files/hotkey.js" type="text/javascript" />
+		<script src="./testtest_files/code_favorites.js" type="text/javascript" />
+		<script src="./testtest_files/dragdrop.js" type="text/javascript" />
+		<style><![CDATA[@-moz-keyframes nodeInserted{from{opacity:0.99;}to{opacity:1;}}@-webkit-keyframes nodeInserted{from{opacity:0.99;}to{opacity:1;}}@-o-keyframes nodeInserted{from{opacity:0.99;}to{opacity:1;}}@keyframes nodeInserted{from{opacity:0.99;}to{opacity:1;}}embed,object{animation-duration:.001s;-ms-animation-duration:.001s;-moz-animation-duration:.001s;-webkit-animation-duration:.001s;-o-animation-duration:.001s;animation-name:nodeInserted;-ms-animation-name:nodeInserted;-moz-animation-name:nodeInserted;-webkit-animation-name:nodeInserted;-o-animation-name:nodeInserted;}]]></style>
+		<style type="text/css" />
+	</head>
+	<body><!-- saved from url=(0033)http://www.iteye.com/topic/141854 -->
+		<div id="page">
+			<div id="header">
+				<div class="clearfix">
+					<div id="user_nav">
+						<a href="http://www.iteye.com/login" class="welcome" title="登录">您还未登录
+							!</a>
+						<a href="http://www.iteye.com/login">登录</a>
+						<a href="http://www.iteye.com/signup" class="nobg">注册</a>
+					</div>
+				</div>
+				<div class="clearfix">
+					<div id="branding">
+						<a href="http://www.iteye.com/">
+							<img alt="ITeye-最棒的软件开发交流社区" src="./testtest_files/logo.gif"
+								title="ITeye-最棒的软件开发交流社区" />
+						</a>
+					</div>
+					<div id="gg" />
+				</div>
+			</div>
+			<div id="content" class="clearfix">
+				<div id="main">
+					<div class="clearfix">
+						<div class="crumbs">
+							<a href="http://www.iteye.com/forums">论坛首页</a>
+							<span class="arrow">→</span>
+							<a href="http://www.iteye.com/forums/board/mobile">移动开发技术论坛</a>
+							<span class="arrow">→</span>
+							<h1>初体验Android的两个小不爽</h1>
+						</div>
+					</div>
+					<div id="forum_tag_list">
+						<a href="http://www.iteye.com/forums/board/mobile">全部</a>
+						<a href="http://www.iteye.com/forums/tag/Android">Android</a>
+						<a href="http://www.iteye.com/forums/tag/iOS">iOS</a>
+						<a href="http://www.iteye.com/forums/tag/wp7">wp7</a>
+						<a href="http://www.iteye.com/forums/tag/J2ME">J2ME</a>
+						<a
+							href="http://www.iteye.com/forums/tag/%E7%A7%BB%E5%8A%A8%E7%BB%BC%E5%90%88">移动综合</a>
+						<a href="http://www.iteye.com/forums/tag/Symbian">Symbian</a>
+						<a href="http://www.iteye.com/forums/tag/BlackBerry">BlackBerry</a>
+						<a href="http://www.iteye.com/forums/tag/WAP">WAP</a>
+					</div>
+					<div class="actions">
+						<div class="buttons" />
+						<div class="wrapper">
+							<div id="forum_recommended_f4">
+								<a href="http://www.iteye.com/clicks/849" target="_blank">
+									<span style="font-weight:bold;color:red">Java开发新方式：专注UI，快速开发</span>
+								</a>
+							</div>
+							<div class="pagination">
+								<span class="disabled prev_page">« 上一页</span>
+								<span class="current">1</span>
+								<a href="http://www.iteye.com/topic/141854?page=2" rel="next">2</a>
+								<a href="http://www.iteye.com/topic/141854?page=2" class="next_page"
+									rel="next">下一页 »</a>
+							</div>
+							<div class="info">浏览 9786 次</div>
+						</div>
+					</div>
+					<table id="forum_main" cellspacing="1">
+						<thead>
+							<tr>
+								<th colspan="2" class="topic_title">
+									<div class="wrapper">
+										<span class="locked">锁定老帖子</span>
+										<a href="./testtest_files/testtest.htm">主题：初体验Android的两个小不爽</a>
+									</div>
+									<div id="topic_rate_box">精华帖 (0) :: 良好帖 (0) :: 新手帖 (0) :: 隐藏帖 (0)</div>
+								</th>
+							</tr>
+							<tr>
+								<td class="first_col">作者</td>
+								<td class="last_col">正文            </td>
+							</tr>
+						</thead>
+						<tbody id="posts">
+							<tr id="415160">
+								<td class="postauthor">
+									<ul>
+										<li class="name">过河卒</li>
+										<li>
+											等级:
+											<img src="./testtest_files/star3.gif" alt="三星会员" title="三星会员" />
+										</li>
+										<li>
+											<a href="http://ponzmd.iteye.com/" target="_blank">
+												<img alt="过河卒的博客" class="logo"
+													src="./testtest_files/5ae5d35a-c469-45f0-a827-a8cfb6d7561a.jpg"
+													title="过河卒的博客: 过河卒" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 129</li>
+										<li>积分: 298</li>
+										<li>来自: 西安</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-19                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix">
+										<script type="text/javascript"><![CDATA[      var hunters = ["\u003Ca href='/jobs/2506' target='_blank' style='color:#000;'\u003E\u003Cspan style='font-weight:bold;'\u003E\u5317\u4eac: \u003C/span\u003E \u3010\u5317\u4eac\u3011\u6e38\u620f\u516c\u53f8\u8bda\u9080php\u5f00\u53d1\u5de5\u7a0b\u5e08\u003C/a\u003E","\u003Ca href='/jobs/2507' target='_blank' style='color:#000;'\u003E\u003Cspan style='font-weight:bold;'\u003E\u5317\u4eac: \u003C/span\u003E \u3010\u5317\u4eac\u3011\u6570\u636e\u5206\u6790\u9ad8\u7ea7\u5de5\u7a0b\u5e08/\u7ecf\u7406\u003C/a\u003E"]      var hunter_id = Math.ceil(Math.random() * hunters.length) - 1;      if(hunter_id == -1) hunter_id = 0;    ]]></script>
+										<div id="hunter_recommended"
+											style="background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); padding: 4px; margin-bottom: 10px; float: left; width: 557px; background-position: initial initial; background-repeat: initial initial;">
+											<span id="hunters_nav" style="margin-right:5px;">
+												<a href="http://www.iteye.com/topic/141854#"
+													onclick="hunter_id &lt;= 0 ? hunter_id = hunters.length - 1 : hunter_id--; $(&#39;hunters&#39;).update(hunters[hunter_id]);return false;"
+													style="border:1px solid #ccc;padding: 0 3px;size: 13px;text-decoration: none;">&lt;</a>
+												<a href="http://www.iteye.com/topic/141854#"
+													onclick="hunter_id &gt;= hunters.length - 1 ? hunter_id = 0 : hunter_id++; $(&#39;hunters&#39;).update(hunters[hunter_id]);return false;"
+													style="border:1px solid #ccc;padding: 0 3px;size :13px;text-decoration: none;">&gt;</a>
+											</span>
+											猎头职位:
+											<span id="hunters">
+												<a href="http://www.iteye.com/jobs/2506" target="_blank"
+													style="color:#000;">
+													<span style="font-weight:bold;">北京: </span>
+													【北京】游戏公司诚邀php开发工程师
+												</a>
+											</span>
+											<script type="text/javascript"><![CDATA[$('hunters').update(hunters[hunter_id]);]]></script>
+										</div>
+										<div id="related_topics" style="position: relative;">
+											相关文章:
+											<span class="close">
+												<a href="http://www.iteye.com/topic/141854#"
+													onclick="$(&#39;related_topics&#39;).hide();if($(&#39;hunter_recommended&#39;)){$(&#39;hunter_recommended&#39;).style.width=&#39;780px&#39;};if($(&#39;topic_tags&#39;)){$(&#39;topic_tags&#39;).style.width=&#39;790px&#39;};return false;"
+													title="关闭"> </a>
+											</span>
+											<ul>
+												<li>
+													<a href="http://www.iteye.com/topic/755069"
+														title="ubuntu10.04上android环境安装“org.eclipse.gef 0.0.0”问题解决"
+														target="_blank">ubuntu10.04上android环境安装“org.eclipse.gef 0.0.0”问题解决</a>
+												</li>
+												<li>
+													<a href="http://www.iteye.com/topic/1112948" title="Android腾讯微薄客户端开发十五:终结篇(分享源代码)"
+														target="_blank">Android腾讯微薄客户端开发十五:终结篇(分享源代码)</a>
+												</li>
+												<li>
+													<a href="http://www.iteye.com/topic/992797" title="Android模拟器简介—更新到最新的3.0 Honeycomb"
+														target="_blank">Android模拟器简介—更新到最新的3.0 Honeycomb</a>
+												</li>
+											</ul>
+											<br />
+											<span>
+												推荐群组:
+												<a href="http://pcdiy.group.iteye.com/" target="_blank">电脑DIY</a>
+											</span>
+											<br />
+											<a href="http://www.iteye.com/wiki/topic/141854" target="_blank">更多相关推荐</a>
+										</div>
+										<script type="text/javascript"><![CDATA[              document.observe("dom:loaded", function() {                if($('hunter_recommended')) {                  $('hunter_recommended').setStyle({cssFloat: 'left', width: '557px'})                }                if($('topic_tags')) {                  $('topic_tags').setStyle({width: '567px'})                }                new Draggable("related_topics");              });            ]]></script>
+										<div id="topic_tags" class="news_tag" style="width: 567px;">
+											<a href="http://www.iteye.com/forums/tag/Android">Android</a>
+										</div>
+										<p>今天下午花了点时间来体验Android，本以为5分钟就可以完成的Helloworld，却用了将近1个半小时的时间，实在有些不爽。现在暂时记下一些不爽的地方，希望大家能指出问题在哪里？有什么更好的办法？</p>
+										<p>前面按照安装文档，下载sdk和eclipse
+											plugin，安装配置安装文档一路顺风。马上新建工程，编写Helloworld代码，启动运行。想着应该大工告成，看的到效果收工了。谁知道问题出来了。</p>
+										<p>代码如下：</p>
+										<pre class="csharpcode">
+											package person.pengjun.hello;
+											<br />
+											<br />
+											import android.app.Activity;
+											<br />
+											import android.os.Bundle;
+											<br />
+											import android.widget.TextView;
+											<br />
+											<br />
+											<span class="kwrd">public</span>
+											<span class="kwrd">class</span>
+											HelloAndroid extends Activity {
+											<br />
+											<span class="rem">/** Called when the activity is first
+												created. */</span>
+										</pre>
+										<pre class="csharpcode">
+											<span class="preproc">@Override</span>
+											<br />
+											<span class="kwrd">public</span>
+											<span class="kwrd">void</span>
+											onCreate(Bundle icicle) {
+											<br />
+											super.onCreate(icicle);
+											<br />
+											TextView tv =
+											<span class="kwrd">new</span>
+											TextView(
+											<span class="kwrd">this</span>
+											);
+											<br />
+											tv.setText(
+											<span class="str">&quot;过河卒, 每天进步1%&quot;</span>
+											);
+											<br />
+											setContentView(tv);
+											<br />
+											}
+											<br />
+											}
+										</pre>
+										<p>
+										</p>
+										<p>
+										</p>
+										<p>
+											<strong>不爽1：HelloWorld需启动两次</strong>
+										</p>
+										<p>在Eclipse的run菜单里面配置了Android
+											Appliaction的运行配置，一切OK，启动工程。一切启动正常，按照文档的说发，我就应该能够看到屏幕中显示出来的“过河卒，每天进步1%”的字样了。而我实践看到的确实手机桌面，不解。在手机菜单里面找了好几遍也没有找到相应的启动选项。（PS：到时里面的API
+											DEMO吸引我看了好久）。没办法，没看到效果。只好回头检查是否有错误。</p>
+										<p>发现Eclipse里面的启动信息如下：</p>
+										<p>
+											[2007-11-19 18:10:52 - HelloAndroid]
+											------------------------------
+											<br />
+											[2007-11-19 18:10:52 - HelloAndroid] Android Launch!
+											<br />
+											[2007-11-19 18:10:52 - HelloAndroid] Launching:
+											person.pengjun.hello.HelloAndroid
+											<br />
+											[2007-11-19 18:10:52 - HelloAndroid] Launching the emulator.
+										</p>
+										<p>回想doc里面说的，启动会先启动emulator，之后才会启动application。</p>
+										<p>看到这里，我又Ctrl+F11再启动了一次Android
+											Application，结果挺好。终于出现了，我希望看到的界面。</p>
+										<p>
+											<a
+												href="http://www.blogjava.net/images/blogjava_net/ponzmd/WindowsLiveWriter/Android_10FED/%E6%9C%AA%E5%91%BD%E5%90%8D2.jpg">
+												<img alt="未命名2" height="244" border="0" width="147"
+													style="border: 0px none ;" src="./testtest_files/未命名2_thumb.jpg" />
+											</a>
+										</p>
+										<p>启动信息如下：</p>
+										<p>
+											[2007-11-19 18:12:30 - HelloAndroid]
+											------------------------------
+											<br />
+											[2007-11-19 18:12:30 - HelloAndroid] Android Launch!
+											<br />
+											[2007-11-19 18:12:31 - HelloAndroid] Launching:
+											person.pengjun.hello.HelloAndroid
+											<br />
+											[2007-11-19 18:12:31 - HelloAndroid] Pushing HelloAndroid.apk
+											to /data/app on the device
+											<br />
+											[2007-11-19 18:12:31 - HelloAndroid] Starting activity on
+											device: person.pengjun.hello.HelloAndroid
+											<br />
+											[2007-11-19 18:12:33 - HelloAndroid] ActivityManager:
+											Starting: Intent {
+											comp={person.pengjun.hello/person.pengjun.hello.HelloAndroid}
+											}
+										</p>
+										<p>
+										</p>
+										<p>虽然这没有浪费我什么时间，但是文档里面居然一个字也没有提。不爽。</p>
+										<p>
+										</p>
+										<p>
+											<strong>
+												<br />
+											</strong>
+										</p>
+										<p>
+											<strong>
+												<br />
+											</strong>
+										</p>
+										<p>
+											<strong>
+												<br />
+											</strong>
+										</p>
+										<p>
+											<strong>不爽2：修改居然不会自动更新</strong>
+										</p>
+										<p>看到效果了，心里面也不免小兴奋一把。修改了“过河卒，每天进步1%”为“Android，I love
+											you”以表庆祝。启动运行，问题还是依旧，看到的还就手机桌面，心里面不免暗暗叹息。再次Ctrl+F11，这回出来了。但是出来了的字符让我伤心，居然还是“过河卒，，每天进步1%”，这有点受不了了。尝试关闭程序再次尝试，问题依旧。于是想是不是和Web浏览器的缓存一样，那有记录下来了。于是查找一番，果然让我查到了，在手机桌面的Application里面出现了
+											我的AndroidApplication，启动依然是“过河卒，每天进步1%”。</p>
+										<p>没办法只好查文档了，折腾了一会，终于让我查到。</p>
+										<p>
+											<a
+												href="http://code.google.com/android/reference/emulator.html#controlling"
+												title="http://code.google.com/android/reference/emulator.html#controlling">http://code.google.com/android/reference/emulator.html#controlling</a>
+										</p>
+										<p>里面有这样的记录：</p>
+										<p>
+											<em>
+												Only the first emulator instance can preserve user data
+												across sessions. It stores the user data in a file — by
+												default, it stores the data in the file
+												<code>~/.android/userdata.img (on Linux and Mac)</code>
+												or
+												<code>C:\Documents and
+													Settings\&lt;user&gt;&lt;/user&gt;\Local
+													Settings\Android\userdata.img</code>
+												(on Windows) in your development computer. You can control
+												the storage (and loading) location of the user data file by
+												using the
+												<code>-data</code>
+												option when starting the emulator 。
+											</em>
+										</p>
+										<p>
+											<code>原来在这里C:\Documents and
+												Settings\&lt;user&gt;&lt;/user&gt;\Local
+												Settings\Android\userdata.img</code>
+										</p>
+										<p>
+											去到这里，发现什么也没有。不甘心，查找了一下。原来它在
+											<code>C:\Documents
+												and Settings\&lt;user&gt;&lt;/user&gt;\Local Settings\
+												<strong>Application Data</strong>
+												\Android\userdata.img
+												。找到它，毫不客气删除重运行AndroidApplication，终于见到“Android，I love
+												you”。看来还是那句歌唱的好啊，“想说爱你不容易”。
+											</code>
+										</p>
+										<p>
+											<code>找到问题经过多次尝试，仍然不会自动随修改更新，心里面很是不爽啊。每次修改只好删除，userdata.img再试，实在麻烦。不过暂时也没有更好的办法，只好如此。由于默认目录太偏，而且会影响所有的Android的运行，所以想了个替代的办法。在Eclipse的run菜单里面配置emulator的启动配置。在工程文件下面建一个data文件夹，把这个user
+												data file 指定到这个位置上面。这样每个Application都配置的话相互直接也就不会影响了。配置如下图，</code>
+										</p>
+										<p>
+											<code>
+												<a
+													href="http://www.blogjava.net/images/blogjava_net/ponzmd/WindowsLiveWriter/Android_10FED/%E6%9C%AA%E5%91%BD%E5%90%8D3.jpg">
+													<img alt="未命名3" height="484" border="0" width="604"
+														style="border: 0px none ;" src="./testtest_files/未命名3_thumb.jpg" />
+												</a>
+											</code>
+										</p>
+										<p>不管配置的好，总之还是那个词，不爽。</p>
+										<p>上面是我今天初用Android遇到的问题，这可能和我机器的运行环境有关系。不知道大家是否也有遇到，不知道大家是否有更好好的处理办法？
+											请大家多多指点。</p>
+										<img alt="" height="1" width="1"
+											src="./testtest_files/161702.html" />
+										<br />
+										11月20日晨
+										<br />
+										早上换了台机器，重新解压了个eclipse,版本3.3.再次尝试HelloAndroid，居然上面的问题，一个也没有出现。这可能和系统的环境有关系。因为昨天的那台机器上面东西比较杂，也疏于打理。具体是什么方面的影响还不清楚，不过昨天机器的Eclipse是3.1的版本。
+										<br />
+										<div>
+											<a target="_blank" href="http://www.blogjava.net/ponzmd/"
+												style="text-decoration: none;">彭俊</a>
+											2007-11-19 19:21
+											<a target="_blank"
+												href="http://www.blogjava.net/ponzmd/archive/2007/11/19/161702.html#Feedback"
+												style="text-decoration: none;">发表评论</a>
+										</div>
+									</div>
+									<div id="topic_copyright">声明：ITeye文章版权属于作者，受法律保护。没有作者书面许可不得转载。 </div>
+									<div id="forum_recommended_f5">
+										<span>推荐链接</span>
+										<ul>
+											<li>
+												<a href="http://www.iteye.com/clicks/609" target="_blank">
+													<script type="text/javascript"><![CDATA[/*468*60，iteye新闻内页页底*/ var cpro_id = 'u671994';]]></script>
+													<script src="./testtest_files/c.js" type="text/javascript" />
+												</a>
+											</li>
+											<li>
+												<a href="http://www.iteye.com/clicks/854" target="_blank">
+													<span style="font-weight:bold;color:red">Java开发新方式：专注UI，快速开发！</span>
+												</a>
+											</li>
+										</ul>
+									</div>
+									<div id="forum_recommended_f0" />
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://ponzmd.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://ponzmd.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=%E8%BF%87%E6%B2%B3%E5%8D%92"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://ponzmd.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=%E8%BF%87%E6%B2%B3%E5%8D%92"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+							<tr id="415167">
+								<td class="postauthor">
+									<ul>
+										<li class="name">ray_linn</li>
+										<li>
+											等级:
+											<img src="./testtest_files/star5.gif" alt="五星会员" title="五星会员" />
+										</li>
+										<li>
+											<a href="http://raylinn.iteye.com/" target="_blank">
+												<img alt="ray_linn的博客" class="logo"
+													src="./testtest_files/dc247550-6fcf-4e61-9074-0d6a13c9af02.gif"
+													title="ray_linn的博客: 爬向春天的蜗牛" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 7694</li>
+										<li>积分: 605</li>
+										<li>来自: 坚持零分</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-19                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix"> 真差劲的Emulator,比起Visual Studio里的，好象差距甚远.    </div>
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://raylinn.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://raylinn.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=ray_linn"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://raylinn.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=ray_linn"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+										<a href="http://www.iteye.com/topic/141854#415167" title="ray_linn回帖:初体验Android的两个小不爽">回帖地址</a>
+									</div>
+									<div id="post_rate_box_415167" class="post_rate_box">
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="good" title="好">0</a>
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="hidden" title="差">0</a>
+										请登录后投票
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+							<tr id="415170">
+								<td class="postauthor">
+									<ul>
+										<li class="name">robbin</li>
+										<li>
+											等级:
+											<img src="./testtest_files/zisen.gif" alt="资深会员" title="资深会员" />
+											<span style="color:#009900;font-weight:bold;">资深会员</span>
+										</li>
+										<li>
+											<a href="http://robbin.iteye.com/" target="_blank">
+												<img alt="robbin的博客" class="logo"
+													src="./testtest_files/76122f8b-2027-3997-8e92-8aea4416a30b.jpg"
+													title="robbin的博客: robbin的自言自语" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 6222</li>
+										<li>积分: 3125</li>
+										<li>来自: 北京</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-19                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix"> 现在的模拟器跑起来貌似比较费CPU，其他的倒还好。    </div>
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://robbin.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://robbin.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=robbin"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://robbin.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=robbin"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+										<a href="http://www.iteye.com/topic/141854#415170" title="robbin回帖:初体验Android的两个小不爽">回帖地址</a>
+									</div>
+									<div id="post_rate_box_415170" class="post_rate_box">
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="good" title="好">0</a>
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="hidden" title="差">0</a>
+										请登录后投票
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+							<tr id="415171">
+								<td class="postauthor">
+									<ul>
+										<li class="name">过河卒</li>
+										<li>
+											等级:
+											<img src="./testtest_files/star3.gif" alt="三星会员" title="三星会员" />
+										</li>
+										<li>
+											<a href="http://ponzmd.iteye.com/" target="_blank">
+												<img alt="过河卒的博客" class="logo"
+													src="./testtest_files/5ae5d35a-c469-45f0-a827-a8cfb6d7561a.jpg"
+													title="过河卒的博客: 过河卒" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 129</li>
+										<li>积分: 298</li>
+										<li>来自: 西安</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-19                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix">
+										<div class="quote_title">robbin 写道</div>
+										<div class="quote_div">现在的模拟器跑起来貌似比较费CPU，其他的倒还好。</div>
+										<br />
+										<br />
+										跑起来对资源的占用到还好，问题是这些小问题很伤情绪，不知道各位有没有遇到。
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://ponzmd.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://ponzmd.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=%E8%BF%87%E6%B2%B3%E5%8D%92"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://ponzmd.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=%E8%BF%87%E6%B2%B3%E5%8D%92"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+										<a href="http://www.iteye.com/topic/141854#415171" title="过河卒回帖:初体验Android的两个小不爽">回帖地址</a>
+									</div>
+									<div id="post_rate_box_415171" class="post_rate_box">
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="good" title="好">0</a>
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="hidden" title="差">0</a>
+										请登录后投票
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+							<tr id="415179">
+								<td class="postauthor">
+									<ul>
+										<li class="name">QuakeWang</li>
+										<li>
+											等级:
+											<img src="./testtest_files/dimd5.gif" alt="五钻会员" title="五钻会员" />
+										</li>
+										<li>
+											<a href="http://quake.iteye.com/" target="_blank">
+												<img alt="QuakeWang的博客" class="logo"
+													src="./testtest_files/4e9322b1-b885-3d92-bf20-523b98d8587b.jpg"
+													title="QuakeWang的博客: 写程序的70后" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 855</li>
+										<li>积分: 2516</li>
+										<li>来自: 上海</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-19                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix">
+										第一个问题我也有遇到，不过google了一下，就找到问题了，据说是eclipse plugin的bug
+										<br />
+										<br />
+										第二个问题我没有遇到，编译以后，重新运行一下（模拟器不要关掉）就可以看到新的了。
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://quake.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://quake.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=QuakeWang"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://quake.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=QuakeWang"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+										<a href="http://www.iteye.com/topic/141854#415179" title="QuakeWang回帖:初体验Android的两个小不爽">回帖地址</a>
+									</div>
+									<div id="post_rate_box_415179" class="post_rate_box">
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="good" title="好">0</a>
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="hidden" title="差">0</a>
+										请登录后投票
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+							<tr id="415185">
+								<td class="postauthor">
+									<ul>
+										<li class="name">gigix</li>
+										<li>
+											等级:
+											<img src="./testtest_files/zisen.gif" alt="资深会员" title="资深会员" />
+											<span style="color:#009900;font-weight:bold;">资深会员</span>
+										</li>
+										<li>
+											<a href="http://gigix.iteye.com/" target="_blank">
+												<img alt="gigix的博客" class="logo"
+													src="./testtest_files/a43d1bc6-aa07-4faf-b6b1-4e2ca99a1dac.bmp"
+													title="gigix的博客: 透明之眼" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 4925</li>
+										<li>积分: 2991</li>
+										<li>来自: 北京</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-19                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix">
+										我想找个办法编程控制这个模拟器，按几个钮啥的，至今未找到啊～～
+										<br />
+										不能自动化测试的程序，那开发起来是相当费劲的说～～
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://gigix.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://gigix.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=gigix"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://gigix.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=gigix"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+										<a href="http://www.iteye.com/topic/141854#415185" title="gigix回帖:初体验Android的两个小不爽">回帖地址</a>
+									</div>
+									<div id="post_rate_box_415185" class="post_rate_box">
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="good" title="好">0</a>
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="hidden" title="差">0</a>
+										请登录后投票
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+							<tr id="415186">
+								<td class="postauthor">
+									<ul>
+										<li class="name">Eastsun</li>
+										<li>
+											等级:
+											<img src="./testtest_files/dimd2.gif" alt="二钻会员" title="二钻会员" />
+										</li>
+										<li>
+											<a href="http://eastsun.iteye.com/" target="_blank">
+												<img alt="Eastsun的博客" class="logo"
+													src="./testtest_files/e9aa329e-74a6-34c8-be31-e1b00388fcf5.jpg"
+													title="Eastsun的博客: http://ithinksoim.wordpress.com/" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 794</li>
+										<li>积分: 1329</li>
+										<li>来自: 天津</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-19                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix">
+										不知道什么时候出Netbeans的插件.
+										<br />
+										总不能为了玩Android而去装个eclipse吧...
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://eastsun.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://eastsun.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=Eastsun"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://eastsun.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=Eastsun"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+										<a href="http://www.iteye.com/topic/141854#415186" title="Eastsun回帖:初体验Android的两个小不爽">回帖地址</a>
+									</div>
+									<div id="post_rate_box_415186" class="post_rate_box">
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="good" title="好">0</a>
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="hidden" title="差">0</a>
+										请登录后投票
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+							<tr id="415195">
+								<td class="postauthor">
+									<ul>
+										<li class="name">gigix</li>
+										<li>
+											等级:
+											<img src="./testtest_files/zisen.gif" alt="资深会员" title="资深会员" />
+											<span style="color:#009900;font-weight:bold;">资深会员</span>
+										</li>
+										<li>
+											<a href="http://gigix.iteye.com/" target="_blank">
+												<img alt="gigix的博客" class="logo"
+													src="./testtest_files/a43d1bc6-aa07-4faf-b6b1-4e2ca99a1dac.bmp"
+													title="gigix的博客: 透明之眼" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 4925</li>
+										<li>积分: 2991</li>
+										<li>来自: 北京</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-19                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix">
+										<div class="quote_title">Eastsun 写道</div>
+										<div class="quote_div">
+											不知道什么时候出Netbeans的插件.
+											<br />
+											总不能为了玩Android而去装个eclipse吧...
+										</div>
+										<br />
+										copy一个makefile好了（还是ant脚本？忘了）
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://gigix.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://gigix.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=gigix"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://gigix.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=gigix"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+										<a href="http://www.iteye.com/topic/141854#415195" title="gigix回帖:初体验Android的两个小不爽">回帖地址</a>
+									</div>
+									<div id="post_rate_box_415195" class="post_rate_box">
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="good" title="好">0</a>
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="hidden" title="差">0</a>
+										请登录后投票
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+							<tr id="415235">
+								<td class="postauthor">
+									<ul>
+										<li class="name">lordhong</li>
+										<li>
+											等级:
+											<img src="./testtest_files/dimd5.gif" alt="五钻会员" title="五钻会员" />
+										</li>
+										<li>
+											<a href="http://lordhong.iteye.com/" target="_blank">
+												<img alt="lordhong的博客" class="logo"
+													src="./testtest_files/8e761c52-85fa-3162-b96a-885d6909260b.jpg"
+													title="lordhong的博客: lordhong" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 4687</li>
+										<li>积分: 2737</li>
+										<li>来自: 在野</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-19                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix"> 第二个没遇过, 重新RUN基本都搞定了...    </div>
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://lordhong.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://lordhong.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=lordhong"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://lordhong.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=lordhong"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+										<a href="http://www.iteye.com/topic/141854#415235" title="lordhong回帖:初体验Android的两个小不爽">回帖地址</a>
+									</div>
+									<div id="post_rate_box_415235" class="post_rate_box">
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="good" title="好">0</a>
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="hidden" title="差">0</a>
+										请登录后投票
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+							<tr id="415250">
+								<td class="postauthor">
+									<ul>
+										<li class="name">fins</li>
+										<li>
+											等级:
+											<img src="./testtest_files/zisen.gif" alt="资深会员" title="资深会员" />
+											<span style="color:#009900;font-weight:bold;">资深会员</span>
+										</li>
+										<li>
+											<a href="http://fins.iteye.com/" target="_blank">
+												<img alt="fins的博客" class="logo"
+													src="./testtest_files/8b5d1675-cdba-3cb7-8682-1c9ba0174e40.jpg"
+													title="fins的博客: 大城小胖的大城" />
+											</a>
+										</li>
+										<li>
+											性别:
+											<img src="./testtest_files/icon_minigender_1.gif" title="男" />
+										</li>
+										<li>文章: 3199</li>
+										<li>积分: 2953</li>
+										<li>来自: 小胖儿的大城</li>
+										<li>
+											<img src="./testtest_files/offline.gif" />
+										</li>
+									</ul>
+								</td>
+								<td class="postcontent">
+									<div class="postactions">
+										<div class="description">    发表时间：2007-11-20                </div>
+										<div class="links">
+										</div>
+									</div>
+									<div class="postbody clearfix">
+										这些问题有时候是有 但是lz说的解决方法不是最好的
+										<br />
+										要善用 adb shell
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="postauthor">
+									<a href="http://www.iteye.com/topic/141854#">返回顶楼</a>
+								</td>
+								<td class="postcontent">
+									<div class="icons">
+										<a href="http://fins.iteye.com/" class="icon_www" title="浏览作者的博客"> </a>
+										<a href="http://fins.iteye.com/blog/profile" class="icon_profile"
+											title="浏览作者资料"> </a>
+										<a
+											href="http://my.iteye.com/messages/new?message%5Breceiver_name%5D=fins"
+											class="icon_pm" title="发送站内短信"> </a>
+										<a href="http://fins.iteye.com/blog/guest_book" class="icon_guestbook"
+											title="给作者留言"> </a>
+										<a
+											href="http://my.iteye.com/feed?subscription%5Bsubscribed_user_name%5D=fins"
+											class="icon_rss"
+											onclick="var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var s = document.createElement(&#39;input&#39;); s.setAttribute(&#39;type&#39;, &#39;hidden&#39;); s.setAttribute(&#39;name&#39;, &#39;authenticity_token&#39;); s.setAttribute(&#39;value&#39;, &#39;epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=&#39;); f.appendChild(s);f.submit();return false;"
+											title="关注作者"> </a>
+										<a href="http://www.iteye.com/topic/141854#415250" title="fins回帖:初体验Android的两个小不爽">回帖地址</a>
+									</div>
+									<div id="post_rate_box_415250" class="post_rate_box">
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="good" title="好">0</a>
+										<a href="http://www.iteye.com/topic/141854#" onclick="return false;"
+											class="hidden" title="差">0</a>
+										请登录后投票
+									</div>
+								</td>
+							</tr>
+							<tr class="sep2">
+								<td colspan="2" />
+							</tr>
+						</tbody>
+					</table>
+					<div class="actions">
+						<div class="buttons" />
+						<div class="wrapper">
+							<div class="pagination">
+								<span class="disabled prev_page">« 上一页</span>
+								<span class="current">1</span>
+								<a href="http://www.iteye.com/topic/141854?page=2" rel="next">2</a>
+								<a href="http://www.iteye.com/topic/141854?page=2" class="next_page"
+									rel="next">下一页 »</a>
+							</div>
+						</div>
+					</div>
+					<div>
+						<div class="crumbs">
+							<a href="http://www.iteye.com/forums">论坛首页</a>
+							<span class="arrow">→</span>
+							<a href="http://www.iteye.com/forums/board/mobile">移动开发技术版</a>
+							<br />
+							<br />
+							跳转论坛:
+							<select id="forum_urlname" name="forum[urlname]"
+								onchange="window.location=&#39;/forums/board/&#39;+this.value">
+								<option value="mobile" selected="selected">移动开发技术</option>
+								<option value="web">Web前端技术</option>
+								<option value="Java">Java企业应用</option>
+								<option value="language">编程语言技术</option>
+								<option value="Tech">综合技术</option>
+								<option value="New">入门技术</option>
+								<option value="Job">招聘求职</option>
+								<option value="Life">海阔天空</option>
+							</select>
+						</div>
+					</div>
+					<div style="display:none">
+						<form action="http://www.iteye.com/posts/rate" id="post_rate_form"
+							method="post"
+							onsubmit="new Ajax.Request(&#39;/posts/rate&#39;, {asynchronous:true, evalScripts:true, parameters:Form.serialize(this)}); return false;">
+							<div style="margin:0;padding:0;display:inline">
+								<input name="authenticity_token" type="hidden"
+									value="epVecymY7WHHVsPrJ3+JyGvQrvsbn62j5wXKZfFvzl4=" />
+							</div>
+							<input type="hidden" id="post_rate_id" name="id" />
+							<input type="hidden" id="post_rate_type" name="type" />
+						</form>
+					</div>
+					<script type="text/javascript"><![CDATA[  function processComment() {    fix_image_size($$('div.postbody img'), 760);        $$('#forum_main > #posts > tr[id]').each(function(tr){      var post_id = tr.id;      $$("#"+post_id+" pre[name=code]").each(function(pre, index){        var location = window.location;        source_url = location.protocol + "//" + location.host + location.pathname + location.search;        source_url += "#" + post_id;        pre.writeAttribute('codeable_type', 'Post');        pre.writeAttribute('codeable_id', post_id);        pre.writeAttribute('source_url', source_url);        pre.writeAttribute('pre_index', index);        pre.writeAttribute('title', '初体验Android的两个小不爽');      });    });  }  dp.SyntaxHighlighter.HighlightAll('code', true, true);  processComment();  code_favorites_init();  function rate_post(id, type) {    Element.update('post_rate_box_' + id, '提交中...');    new Ajax.Request('/posts/rate', {asynchronous:true, evalScripts:true, parameters:{"id":id, "type":type}});  }  function rate_topic(type) {    Element.update('topic_rate_box', '提交中...');    new Ajax.Request('/topics/rate', {asynchronous:true, evalScripts:true, parameters:{"id":141854, "type":type}});  }]]></script>
+				</div>
+				<div id="nav">
+					<div class="wrapper">
+						<ul>
+							<li>
+								<a href="http://www.iteye.com/">首页</a>
+							</li>
+							<li>
+								<a href="http://www.iteye.com/news">资讯</a>
+							</li>
+							<li>
+								<a href="http://www.iteye.com/magazines">精华</a>
+							</li>
+							<li>
+								<a href="http://www.iteye.com/forums" class="selected">论坛</a>
+							</li>
+							<li>
+								<a href="http://www.iteye.com/ask">问答</a>
+							</li>
+							<li>
+								<a href="http://www.iteye.com/blogs">博客</a>
+							</li>
+							<li>
+								<a href="http://www.iteye.com/blogs/subjects">专栏</a>
+							</li>
+							<li>
+								<a href="http://www.iteye.com/groups">群组</a>
+							</li>
+							<li>
+								<a target="_blank" href="http://job.iteye.com/iteye">招聘</a>
+							</li>
+							<li class="last">
+								<a href="http://www.iteye.com/search">搜索</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div id="footer">
+				<div id="site_nav">
+					<ul>
+						<li>
+							<a href="http://www.iteye.com/index/service">广告服务</a>
+						</li>
+						<li>
+							<a href="http://webmaster.iteye.com/">ITeye黑板报</a>
+						</li>
+						<li>
+							<a href="http://www.iteye.com/index/contactus">联系我们</a>
+						</li>
+						<li class="last">
+							<a href="http://www.iteye.com/index/friend_links">友情链接</a>
+						</li>
+					</ul>
+				</div>
+				<div id="copyright">
+					© 2003-2012 ITeye.com. [
+					<a href="http://www.miibeian.gov.cn/">京ICP证110151号</a>
+					京公网安备110105010620 ]
+					<br />
+					百联优力(北京)投资有限公司 版权所有
+					<br />
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript"><![CDATA[  document.write("<img src='http://stat.iteye.com/?url="+ encodeURIComponent(document.location.href) + "&referrer=" + encodeURIComponent(document.referrer) + "&user_id=' width='0' height='0' />");]]></script>
+	</body>
+</html>

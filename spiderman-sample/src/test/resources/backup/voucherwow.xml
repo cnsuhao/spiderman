@@ -157,7 +157,7 @@
 					<field name="expiryTime">
 						<parsers>
 							<parser xpath="//script/text()" regex="(?&lt;=(until: '))\d+" />
-							<parser exp="$Util.toLong($this)*1000+$Util.getNow()" />
+							<parser exp="$Util.addLong($Util.toLong($this)*1000,$Util.getNow())" />
 							<parser exp="$Util.String($this.substring(0, 10))" />
 						</parsers>
 					</field>
