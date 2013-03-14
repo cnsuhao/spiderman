@@ -138,7 +138,7 @@
 							<parser xpath="//h1[@id='h1title']/text()" />
 						</parsers>
 					</field>
-					<field name="content" isArray="1" isAlsoParseInNextPage="1">
+					<field name="content" isArray="1" isAlsoParseInNextPage="1" isTrim="1">
 						<parsers>
 							<parser xpath="//div[@id='endText']" exp="$output($this)" />
 							<!--attribute 黑名单-->

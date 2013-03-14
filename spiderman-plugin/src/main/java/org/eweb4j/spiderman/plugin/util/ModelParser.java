@@ -1,7 +1,6 @@
 package org.eweb4j.spiderman.plugin.util;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -32,7 +31,6 @@ import org.eweb4j.spiderman.xml.Namespaces;
 import org.eweb4j.spiderman.xml.Parsers;
 import org.eweb4j.spiderman.xml.Target;
 import org.eweb4j.util.CommonUtil;
-import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.xml.Attrs;
 import org.eweb4j.util.xml.Tags;
 import org.htmlcleaner.HtmlCleaner;
@@ -85,6 +83,7 @@ public class ModelParser extends DefaultHandler{
 		fel.getContext().set("$target", this.target);
 		fel.getContext().set("$listener", this.listener);
 		fel.getContext().set("$task_url", this.task.url);
+		fel.getContext().set("$source_url", this.task.sourceUrl);
 	}
 	
 	public ModelParser(Task task, Target target, SpiderListener listener) {
@@ -118,6 +117,7 @@ public class ModelParser extends DefaultHandler{
         factory.setNamespaceAware(!isFromHtml); // never forget this!
         DocumentBuilder builder = factory.newDocumentBuilder();
         String validXml = ParserUtil.checkUnicodeString(page.getContent());
+        fel.getContext().set("$page_content", validXml);
     	Document doc = builder.parse(new ByteArrayInputStream(validXml.getBytes()));
         XPathFactory xfactory = XPathFactoryImpl.newInstance();
         XPath xpathParser = xfactory.newXPath();
@@ -343,8 +343,9 @@ public class ModelParser extends DefaultHandler{
 	private List<Map<String, Object>> parseHtml(Page page) throws Exception{
 		HtmlCleaner cleaner = new HtmlCleaner();
 		cleaner.getProperties().setTreatUnknownTagsAsContent(true);
-		TagNode rootNode = cleaner.clean(page.getContent());
-		
+		String html = page.getContent();
+		fel.getContext().set("$page_content", html);
+		TagNode rootNode = cleaner.clean(html);
         final List<Field> fields = target.getModel().getField();
 		String isModelArray = target.getModel().getIsArray();
 		String modelXpath = target.getModel().getXpath();

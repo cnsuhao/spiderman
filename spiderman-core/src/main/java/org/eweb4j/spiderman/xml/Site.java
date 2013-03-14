@@ -29,6 +29,9 @@ public class Site {
 	@AttrTag
 	private String name;//网站名
 	
+	@AttrTag
+	private String country;//网站所属国家
+	
 	private ValidHosts validHosts;//限制在同这些host里面抓取数据
 	
 	@AttrTag
@@ -120,6 +123,14 @@ public class Site {
 		this.name = name;
 	}
 	
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
 	public ValidHosts getValidHosts() {
 		return this.validHosts;
 	}

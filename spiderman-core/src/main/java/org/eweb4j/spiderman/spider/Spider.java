@@ -173,8 +173,10 @@ public class Spider implements Runnable{
 				return ;
 			}
 			
-			for (Map<String,Object> model : models)
+			for (Map<String,Object> model : models){
+				model.put("source_url", task.sourceUrl);
 				model.put("task_url", task.url);
+			}
 			
 			// 统计任务完成数+1
 			this.task.site.counter.plus();

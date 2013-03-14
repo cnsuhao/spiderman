@@ -10,7 +10,18 @@ import org.eweb4j.util.xml.AttrTag;
 public class Seed {
 
 	@AttrTag
+	private String name;
+	
+	@AttrTag
 	private String url;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public String getUrl() {
 		return this.url;
