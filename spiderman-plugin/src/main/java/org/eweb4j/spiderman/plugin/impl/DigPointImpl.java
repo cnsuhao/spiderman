@@ -54,24 +54,26 @@ public class DigPointImpl implements DigPoint{
 			if (!moveUrl.equals(task.url))
 				urls.add(moveUrl);
 		}
+		
 		// 如果定义了sourceUrl的digUrls，只是用这个方式发现新url
 		Target target = site.getTargets().getTarget().get(0);
 		Rules rules = target.getSourceRules();
 		if (rules != null && rules.getRule() != null && !rules.getRule().isEmpty()){
 			for (Rule r : rules.getRule()){
-				boolean isSourceUrl = UrlRuleChecker.check(task.url, Arrays.asList(r));
+				Model digModel = r.getDigUrls();
+				
 				//判断当前url是否是sourceUrl
+				boolean isSourceUrl = UrlRuleChecker.check(task.url, Arrays.asList(r), "and");
 				if (!isSourceUrl)
 					continue;
 				
 				//判断是否定义了digUrls
-				Model mdl = r.getDigUrls();
 				Target tgt = new Target();
 				tgt.setCType(target.getCType());
 				tgt.setIsForceUseXmlParser(target.getIsForceUseXmlParser());
 				tgt.setName(target.getName());
 				tgt.setNamespaces(target.getNamespaces());
-				tgt.setModel(mdl);
+				tgt.setModel(digModel);
 				Collection<String> newUrls = UrlUtils.digUrls(result.getPage(), task, r, tgt, listener);
 //				System.out.println("newUrls->"+newUrls);
 //				System.out.println("from->"+task.url);

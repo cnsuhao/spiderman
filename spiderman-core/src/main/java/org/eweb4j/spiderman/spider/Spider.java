@@ -20,6 +20,7 @@ import org.eweb4j.spiderman.plugin.TaskPushPoint;
 import org.eweb4j.spiderman.plugin.TaskSortPoint;
 import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.spiderman.url.SourceUrlChecker;
+import org.eweb4j.spiderman.xml.Rules;
 import org.eweb4j.spiderman.xml.Target;
 import org.eweb4j.util.CommonUtil;
 
@@ -155,7 +156,8 @@ public class Spider implements Runnable{
 				return ;
 			
 			//检查sourceUrl
-			boolean isSourceUrlOk = SourceUrlChecker.checkSourceUrl(target.getSourceRules(), task.sourceUrl);
+			Rules rules = target.getSourceRules();
+			boolean isSourceUrlOk = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl, rules.getPolicy());
 			if (!isSourceUrlOk){
 				return ;
 			}
