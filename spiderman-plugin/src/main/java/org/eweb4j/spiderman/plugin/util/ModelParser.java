@@ -303,13 +303,11 @@ public class ModelParser extends DefaultHandler{
 					}
 				}
 				
-				//数组的话，需要去除重复和空空元素
+				//数组的话，需要去除空元素
 				if (values.size() >= 2){
 					List<Object> noRepeatValues = new ArrayList<Object>();
 					for (Iterator<Object> it = values.iterator(); it.hasNext(); ){
 						Object obj = it.next();
-						if (noRepeatValues.contains(obj))
-							continue;
 						if (obj instanceof String) {
 							if (((String)obj) == null || ((String)obj).trim().length() == 0)
 								continue;
@@ -498,13 +496,11 @@ public class ModelParser extends DefaultHandler{
 					}
 				}
 				
-				//数组的话，需要去除重复和空空元素
+				//数组的话，需要去除空元素
 				if (values.size() >= 2){
 					List<Object> noRepeatValues = new ArrayList<Object>();
 					for (Iterator<Object> it = values.iterator(); it.hasNext(); ){
 						Object obj = it.next();
-						if (noRepeatValues.contains(obj))
-							continue;
 						if (obj instanceof String) {
 							if (((String)obj) == null || ((String)obj).trim().length() == 0)
 								continue;
