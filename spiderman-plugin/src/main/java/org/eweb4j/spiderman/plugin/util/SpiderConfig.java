@@ -97,7 +97,7 @@ public class SpiderConfig {
 	/**
 	 * Should we follow redirects?
 	 */
-	private boolean followRedirects = true;
+	private boolean followRedirects = false;
 
 	/**
 	 * If crawler should run behind a proxy, this parameter can be used for

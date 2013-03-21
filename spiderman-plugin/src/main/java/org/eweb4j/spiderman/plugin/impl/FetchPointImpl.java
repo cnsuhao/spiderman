@@ -72,8 +72,8 @@ public class FetchPointImpl implements FetchPoint{
 					config.setUserAgentString(task.site.getUserAgent());
 				if ("1".equals(task.site.getIncludeHttps()) || "true".equals(task.site.getIncludeHttps()))
 					config.setIncludeHttpsPages(true);
-				if ("0".equals(task.site.getIsFollowRedirects()) || "false".equals(task.site.getIsFollowRedirects()))
-					config.setFollowRedirects(false);
+				if ("1".equals(task.site.getIsFollowRedirects()) || "true".equals(task.site.getIsFollowRedirects()))
+					config.setFollowRedirects(true);
 				
 				String sdelay = task.site.getReqDelay();
 				if (sdelay == null || sdelay.trim().length() == 0)
