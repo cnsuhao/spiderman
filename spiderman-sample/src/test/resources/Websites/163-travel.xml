@@ -88,7 +88,7 @@
 			<!--
 			  | name:目标名称	
 			-->
-			<target name="travel" isForceUseXmlParser="1">
+			<target name="article" isForceUseXmlParser="1">
 				<!--
 				  | 目标URL的规则
 				-->

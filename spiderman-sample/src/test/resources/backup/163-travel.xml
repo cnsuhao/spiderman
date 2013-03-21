@@ -21,7 +21,7 @@
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	-->
-	<site name="163-travel" url="http://travel.163.com/special/cjgat/" reqDelay="1s" enable="0" charset="gbk" schedule="1h" thread="2" waitQueue="10s">
+	<site name="163-travel" url="http://travel.163.com/special/cjgat/" reqDelay="1s" enable="1" charset="gbk" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | url:种子链接
@@ -88,7 +88,7 @@
 			<!--
 			  | name:目标名称	
 			-->
-			<target name="travel" isForceUseXmlParser="1">
+			<target name="article" isForceUseXmlParser="1">
 				<!--
 				  | 目标URL的规则
 				-->
