@@ -38,9 +38,10 @@
 		</headers>-->
 		<!--
 		  | HTTP Cookie
+		-->
 		<cookies>
-			<cookie name="" value="" domain="" path="" />
-		</cookies>-->
+			<cookie name="PHPSESSID" value="cb731c948a731f5f9b4093a9ffa46d07" host="www.myimart.com" path="/" />
+		</cookies>
 		<!--
 		  | 进入任务队列的URL规则
 		  | policy:多个rule的策略，暂时只实现了and，未来会有or
