@@ -41,7 +41,7 @@
 		<!--
 		  | HTTP Cookie
 		<cookies>
-			<cookie name="" value="" domain="" path="" />
+			<cookie name="" value="" host="" path="" />
 		</cookies>-->
 		<!--
 		  | 进入任务队列的URL规则
