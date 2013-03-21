@@ -151,6 +151,8 @@ public class PageFetcherImpl implements PageFetcher{
 		
 		httpClient.getParams().setIntParameter("http.socket.timeout", 60000);
 		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BEST_MATCH);
+		httpClient.getParams().setParameter(ClientPNames.HANDLE_REDIRECTS, config.isFollowRedirects());
+//		HttpClientParams.setCookiePolicy(httpClient.getParams(),CookiePolicy.BEST_MATCH);
 
 		//设置响应拦截器
         httpClient.addResponseInterceptor(new HttpResponseInterceptor() {
@@ -179,6 +181,7 @@ public class PageFetcherImpl implements PageFetcher{
 			}
 			if (this.site.getCookies() != null && this.site.getCookies().getCookie() != null){
 				for (org.eweb4j.spiderman.xml.Cookie cookie : this.site.getCookies().getCookie()){
+					System.out.println("cookie------>"+CommonUtil.toJson(cookie));
 					this.addCookie(cookie.getName(), cookie.getValue(), cookie.getHost(), cookie.getPath());
 				}
 			}
@@ -335,15 +338,14 @@ public class PageFetcherImpl implements PageFetcher{
 		//设置返回内容的字符集
 		String contentCharset = EntityUtils.getContentCharSet(entity);
 		page.setCharset(contentCharset);
-		
 		//根据配置文件设置的字符集参数进行内容二进制话
 		String charset = config.getCharset();
 		String content = this.read(entity.getContent(), charset);
 		page.setContent(content);
-		if (charset == null || charset.trim().length() == 0)
-			page.setContentData(content.getBytes());
-		else
-			page.setContentData(content.getBytes(charset));
+//		if (charset == null || charset.trim().length() == 0)
+//			page.setContentData(content.getBytes());
+//		else
+//			page.setContentData(content.getBytes(charset));
 		
 		return page;
 	}

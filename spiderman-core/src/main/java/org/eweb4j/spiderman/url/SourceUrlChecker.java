@@ -11,7 +11,7 @@ import org.eweb4j.spiderman.xml.Rules;
  * @date 2013-2-28 下午08:34:54
  */
 public class SourceUrlChecker {
-	public static boolean checkSourceUrl(Rules rules, String sourceUrl, String policy) {
+	public static boolean checkSourceUrl(Rules rules, String sourceUrl) {
 		if (sourceUrl != null) {
 			// 判断下当前Target的sourceURL是否是我们要的来源URL
 			if (rules == null)
@@ -21,7 +21,7 @@ public class SourceUrlChecker {
 				if (ruleList == null || ruleList.isEmpty())
 					return true;
 				else {
-					return UrlRuleChecker.check(sourceUrl, ruleList, policy);
+					return UrlRuleChecker.check(sourceUrl, ruleList, rules.getPolicy());
 				}
 			}
 		}

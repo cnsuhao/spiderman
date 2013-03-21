@@ -10,6 +10,23 @@ public class Model {
 	@AttrTag
 	private String clazz ;
 	
+	/**
+	 * 目标的contentType
+	 */
+	@AttrTag
+	private String cType;
+	
+	/**
+	 * 如果页面是html类型，是否强制使用XML的解析器来解析xpath
+	 */
+	@AttrTag
+	private String isForceUseXmlParser;
+	
+	/**
+	 * XML命名空间设置
+	 */
+	private Namespaces namespaces;
+	
 	@AttrTag
 	private String isArray ;
 	
@@ -82,4 +99,29 @@ public class Model {
 		
 		return fields;
 	}
+
+	public String getCType() {
+		return cType;
+	}
+
+	public void setCType(String cType) {
+		this.cType = cType;
+	}
+
+	public String getIsForceUseXmlParser() {
+		return isForceUseXmlParser;
+	}
+
+	public void setIsForceUseXmlParser(String isForceUseXmlParser) {
+		this.isForceUseXmlParser = isForceUseXmlParser;
+	}
+
+	public Namespaces getNamespaces() {
+		return namespaces;
+	}
+
+	public void setNamespaces(Namespaces namespaces) {
+		this.namespaces = namespaces;
+	}
+	
 }

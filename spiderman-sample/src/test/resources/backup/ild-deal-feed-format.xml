@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<ildfeed>
+	<apiversion>1.0</apiversion>
+	<!--The version of API, for our internal reference only [REQUIRED]-->
+	<site_name>StreetDeal.sg</site_name>
+	<!--The name of your website, domain name is recommended [REQUIRED]-->
+	<goodsdata>
+		<goods>
+			<pid>102541</pid>
+			<!--The unique ID for the goods, normally it could be the primary key in database [REQUIRED]-->
+			<site_url>http://www.streetdeal.sg/</site_url>
+			<!--The main url of your website, if you have specific url for different cities, use the specific one [REQUIRED]-->
+			<city>Singapore</city>
+			<!--[REQUIRED]-->
+			<short_title>4D3N Bali Villa Trip</short_title>
+			<!--The short title usually could the product/service user paid for. e.g. 10 Session Facial Treatment; HanSing Korean BBQ Buffet; [OPTIONAL]-->
+			<long_title>4D3N BALI, INDONESIA: $333 per pax for 4D3N stay at Adi Dharma BALI + Daily Breakfast + Return Flights by KLM + Airport Transfers + Half Day City Tour! (min. 2 to go)</long_title>
+			<!--More verbose title with more detailed information [REQUIRED]-->
+			<sale_price>333</sale_price>
+			<!--[REQUIRED]-->
+			<original_price>542</original_price>
+			<!--[REQUIRED]-->
+			<discount>0.614</discount>
+			<!--The decimal sale_price devided by original_price, if the goods has no specific price, put sale_price, original_price "0" [OPTIONAL]-->
+			<currency>SGD</currency>
+			<!--[REQUIRED]-->
+			<sold_num>20</sold_num>
+			<!--Current bought number for the goods [OPTIONAL]-->
+			<max_num>100</max_num>
+			<!--Maximum bought allowed for the goods[OPTIONAL]-->
+			<min_num>10</min_num>
+			<!--Minimum bought to activate the goods[OPTIONAL]-->
+			<current_status>ongoing</current_status>
+			<!--Could be "ongoing, pending, soldout, expired, unavailable" [OPTIONAL] -->
+			<start_time>2013-01-30 01:00:00</start_time>
+			<!--Start time for user to purchase[REQUIRED]-->
+			<end_time>2013-02-10 00:00:00</end_time>
+			<!--The deadline for user to purchase[REQUIRED]-->
+			<validity_start_time>2013-02-01 10:00:00</validity_start_time>
+			<!--Start time user to redeem[OPTIONAL]-->
+			<validity_end_time>2013-05-01 10:00:00</validity_end_time>
+			<!--The deadline for user to redeem[OPTIONAL]-->
+			<destination>Indonesia, Bali</destination>
+			<!--For travel deal only, other type leave it empty[OPTIONAL]-->
+			<category>Travel</category>
+			<!--Could be Travel, Food, Beauty, Attraction, Leisure, Learning, Services, Products [REQUIRED]-->
+			<keywords>Travel, Bali, Villa, KLM, City Tour</keywords>
+			<!--The keywords list to describe the goods[OPTIONAL]-->
+			<features>Min 2 Go, Tax Included, Land Transfer</features>
+			<!--Special features of the goods/deal, e.g. Free Delivery, Use Instantly etc.[OPTIONAL]-->
+			<main_img_url>http://www.streetdeal.sg/1.jpg</main_img_url>
+			<!--Main image displayed in list page[REQIRED]-->
+			<slide>
+				<slide_img_url>http://www.streetdeal.sg/1.jpg</slide_img_url>				
+				<slide_img_url>http://www.streetdeal.sg/2.jpg</slide_img_url>
+			</slide>
+			<!--Slide images if multiple images provided, displayed in detail page[OPTIONAL]-->
+			<options>
+				<option>
+					<short_title>4D3N Bali Villa Trip 2 Pax</short_title>
+					<!--[OPTIONAL]-->
+					<long_title>$333 per pax for 4D3N stay at Adi Dharma BALI + Daily Breakfast for 2 Pax</long_title>
+					<!--[REQUIRED]-->
+					<original_price>333</original_price>
+					<!--[REQUIRED]-->
+					<sale_price>542</sale_price>
+					<!--[REQUIRED]-->
+					<discount>0.614</discount>
+					<!--[OPTIONAL]-->
+				</option>
+				<option>
+					<short_title>4D3N Bali Villa Trip 4 Pax</short_title>
+					<long_title>$299 per pax for 4D3N stay at Adi Dharma BALI + Daily Breakfast for 4 Pax</long_title>
+					<original_price>299</original_price>
+					<sale_price>542</sale_price>
+					<discount>0.614</discount>					
+				</option>
+			</options>
+			<!--Options if got several tiers for the same goods/deal, usually used for different package[OPTIONAL]-->
+			<merchant_name>Tripuri Services</merchant_name>
+			<!--[OPTIONAL]-->
+			<merchant_address>190 Middle Road, Fortune Centre #04-24 Singapore 188979</merchant_address>
+			<!--[OPTIONAL]-->
+			<merchant_tel>63371684</merchant_tel>
+			<!--[OPTIONAL]-->
+			<merchant_website>www.tripurigroup.com</merchant_website>
+			<!--[OPTIONAL]-->
+			<merchant_email>info@tripurigroup.com</merchant_email>
+			<!--[OPTIONAL]-->
+			<merchant_coordinate>1.315635, 103.825607</merchant_coordinate>
+			<!-- latitude, longitude. Seperated by "," comma [OPTIONAL]-->
+			<outlets>
+				<outlet>
+					<outlet_name>Tripuri Services</outlet_name>
+					<!--[OPTIONAL]-->
+					<outlet_address>190 Middle Road, Fortune Centre #04-24 Singapore 188979</outlet_address>
+					<!--Always include postcode in this field [OPTIONAL]-->
+					<outlet_tel>63371684</outlet_tel>
+					<!--[OPTIONAL]-->
+					<outlet_email>info@tripurigroup.com</outlet_email>
+					<!--[OPTIONAL]-->
+					<outlet_coordinate>1.315635, 103.825607</outlet_coordinate>
+					<!-- latitude, longitude. Seperated by "," comma [OPTIONAL]-->
+				</outlet>
+			</outlets>
+			<!-- Multiple outlets is possible, put outlet information one by one here. If no outlet information availabe or only 1 outlet, just fill up merchant information and leave outlets node empty [OPTIONAL]-->
+			<highlights><![CDATA[
+			<ul><li><b>Journey to BALI, the Island of the Gods and a internationally renowned tropical paradise for a luxurious 4D3N holiday!</b></li><li><b><u>Package includes</u></b>: 	
+
+Half Day City Tour</li><li><b><u>FLIGHT DETAILS</u></b> </li><li><u>SIN - DPS</u> 	
+KL 835 : ETD 1730hrs // ETA 2010hrs</li><li><u>DPS - SIN</u> 	
+KL 836 : ETD 2135hrs // ETA 2359hrs</li><li><b><u>Child Rate</u></b> 	
+CHILD with Bed : S$256 per pax 	
+CHILD without Bed : S$225 per pax</li><li><b><u>Extension Rate</u></b> 	
+S$85 per room per night</li><li><b>Enjoy the beauty of Bali's natural setting and at night, paint the town red with its vibrant nightlife!</b></li><li>Buy multiple vouchers for your family and pals for a memorable group holiday</li>                    </ul>
+			]]>
+			</highlights>
+			<!--To state the selling points of the goods/deal, HTML code, \r\n are allowed, must wrapped with "<![CDATA[" and "]]>" [OPTIONAL]-->
+			<conditions><![CDATA[
+			<ul>                        <li><b>Redemption/Booking Period : by 14 Feb 2013</b></li><li><b>Travel Period : till 31 Mar 2013</b></li><li><b>Blackout Period : 08 to 12 Feb 2013 // 27 - 31 Mar 2013</b></li><li><b>TO REDEEM</b>, email <u>feryanto@tripuri.com</u> or <u>nazril@tripuri.com</u> stating: 	
+- All Travellers' particulars (Name as in Passport, Passport No., Passport Expiry Date, DOB, Nationality, Gender &amp; Contact No.) 	
+- Preferred travel dates 	
+- Attached StreetDeal PDF voucher</li><li>Booking must be made at least 3 working days before travel date</li><li>Buy as many as you like as gifts! 1 voucher is valid for 1 person. Minimum 2 to go. </li><li>Rooms are based on Twin Sharing only</li><li><b><u>Excludes</u></b>: 	
+? Singapore Airport Taxes : S$95 	
+? Indonesia Airport Taxes : IDR150,000</li><li><b><u>Strictly no extension upon expiry</u></b></li><li>Hotel Room is subject to availability. Strictly on a first-come-first-served basis.</li><li><b><u>No amendment or cancellation is allowed</u></b> once booking has been sent to Travel Agency by email unless the date is fully booked</li><li>StreetDeal and the Company cannot be held responsible for any expenses, reimbursement or refund of any tour prices if passenger is refused entry by any country on the tour for whatever reasons including lack of necessary visas</li><li>For enquiries, call 6337 1684</li><li>When booking is made, the Travel Agent shall assume full responsibility for all coordinations and fulfillments/duties towards the customer</li><li>Voucher is non-exchangeable, non-refundable, non-extendable, non-transferable and not valid with other existing discounts or promotions</li>                    </ul>
+			]]>
+			</conditions>
+			<!--Fine print and conditions, HTML code, \r\n are allowed, must wrapped with "<![CDATA[" and "]]>" [OPTIONAL]-->
+			<description><![CDATA[
+			Where better to step out of your comfort zone than in BALI, the famed Island of the Gods that is a tropical paradise that draws throngs of holidaymakers and even pilgrims who are seeking to embark on a journey of self-discovery, as popularized by Elizabeth Gilbert's memoir, <i>Eat Pray Love</i>.	
+	
+	
+<img src="http://www.streetdeal.sg/1.jpg">	
+	
+Adi Dharma has 68 comfortably appointed Superior rooms, 10 Deluxe room, 4 Super deluxe Rooms and 5 family rooms. All Rrooms of Adi Dharma Hotel Legian Bali are with balcony facing to garden or pool with individually selft controlled air - conditioning, refrigerator with mini bar, direct dial telephone, television with 60 international and local chanel, in room digital safety box, hair dryer and hot shower over bath tub. Tea and coffe making facilities are also available in all rooms.	
+	
+<img src="http://www.streetdeal.sg/2.jpg">  
+			]]>                               
+			</description>
+			<!--The detailed description of the goods/deal, HTML code, \r\n are allowed, must wrapped with "<![CDATA[" and "]]>" [OPTIONAL]-->
+		</goods>
+		<goods>
+		<!-- The second goods, loop start -->
+		</goods>
+	</goodsdata>
+</ildfeed>

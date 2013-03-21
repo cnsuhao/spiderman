@@ -2,6 +2,7 @@ package org.eweb4j.spiderman.plugin.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -53,28 +54,26 @@ public class ParsePointImpl implements ParsePoint{
 		List<Rule> rules = target.getUrlRules().getRule();
 		for (Rule rule : rules) {
 			//顺序递归解析下一页的内容
-			parseNextPage(rule, target, task, page, results, visitedUrls);
+			Map<String, Object> finalFields = new HashMap<String, Object>();
+			parseNextPage(rule, target, task, page, results, visitedUrls, finalFields);
 		}
 		return results;
 	}
 
 	//递归的额关键是 Page
-	public void parseNextPage(Rule rule, Target target, Task task, Page page, List<Map<String, Object>> results, Set<String> visitedUrls) throws Exception{
+	public void parseNextPage(Rule rule, Target target, Task task, Page page, List<Map<String, Object>> results, Set<String> visitedUrls, Map<String,Object> finalFields) throws Exception{
 //		System.out.println("parse.next->"+page.getUrl());
 		Model mdl = rule.getNextPage();
 		if (mdl == null)
 			return ;
-		
+
 		Target tgt = new Target();
-		tgt.setCType(target.getCType());
-		tgt.setIsForceUseXmlParser(target.getIsForceUseXmlParser());
 		tgt.setName(target.getName());
-		tgt.setNamespaces(target.getNamespaces());
 		tgt.setModel(mdl);
-		
+
 		//解析Model获得next URL
 //		System.out.println("page--!!!!!!----->"+page.getUrl());
-		Collection<String> nextUrls = UrlUtils.digUrls(page, task, rule, tgt, listener);
+		Collection<String> nextUrls = UrlUtils.digUrls(page, task, rule, tgt, listener, finalFields);
 //		System.out.println("visitedUrls-->>>>>>>>>>>>!!!!!!!!!!!!!!" + visitedUrls);
 //		System.out.println("nextUrls-->>>>>>>>>>>>!!!!!!!!!!!!!!" + nextUrls);
 		if (nextUrls == null || nextUrls.isEmpty())
@@ -82,36 +81,36 @@ public class ParsePointImpl implements ParsePoint{
 		String nextUrl = new ArrayList<String>(nextUrls).get(0);
 		if (nextUrl == null || nextUrl.trim().length() == 0)
 			return ;
-		
+
 		if (visitedUrls.contains(nextUrl)){
 			return ;
 		}
-		
-		//解析nextPage
-		Task nextTask = new Task(nextUrl, task.url, task.site, 0);
-		
-		Model nextModel = new Model();
-		List<Field> isAlsoParseInNextPageFields = target.getModel().getIsAlsoParseInNextPageFields();
-		if (isAlsoParseInNextPageFields == null || isAlsoParseInNextPageFields.isEmpty())
-			return ;
-		
-		nextModel.getField().addAll(isAlsoParseInNextPageFields);
-		tgt.setModel(nextModel);
-		ModelParser parser = new ModelParser(nextTask, tgt, listener);
-		
+
 		FetchRequest req = new FetchRequest();
 		req.setUrl(nextUrl);
 		FetchResult fr = task.site.fetcher.fetch(req);
 		if (fr == null || fr.getPage() == null)
 			return ;
-		
+
 		//记录已经访问过该url，下次不要重复访问它
 		visitedUrls.add(nextUrl);
+
+		//解析nextPage
+		Task nextTask = new Task(nextUrl, task.url, task.site, 0);
+		Model nextModel = new Model();
+		List<Field> isAlsoParseInNextPageFields = target.getModel().getIsAlsoParseInNextPageFields();
+		if (isAlsoParseInNextPageFields == null || isAlsoParseInNextPageFields.isEmpty())
+			return ;
+
+		nextModel.getField().addAll(isAlsoParseInNextPageFields);
+		tgt.setModel(nextModel);
+
+		ModelParser parser = new ModelParser(nextTask, tgt, listener);
 		Page nextPageResult = fr.getPage();
 		List<Map<String, Object>> nextMaps = parser.parse(nextPageResult);
 		if (nextMaps == null)
 			return ;
-		
+
 		for (Map<String, Object> nextMap : nextMaps){
 			for (Iterator<Entry<String, Object>> it = nextMap.entrySet().iterator(); it.hasNext();){
 				Entry<String, Object> e = it.next();
@@ -129,7 +128,7 @@ public class ParsePointImpl implements ParsePoint{
 				}
 			}
 		}
-		
-		parseNextPage(rule, target, nextTask, nextPageResult, results, visitedUrls);
+
+		parseNextPage(rule, target, nextTask, nextPageResult, results, visitedUrls, finalFields);
 	}
 }

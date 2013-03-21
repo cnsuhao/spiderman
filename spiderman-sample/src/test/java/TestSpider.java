@@ -79,7 +79,7 @@ public class TestSpider {
 				File dir = null;
 				synchronized (mutex) {
 					try {
-						dir = new File("d:/jsons/"+task.site.getName());
+						dir = new File("d:/spiderman-output/"+task.site.getName()+"/"+task.target.getName());
 						if (!dir.exists())
 							dir.mkdirs();
 					} catch (Exception e) {

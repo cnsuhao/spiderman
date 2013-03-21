@@ -16,25 +16,6 @@ public class Target {
 	private String name;
 	
 	/**
-	 * 目标的contentType
-	 */
-	@AttrTag
-	private String cType;
-	
-	/**
-	 * 如果页面是html类型，是否强制使用XML的解析器来解析xpath
-	 */
-	@AttrTag
-	private String isForceUseXmlParser;
-	
-	private Namespaces namespaces;
-	
-	/**
-	 * 来源页面的url规则
-	 */
-	private Rules sourceRules ;
-	
-	/**
 	 * 目标页面的url规则
 	 */
 	private Rules urlRules ;
@@ -52,22 +33,6 @@ public class Target {
 		this.name = name;
 	}
 	
-	public Namespaces getNamespaces() {
-		return this.namespaces;
-	}
-
-	public void setNamespaces(Namespaces namespaces) {
-		this.namespaces = namespaces;
-	}
-
-	public Rules getSourceRules() {
-		return this.sourceRules;
-	}
-
-	public void setSourceRules(Rules sourceRules) {
-		this.sourceRules = sourceRules;
-	}
-
 	public Rules getUrlRules() {
 		return this.urlRules;
 	}
@@ -84,20 +49,4 @@ public class Target {
 		this.model = model;
 	}
 
-	public String getIsForceUseXmlParser() {
-		return isForceUseXmlParser;
-	}
-
-	public void setIsForceUseXmlParser(String isForceUseXmlParser) {
-		this.isForceUseXmlParser = isForceUseXmlParser;
-	}
-
-	public String getCType() {
-		return this.cType;
-	}
-
-	public void setCType(String cType) {
-		this.cType = cType;
-	}
-	
 }

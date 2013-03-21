@@ -2,7 +2,7 @@
 <!--
   | Spiderman Java开源垂直网络爬虫 
   | author: l.weiwei@163.com
-  | blog: http://laiweiweihi.iteye.com,http://my.oschina.net/laiweiwei
+  | blog: http://laiweiweihi.iteye.com
   | qq: 493781187
   | time: 2013-01-08 16:12
 -->
@@ -10,8 +10,6 @@
 	<!--
 	  | name:名称
 	  | url:种子链接
-	  | skipStatusCode:设置忽略哪些状态码，用英文逗号隔开
-	  | userAgent:设置爬虫标识
 	  | reqDelay:{n}s|{n}m|{n}h|n每次请求之前延缓时间
 	  | enable:0|1是否开启本网站的抓取
 	  | charset:网站字符集
@@ -19,21 +17,7 @@
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	-->
-	<site name="nicedeal" url="http://nicedeal.sg/api/index.php" reqDelay="0.1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
-		<!--
-		  | 配置多个种子链接
-		  | url:种子链接
-		-->
-		<!--seeds>
-			<seed url="" />
-		</seeds-->
-		<!--
-		  | 告诉爬虫仅抓取以下这些host的链接，多数是应对二级或多级域名的情况
-		-->
-		<!--validHosts>
-			<validHost value="demo.eweb4j.org" />
-			<validHost value="wwww.eweb4j.org" />
-		</validHosts-->
+	<site name="nicedeal" country="Singapore" url="http://nicedeal.sg/api/index.php" reqDelay="0.1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
 		<!--
 		  | HTTP Header
 		<headers>
@@ -61,34 +45,37 @@
 		-->
 		<targets>
 			<!--
+			  | 限制目标URL的来源
+			-->
+			<sourceRules policy="and">
+				<rule type="equal" value="http://nicedeal.sg/api/index.php">
+					<!--
+					  | 设置如何发现新的目标URL
+					-->
+					<digUrls>
+						<field name="target_url" isArray="1">
+							<parsers>
+								<parser xpath="//team//link/text()" />
+							</parsers>
+						</field>
+					</digUrls>
+				</rule>
+			</sourceRules>
+			<!--
 			  | name:目标名称
 			  | cType: 内容类型  xml | html | json ...
 			-->
 			<target name="deal">
 				<!--
-				  | 限制目标URL的来源
-				-->
-				<!--sourceRules policy="and">
-					<rule type="" value="" />
-				</sourceRules-->
-				<!--
 				  | 目标URL的规则
 				-->
 				<urlRules policy="and">
-					<rule type="equal" value="http://nicedeal.sg/api/index.php" />
+					<rule type="regex" value="http://nicedeal\.sg/team\.php\?id=\d+" />
 				</urlRules>
-				<!--
-				  | 目标网页的命名空间配置
-				  | prefix: 前缀
-				  | uri: 关联的URI
-				-->
-				<!--namespaces>
-					<namespace prefix="" uri="" />
-				</namespaces-->
 				<!--
 				  | 目标网页的数据模型
 				-->
-				<model isArray="1" xpath="//team">
+				<model>
 					<!--
 					  | 属性的配置
 					  | name:属性名称
@@ -115,52 +102,88 @@
 						  |            $Attrs.xml($this).rm('style').Tags().rm('p').ok()
 						-->
 						<parsers>
-							<parser xpath="title/text()" />
+							<parser xpath="//a[@class='multi-title']/text()" />
 						</parsers>
 					</field>
 					<field name="url">
 						<parsers>
-							<parser xpath="link/text()" />
+							<parser exp="$task_url" />
 						</parsers>
 					</field>
 					<field name="oldImg" isArray="1">
 						<parsers>
-							<parser xpath="large_image_url/text()" />
+							<parser xpath="//div[@id='team_images']//img[@src]" attribute="src" />
 						</parsers>
 					</field>
 					<field name="descOldImg" isArray="1">
+						<parsers>
+							<parser xpath="(//div[@class='deal-details']//div[@class='blk detail'])[1]//img[@src]" attribute="src" />
+						</parsers>
 					</field>
 					<field name="cate">
 					</field>
 					<field name="price">
 						<parsers>
-							<parser xpath="team_price/text()" />
+							<parser xpath="//span[@id='deal_price']/text()" regex="\d+(,?\d+)*(\.?\d+)*" exp="$this.replace(',','')" />
 						</parsers>
 					</field>
 					<field name="originalPrice">
 						<parsers>
-							<parser xpath="market_price/text()" />
+							<parser xpath="//p[@id='market_price']//del/text()" regex="\d+(,?\d+)*(\.?\d+)*" exp="$this.replace(',','')" />
 						</parsers>
 					</field>
 					<field name="countBought">
 						<parsers>
-							<parser xpath="current_point/text()" regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser xpath="//div[@id='deal-status']//h4//span/text()" regex="\d+(,?\d+)*(\.?\d+)*" />
 							<parser exp="$this.replace(',','')" />
 						</parsers>
 					</field>
 					<field name="expiryTime">
 						<parsers>
-							<parser xpath="end_date/text()" 
-									exp="$Util.parse('yyyy-MM-dd HH:mm:ss', $this.replace('T',' ')).getTime()"/>
-							<parser exp="$Util.addLong($this,$Util.toSeconds('8h').longValue()*1000)" />
+							<parser xpath="//div[@id='deal-timeleft']" attribute="diff" 
+									exp="$Util.addLong($Util.getNow(),$Util.toLong($this))" />
 							<parser exp="$Util.String($this).substring(0, 10)" />
 						</parsers>
 					</field>
 					<field name="highlight" isTrim="1">
+						<parsers>
+							<parser xpath="(//div[@class='deal-details']//div[@class='blk detail'])[1]" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+							<parser exp="$this.substring($this.indexOf('Highlights:')+11)" />
+						</parsers>
 					</field>
 					<field name="condition" isTrim="1">
+						<parsers>
+							<parser xpath="(//div[@class='deal-details']//div[@class='blk detail'])[2]" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+							<parser exp="$this.replace('Conditions', '').replace('&lt;u /&gt;', '')" />
+						</parsers>
 					</field>
 					<field name="description" isTrim="1">
+						<parsers>
+							<parser xpath="(//div[@class='deal-details']//div[@class='blk detail'])[1]" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+							<!--其他-->
+							<parser exp="$this.substring(0, $this.indexOf('Highlights:'))" />
+						</parsers>
 					</field>
 					<field name="postCode">
 					</field>
@@ -224,9 +247,9 @@
 					<extension point="parse">
 						<impl type="" value="spiderman.plugin.impl.ParsePointImpl" sort="0"/>
 					</extension>
-					<!--extension point="pojo">
+					<extension point="pojo">
 						<impl type="" value="sg.ilovedeals.shoplay.spiderman.PojoPointImpl" sort="0"/>
-					</extension-->
+					</extension>
 					<extension point="end">
 						<impl type="" value="spiderman.plugin.impl.EndPointImpl" sort="0"/>
 					</extension>

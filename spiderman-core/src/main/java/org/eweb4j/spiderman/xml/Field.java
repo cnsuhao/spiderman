@@ -14,6 +14,18 @@ public class Field {
 	private String isMergeArray;
 	
 	/**
+	 * 是否是给别的field做参数用
+	 */
+	@AttrTag
+	private String isParam;
+	
+	/**
+	 * 一旦被赋值是否不可修改
+	 */
+	@AttrTag
+	private String isFinal;
+	
+	/**
 	 * 是否也在下一页里解析
 	 */
 	@AttrTag
@@ -62,6 +74,22 @@ public class Field {
 
 	public void setIsTrim(String isTrim) {
 		this.isTrim = isTrim;
+	}
+
+	public String getIsParam() {
+		return isParam;
+	}
+
+	public void setIsParam(String isParam) {
+		this.isParam = isParam;
+	}
+
+	public String getIsFinal() {
+		return isFinal;
+	}
+
+	public void setIsFinal(String isFinal) {
+		this.isFinal = isFinal;
 	}
 
 	public String getIsAlsoParseInNextPage() {

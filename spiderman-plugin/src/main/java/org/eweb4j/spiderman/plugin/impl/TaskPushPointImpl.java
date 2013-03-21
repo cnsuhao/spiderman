@@ -56,14 +56,14 @@ public class TaskPushPointImpl implements TaskPushPoint{
 				try {
 					//如果是目标url且是从sourceUrl来的，就是有效的
 					Target tgt = Util.isTargetUrl(task);
-					Rules rules = task.site.getTargets().getTarget().get(0).getSourceRules();
-					boolean isFromSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl, rules.getPolicy());
+					Rules rules = site.getTargets().getSourceRules();
+					boolean isFromSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl);
 					if (tgt != null && isFromSourceUrl){
 						isValid = true;
 					}
 					
 					//如果它本身就是sourceUrl，也应该是有效的
-					boolean isSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.url, rules.getPolicy());
+					boolean isSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.url);
 					if (isSourceUrl){
 						isValid = true;
 					}

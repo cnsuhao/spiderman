@@ -52,6 +52,14 @@ public class ModelParser extends DefaultHandler{
 	private Target target = null;
 	private SpiderListener listener = null;
 	private FelEngine fel = new FelEngineImpl();
+	private Map<String, Object> finalFields = null;
+	   
+	public Map<String, Object> getFinalFields() {
+	  return this.finalFields;
+	}
+	public void setFinalFields(Map<String, Object> finalFields) {
+	  this.finalFields = finalFields;
+	}
 	
 	private final static Function fun = new CommonFunction() {
 		public String getName() {
@@ -91,7 +99,7 @@ public class ModelParser extends DefaultHandler{
 	}
 	
 	public List<Map<String, Object>> parse(Page page) throws Exception{
-		String contentType = this.target.getCType();
+		String contentType = this.target.getModel().getCType();
 		if (contentType == null || contentType.trim().length() == 0)
 			contentType = page.getContentType();
 		if (contentType == null)
@@ -100,7 +108,7 @@ public class ModelParser extends DefaultHandler{
 		if (isXml)
 			return parseXml(page, false);
 		else {
-			String isForceUseXmlParser = this.target.getIsForceUseXmlParser();
+			String isForceUseXmlParser = this.target.getModel().getIsForceUseXmlParser();
 			if (!"1".equals(isForceUseXmlParser))
 				return parseHtml(page);
 			HtmlCleaner cleaner = new HtmlCleaner();
@@ -133,7 +141,7 @@ public class ModelParser extends DefaultHandler{
 				if (prefix == null) 
 					throw new NullPointerException("Null prefix");
 				else {
-		        	Namespaces nss = target.getNamespaces();
+		        	Namespaces nss = target.getModel().getNamespaces();
 		        	if (nss != null) {
 			        	List<NSMap> nsList = nss.getNamespace();
 			        	if (nsList != null) {
@@ -178,6 +186,9 @@ public class ModelParser extends DefaultHandler{
 	
 	private Map<String, Object> parseXmlMap(Object item, XPath xpathParser, final List<Field> fields) {
 		Map<String, Object> map = new HashMap<String, Object>();
+		if (finalFields != null)
+			map.putAll(finalFields);
+		
 		fel.getContext().set("$fields", map);
 		for (Field field : fields){
 			String key = field.getName();
@@ -186,6 +197,11 @@ public class ModelParser extends DefaultHandler{
 			//是否合并数组
 			String isMergeArray = field.getIsMergeArray();
 			String isTrim = field.getIsTrim();
+			String isParam = field.getIsParam();
+			String isFinal = field.getIsFinal();
+			boolean isFinalParam = ("1".equals(isParam) || "true".equals(isParam)) && ("1".equals(isFinal) || "true".equals(isFinal));
+			if (isFinalParam && finalFields != null && finalFields.containsKey(key))
+				continue;
 			
 			Parsers parsers = field.getParsers();
 			if (parsers == null)
@@ -332,6 +348,9 @@ public class ModelParser extends DefaultHandler{
 						map.put(key, new ArrayList<Object>(values).get(0));
 				}
 				
+				if(isFinalParam){
+					finalFields.put(key, map.get(key));
+				}
 			} catch (Exception e) {
 				listener.onError(Thread.currentThread(), task, "field->"+key+" parse failed cause->"+e.toString(), e);
 			}
@@ -366,12 +385,21 @@ public class ModelParser extends DefaultHandler{
 	
 	private Map<String, Object> parseHtmlMap(Object item, final List<Field> fields){
 		Map<String, Object> map = new HashMap<String, Object>();
+		if (finalFields != null)
+			map.putAll(finalFields);
+		
 		fel.getContext().set("$fields", map);
 		
 		for (Field field : fields){
 			String key = field.getName();
 			String isArray = field.getIsArray();
 			String isTrim = field.getIsTrim();
+			String isParam = field.getIsParam();
+			String isFinal = field.getIsFinal();
+			boolean isFinalParam = ("1".equals(isParam) || "true".equals(isParam)) && ("1".equals(isFinal) || "true".equals(isFinal));
+			if (isFinalParam && finalFields != null && finalFields.containsKey(key))
+				continue;
+			
 			Parsers parsers = field.getParsers();
 			if (parsers == null)
 				continue;
@@ -506,6 +534,10 @@ public class ModelParser extends DefaultHandler{
 					map.put(key, values);
 				}else{
 					map.put(key, values.get(0).toString());
+				}
+				
+				if(isFinalParam){
+					finalFields.put(key, map.get(key));
 				}
 			} catch (Exception e) {
 				listener.onError(Thread.currentThread(), task, "field->"+key+" parse failed cause->"+e.toString(), e);

@@ -45,8 +45,7 @@ public class DupRemovalPointImpl implements DupRemovalPoint {
 			Task newTask = new Task(url, task.url, site, 10);
 			try {
 				Target tgt = Util.isTargetUrl(newTask);
-				Rules rules = site.getTargets().getTarget().get(0).getSourceRules();
-				boolean isFromSourceUrl = SourceUrlChecker.checkSourceUrl(rules, newTask.sourceUrl, rules.getPolicy());
+				boolean isFromSourceUrl = SourceUrlChecker.checkSourceUrl(site.getTargets().getSourceRules(), newTask.sourceUrl);
 				// 如果是目标url，但不是来自来源url，跳过
 				if (tgt != null && !isFromSourceUrl) {
 					continue;

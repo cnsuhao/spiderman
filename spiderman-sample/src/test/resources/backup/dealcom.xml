@@ -2,7 +2,7 @@
 <!--
   | Spiderman Java开源垂直网络爬虫 
   | author: l.weiwei@163.com
-  | blog: http://laiweiweihi.iteye.com,http://my.oschina.net/laiweiwei
+  | blog: http://laiweiweihi.iteye.com
   | qq: 493781187
   | time: 2013-01-08 16:12
 -->
@@ -10,8 +10,6 @@
 	<!--
 	  | name:名称
 	  | url:种子链接
-	  | skipStatusCode:设置忽略哪些状态码，用英文逗号隔开
-	  | userAgent:设置爬虫标识
 	  | reqDelay:{n}s|{n}m|{n}h|n每次请求之前延缓时间
 	  | enable:0|1是否开启本网站的抓取
 	  | charset:网站字符集
@@ -19,21 +17,7 @@
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	-->
-	<site name="dealcom" url="http://www.deal.com.sg/deals/singapore" reqDelay="0.1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
-		<!--
-		  | 配置多个种子链接
-		  | url:种子链接
-		-->
-		<!--seeds>
-			<seed url="" />
-		</seeds-->
-		<!--
-		  | 告诉爬虫仅抓取以下这些host的链接，多数是应对二级或多级域名的情况
-		-->
-		<!--validHosts>
-			<validHost value="demo.eweb4j.org" />
-			<validHost value="wwww.eweb4j.org" />
-		</validHosts-->
+	<site name="dealcom" country="Singapore" url="http://www.deal.com.sg/deals/singapore" skipStatusCode="500" reqDelay="0.1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
 		<!--
 		  | HTTP Header
 		<headers>
@@ -61,29 +45,21 @@
 		-->
 		<targets>
 			<!--
+			  | 限制目标URL的来源
+			-->
+			<sourceRules policy="and">
+				<rule type="regex" value=".*/deals/singapore(\?page=\d+)?$" />
+			</sourceRules>
+			<!--
 			  | name:目标名称	
 			-->
 			<target name="deal">
-				<!--
-				  | 限制目标URL的来源
-				-->
-				<sourceRules policy="and">
-					<rule type="regex" value=".*/deals/singapore(\?page=\d+)?$" />
-				</sourceRules>
 				<!--
 				  | 目标URL的规则
 				-->
 				<urlRules policy="and">
 					<rule type="regex" value=".*/deals/singapore/.*" />
 				</urlRules>
-				<!--
-				  | 目标网页的命名空间配置
-				  | prefix: 前缀
-				  | uri: 关联的URI
-				-->
-				<!--namespaces>
-					<namespace prefix="" uri="" />
-				</namespaces-->
 				<!--
 				  | 目标网页的数据模型
 				-->
@@ -286,9 +262,9 @@
 					<extension point="parse">
 						<impl type="" value="spiderman.plugin.impl.ParsePointImpl" sort="0"/>
 					</extension>
-					<!--extension point="pojo">
+					<extension point="pojo">
 						<impl type="" value="sg.ilovedeals.shoplay.spiderman.PojoPointImpl" sort="0"/>
-					</extension-->
+					</extension>
 					<extension point="end">
 						<impl type="" value="spiderman.plugin.impl.EndPointImpl" sort="0"/>
 					</extension>

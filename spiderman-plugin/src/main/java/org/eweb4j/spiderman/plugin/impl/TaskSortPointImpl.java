@@ -14,7 +14,10 @@ import org.eweb4j.util.CommonUtil;
 
 public class TaskSortPointImpl implements TaskSortPoint {
 
+	private Site site;
+	
 	public void init(Site site, SpiderListener listener) {
+		this.site = site;
 	}
 
 	public void destroy() {
@@ -26,13 +29,13 @@ public class TaskSortPointImpl implements TaskSortPoint {
 			i += 0.00001;
 			// 检查url是否符合target的url规则，并且是否是来自于来源url，如果符合排序调整为0
 			Target tgt = Util.isTargetUrl(task);
-			Rules rules = task.site.getTargets().getTarget().get(0).getSourceRules();
-			boolean isFromSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl, rules.getPolicy());
+			Rules rules = site.getTargets().getSourceRules();
+			boolean isFromSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl);
 			if (tgt != null && isFromSourceUrl){
 				task.sort = 0 + CommonUtil.toDouble("0."+System.currentTimeMillis()) + i;
 			}else{
 				//检查url是否符合target的sourceUrl规则，如果符合排序调整为5，否则为10
-				boolean isSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.url, rules.getPolicy());
+				boolean isSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.url);
 				if (isSourceUrl){
 					task.sort = 5 + CommonUtil.toDouble("0."+System.currentTimeMillis()) + i;
 				}else{

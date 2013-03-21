@@ -35,6 +35,9 @@ public class Site {
 	@AttrTag
 	private String isDupRemovalStrict;//是否严格去掉重复的TargetUrl，即已访问过一次的TargetUrl不会再被访问，若否，就算是重复的TargetUrl，只要它的来源URL不同，都会被访问
 	
+	@AttrTag
+	private String isFollowRedirects;//是否自动跟随重定向网页，默认是
+	
 	private ValidHosts validHosts;//限制在同这些host里面抓取数据
 	
 	@AttrTag
@@ -132,6 +135,14 @@ public class Site {
 
 	public void setCountry(String country) {
 		this.country = country;
+	}
+
+	public String getIsFollowRedirects() {
+		return this.isFollowRedirects;
+	}
+
+	public void setIsFollowRedirects(String isFollowRedirects) {
+		this.isFollowRedirects = isFollowRedirects;
 	}
 
 	public String getIsDupRemovalStrict() {

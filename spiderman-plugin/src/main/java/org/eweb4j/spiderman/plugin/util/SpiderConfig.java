@@ -45,7 +45,7 @@ public class SpiderConfig {
 	 */
 	private int maxPagesToFetch = -1;
 
-	private String userAgentString = "Spiderman[https://github.com/laiweiwei/spiderman]";
+	private String userAgentString = "Spiderman[https://gitcafe.com/laiweiwei/Spiderman]";
 
 	/**
 	 * Politeness delay in milliseconds (delay between sending two requests to
