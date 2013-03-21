@@ -30,7 +30,7 @@ public class FetchPointImpl implements FetchPoint{
 	}
 	
 	public static void main(String[] args){
-		String url = "http://localhost:8080/demo/fuck"; 
+		String url = "http://www.dealmates.com.my/kuala-lumpur/deals/all"; 
 		PageFetcherImpl fetcher = new PageFetcherImpl();
 		SpiderConfig config = new SpiderConfig();
 		config.setFollowRedirects(false);
@@ -84,6 +84,14 @@ public class FetchPointImpl implements FetchPoint{
 					delay = 200;
 				
 				config.setPolitenessDelay(delay);
+				
+				String timeout = task.site.getTimeout();
+				if (timeout != null && timeout.trim().length() > 0){
+					int to = CommonUtil.toSeconds(sdelay).intValue()*1000;
+					if (to > 0)
+						config.setConnectionTimeout(to);
+				}
+				
 				fetcher.setConfig(config);
 				
 				fetcher.init(site);
@@ -95,10 +103,8 @@ public class FetchPointImpl implements FetchPoint{
 			FetchRequest req = new FetchRequest();
 			req.setUrl(url);
 			
-			FetchResult fr = site.fetcher.fetch(req);
-			return fr;
+			return site.fetcher.fetch(req);
 		}
-//		return fetch();
 	}
 	
 //	private FetchResult fetch(){

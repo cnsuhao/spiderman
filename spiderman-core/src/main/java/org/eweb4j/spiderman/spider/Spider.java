@@ -64,11 +64,10 @@ public class Spider implements Runnable{
 				}
 			}
 			
-			if (result == null || result.getPage() == null || result.getPage().getContent() == null || result.getPage().getContent().trim().length() == 0) {
-				return ;
-			}
-			
 			listener.onFetch(Thread.currentThread(), task, result);
+			
+			if (result == null) 
+				return ;
 			
 			if (task.site.isStop)
 				return ;

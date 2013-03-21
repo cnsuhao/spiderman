@@ -53,6 +53,9 @@ public class Site {
 	private String skipStatusCode;//设置忽略哪些状态码，例如设置为500,那么针对这个网站的访问请求，就算返回500状态码，依然会去解析相应内容
 	
 	@AttrTag
+	private String timeout;//HTTP请求最大等待时间
+	
+	@AttrTag
 	private String reqDelay = "200";//每个请求的延迟时间
 	
 	@AttrTag 
@@ -129,6 +132,14 @@ public class Site {
 		this.name = name;
 	}
 	
+	public String getTimeout() {
+		return this.timeout;
+	}
+
+	public void setTimeout(String timeout) {
+		this.timeout = timeout;
+	}
+
 	public String getCountry() {
 		return country;
 	}

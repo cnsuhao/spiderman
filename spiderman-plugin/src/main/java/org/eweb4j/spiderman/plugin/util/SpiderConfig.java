@@ -76,12 +76,12 @@ public class SpiderConfig {
 	/**
 	 * Socket timeout in milliseconds
 	 */
-	private int socketTimeout = 60000;
+	private int socketTimeout = 2*60000;
 
 	/**
 	 * Connection timeout in milliseconds
 	 */
-	private int connectionTimeout = 60000;
+	private int connectionTimeout = 2*60000;
 
 	/**
 	 * Max number of outgoing links which are processed from a page

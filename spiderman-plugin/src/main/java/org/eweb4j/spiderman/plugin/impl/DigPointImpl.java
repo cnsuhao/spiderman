@@ -13,9 +13,6 @@ import java.util.Set;
 import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.fetcher.Page;
-import org.eweb4j.spiderman.infra.DefaultLinkFinder;
-import org.eweb4j.spiderman.infra.FrameLinkFinder;
-import org.eweb4j.spiderman.infra.IframeLinkFinder;
 import org.eweb4j.spiderman.plugin.DigPoint;
 import org.eweb4j.spiderman.plugin.util.DefaultLinkNormalizer;
 import org.eweb4j.spiderman.plugin.util.LinkNormalizer;
@@ -61,6 +58,13 @@ public class DigPointImpl implements DigPoint{
 				urls.add(moveUrl);
 		}
 		
+		if (result.getPage() == null) 
+			return urls;
+		
+		String html = result.getPage().getContent();
+		if (html == null) 
+			return urls;
+		
 		// 如果定义了sourceUrl的digUrls，只是用这个方式发现新url
 		boolean isDig = false;
 		Rules rules = site.getTargets().getSourceRules();
@@ -99,10 +103,6 @@ public class DigPointImpl implements DigPoint{
 		}
 		
 		if (!isDig){
-			if (result.getPage() == null) return null;
-			String html = result.getPage().getContent();
-			if (html == null) return null;
-			
 			urls.addAll(UrlUtils.findAllUrls(html, task.url));
 		}
 		
