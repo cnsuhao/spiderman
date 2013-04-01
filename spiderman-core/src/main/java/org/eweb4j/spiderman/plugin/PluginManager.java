@@ -137,7 +137,7 @@ public class PluginManager {
 						t = ioc.createExtensionInstance(value);
 					}else{
 						try {
-							Class<T> cls = (Class<T>) Class.forName(value);
+							Class<T> cls = (Class<T>) Thread.currentThread().getContextClassLoader().loadClass(value);
 							t = cls.newInstance();
 						} catch (ClassNotFoundException e) {
 							throw new RuntimeException("Impl class -> " + value + " of ExtensionPoint["+pointName+"] not found !", e);

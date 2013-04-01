@@ -1,12 +1,14 @@
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.imageio.ImageIO;
 
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.spiderman.fetcher.FetchResult;
@@ -30,6 +32,8 @@ public class TestSpider {
 	
 	@Test
 	public void test() throws Exception {
+		
+		final ExecutorService picPool = Executors.newFixedThreadPool(50);
 		String err = EWeb4JConfig.start();
 		if (err != null)
 			throw new Exception(err);
@@ -76,55 +80,72 @@ public class TestSpider {
 			}
 			
 			public void onParse(Thread thread, Task task, List<Map<String, Object>> models) {
-				File dir = null;
-				synchronized (mutex) {
-					try {
-						dir = new File("d:/spiderman-output/"+task.site.getName()+"/"+task.target.getName());
-						if (!dir.exists())
-							dir.mkdirs();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				
+				final File dir = new File("d:/spiderman-output/"+task.site.getName()+"/"+task.target.getName());
 				try {
+					if (!dir.exists())
+						dir.mkdirs();
+					
 					int i = 0;
 					if (models.size() <= 1)
 						i = task.site.counter.getCount();
 					
 					for (Map<String, Object> map : models) {
-						String fileName = dir+"/count_" + i;
-	//					String fileName = "count_" + task.site.counter.getCount();
-						StringBuilder sb = new StringBuilder();
-						for (Iterator<Entry<String,Object>> it = map.entrySet().iterator(); it.hasNext();){
-							Entry<String,Object> e = it.next();
-							boolean isBlank = false;
-							
-							if (e.getValue() == null)
-								isBlank = true;
-							else if (e.getValue() instanceof String && ((String)e.getValue()).trim().length() == 0)
-								isBlank = true;
-							else if (e.getValue() instanceof List && ((ArrayList<?>)e.getValue()).isEmpty())
-								isBlank = true;
-							else if (e.getValue() instanceof List && !((ArrayList<?>)e.getValue()).isEmpty()) {
-								if (((ArrayList<?>)e.getValue()).size() == 1 && String.valueOf(((ArrayList<?>)e.getValue()).get(0)).trim().length() == 0)
-								isBlank = true;
-							}
+						try {
+							List<String> pics = (List<String>) map.get("pics");
+							for (String pc : pics){
+								if (pc == null || pc.trim().length() == 0)
+									continue;
 								
-							if (isBlank){
-								if (sb.length() > 0)
-									sb.append("_");
-								sb.append(e.getKey());
+								final String pic = pc;
+								picPool.execute(new Runnable() {
+									public void run() {
+										try {
+											File file = new File(dir.getAbsoluteFile()+"/"+pic.replace("http://", "").replace("/", "_"));
+											ImageIO.write(FileUtil.getBufferedImage(pic, true, 1, 1*1000), "jpg", new FileOutputStream(file));
+											System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
+											System.out.println(file.getAbsolutePath() + " create finished...");
+										} catch (Exception e){
+											e.printStackTrace();
+										}
+									}
+								});
 							}
+						}catch(Exception e){
+							e.printStackTrace();
 						}
-						String content = CommonUtil.toJson(map);
-						if (sb.length() > 0)
-							fileName = fileName + "_no_"+sb.toString()+"_";
-						
-						File file = new File(fileName+".json");
-						FileUtil.writeFile(file, content);
-						System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
-						System.out.println(fileName + " create finished...");
+//						
+//						String fileName = dir+"/count_" + i;
+//	//					String fileName = "count_" + task.site.counter.getCount();
+//						StringBuilder sb = new StringBuilder();
+//						for (Iterator<Entry<String,Object>> it = map.entrySet().iterator(); it.hasNext();){
+//							Entry<String,Object> e = it.next();
+//							boolean isBlank = false;
+//							
+//							if (e.getValue() == null)
+//								isBlank = true;
+//							else if (e.getValue() instanceof String && ((String)e.getValue()).trim().length() == 0)
+//								isBlank = true;
+//							else if (e.getValue() instanceof List && ((ArrayList<?>)e.getValue()).isEmpty())
+//								isBlank = true;
+//							else if (e.getValue() instanceof List && !((ArrayList<?>)e.getValue()).isEmpty()) {
+//								if (((ArrayList<?>)e.getValue()).size() == 1 && String.valueOf(((ArrayList<?>)e.getValue()).get(0)).trim().length() == 0)
+//								isBlank = true;
+//							}
+//								
+//							if (isBlank){
+//								if (sb.length() > 0)
+//									sb.append("_");
+//								sb.append(e.getKey());
+//							}
+//						}
+//						String content = CommonUtil.toJson(map);
+//						if (sb.length() > 0)
+//							fileName = fileName + "_no_"+sb.toString()+"_";
+//						
+//						File file = new File(fileName+".json");
+//						FileUtil.writeFile(file, content);
+//						System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
+//						System.out.println(fileName + " create finished...");
 						i++;
 					}
 				} catch (Exception e) {
@@ -137,7 +158,7 @@ public class TestSpider {
 		Spiderman.me()
 			.init(listener)//初始化
 			.startup()//启动
-			.keepStrict("1h");//存活时间，过了存活时间后马上关闭
+			.keepStrict("2h");//存活时间，过了存活时间后马上关闭
 		
 		//启动爬虫 + 调度定时重启
 //		Spiderman.me()

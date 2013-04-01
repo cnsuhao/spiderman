@@ -197,7 +197,7 @@ public class Spider implements Runnable{
 			String modelCls = target.getModel().getClazz();
 			Class<?> cls = null;
 			if (modelCls != null)
-				cls = Class.forName(modelCls);
+				cls = Thread.currentThread().getContextClassLoader().loadClass(modelCls);
 			
 			List<Object> pojos = null;
 			Collection<PojoPoint> pojoPoints = task.site.pojoPointImpls;

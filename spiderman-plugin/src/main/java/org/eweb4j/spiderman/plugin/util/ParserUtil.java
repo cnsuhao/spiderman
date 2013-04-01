@@ -42,6 +42,10 @@ public class ParserUtil {
 	}
 
 	public static Object evalXpath(String html, String xpath, String attribute){
+		if (html == null){
+			return null;
+		}
+		
 		List<Object> result = new ArrayList<Object>();
 		HtmlCleaner cleaner = new HtmlCleaner();
 		try {
@@ -59,7 +63,7 @@ public class ParserUtil {
 
 				result.add(val);
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 
