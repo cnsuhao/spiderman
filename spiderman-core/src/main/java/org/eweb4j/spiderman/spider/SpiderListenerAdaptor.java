@@ -1,6 +1,7 @@
 package org.eweb4j.spiderman.spider;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,4 +25,6 @@ public class SpiderListenerAdaptor implements SpiderListener{
 	public void onPojo(Thread thread, Task task, List<Object> pojos) {}
 	public void onInfo(Thread thread, Task task, String info) {}
 	public void onError(Thread thread, Task task, String err, Exception e) {}
+	public void afterScheduleCancel() {}
+	public void beforeEveryScheduleExecute(Date theLastTimeScheduledAt){}
 }

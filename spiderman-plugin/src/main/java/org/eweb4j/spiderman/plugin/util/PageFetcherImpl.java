@@ -287,7 +287,6 @@ public class PageFetcherImpl implements PageFetcher{
 				return fetchResult;
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
 			fetchResult.setFetchedUrl(e.toString());
 			fetchResult.setStatusCode(Status.INTERNAL_SERVER_ERROR.ordinal());
 			return fetchResult;

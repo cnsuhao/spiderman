@@ -39,6 +39,18 @@ public class TestSpider {
 			throw new Exception(err);
 		
 		SpiderListener listener = new SpiderListenerAdaptor(){
+			public void afterScheduleCancel(){
+				//调度结束回调
+			}
+			/**
+			 * 每次调度执行前回调此方法
+			 * @date 2013-4-1 下午03:33:11
+			 * @param theLastTimeScheduledAt 上一次调度时间
+			 */
+			public void beforeEveryScheduleExecute(Date theLastTimeScheduledAt){
+				System.err.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [LAST_SCHEDULE_AT] ~ ");
+				System.err.println("at -> " + CommonUtil.formatTime(theLastTimeScheduledAt));
+			}
 			public void onFetch(Thread thread, Task task, FetchResult result) {
 				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [FETCH] ~ ");
 				System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
@@ -80,39 +92,39 @@ public class TestSpider {
 			}
 			
 			public void onParse(Thread thread, Task task, List<Map<String, Object>> models) {
-				final File dir = new File("d:/spiderman-output/"+task.site.getName()+"/"+task.target.getName());
-				try {
-					if (!dir.exists())
-						dir.mkdirs();
-					
-					int i = 0;
-					if (models.size() <= 1)
-						i = task.site.counter.getCount();
-					
-					for (Map<String, Object> map : models) {
-						try {
-							List<String> pics = (List<String>) map.get("pics");
-							for (String pc : pics){
-								if (pc == null || pc.trim().length() == 0)
-									continue;
-								
-								final String pic = pc;
-								picPool.execute(new Runnable() {
-									public void run() {
-										try {
-											File file = new File(dir.getAbsoluteFile()+"/"+pic.replace("http://", "").replace("/", "_"));
-											ImageIO.write(FileUtil.getBufferedImage(pic, true, 1, 1*1000), "jpg", new FileOutputStream(file));
-											System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
-											System.out.println(file.getAbsolutePath() + " create finished...");
-										} catch (Exception e){
-											e.printStackTrace();
-										}
-									}
-								});
-							}
-						}catch(Exception e){
-							e.printStackTrace();
-						}
+//				final File dir = new File("d:/spiderman-output/"+task.site.getName()+"/"+task.target.getName());
+//				try {
+//					if (!dir.exists())
+//						dir.mkdirs();
+//					
+//					int i = 0;
+//					if (models.size() <= 1)
+//						i = task.site.counter.getCount();
+//					
+//					for (Map<String, Object> map : models) {
+//						try {
+//							List<String> pics = (List<String>) map.get("pics");
+//							for (String pc : pics){
+//								if (pc == null || pc.trim().length() == 0)
+//									continue;
+//								
+//								final String pic = pc;
+//								picPool.execute(new Runnable() {
+//									public void run() {
+//										try {
+//											File file = new File(dir.getAbsoluteFile()+"/"+pic.replace("http://", "").replace("/", "_"));
+//											ImageIO.write(FileUtil.getBufferedImage(pic, true, 1, 1*1000), "jpg", new FileOutputStream(file));
+//											System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
+//											System.out.println(file.getAbsolutePath() + " create finished...");
+//										} catch (Exception e){
+//											e.printStackTrace();
+//										}
+//									}
+//								});
+//							}
+//						}catch(Exception e){
+//							e.printStackTrace();
+//						}
 //						
 //						String fileName = dir+"/count_" + i;
 //	//					String fileName = "count_" + task.site.counter.getCount();
@@ -146,28 +158,28 @@ public class TestSpider {
 //						FileUtil.writeFile(file, content);
 //						System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
 //						System.out.println(fileName + " create finished...");
-						i++;
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+//						i++;
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
 			}
 		};
 		
 		//启动爬虫
-		Spiderman.me()
-			.init(listener)//初始化
-			.startup()//启动
-			.keepStrict("2h");//存活时间，过了存活时间后马上关闭
+//		Spiderman.me()
+//			.init(listener)//初始化
+//			.startup()//启动
+//			.keepStrict("2h");//存活时间，过了存活时间后马上关闭
 		
 		//启动爬虫 + 调度定时重启
-//		Spiderman.me()
-//			.listen(listener)//设置监听器
-//			.schedule("20s")//调度，爬虫运行10s
-//			.delay("2s")//每隔 10 + 2 秒后重启爬虫
-//			.times(1)//重启 3 次
-//			.startup()//启动
-//			.blocking();//阻塞直到所有调度完成
+		Spiderman.me()
+			.listen(listener)//设置监听器
+			.schedule("10s")//调度，爬虫运行10s
+			.delay("2s")//每隔 10 + 2 秒后重启爬虫
+			.times(3)//调度 3 次
+			.startup()//启动
+			.blocking();//阻塞直到所有调度完成
 	}
 	
 }

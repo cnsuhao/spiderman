@@ -61,6 +61,7 @@ public class Spiderman {
 	private String scheduleTime = "1h";
 	private String scheduleDelay = "1m";
 	private int scheduleTimes = 0;
+	private List<Date> scheduleAt = new ArrayList<Date>();
 	private int maxScheduleTimes = 0;
 	
 	public final static Spiderman me() {
@@ -107,6 +108,7 @@ public class Spiderman {
 					if (_this.maxScheduleTimes > 0 && _this.scheduleTimes >= _this.maxScheduleTimes){
 						_this.cancel();
 						_this.listener.onInfo(Thread.currentThread(), null, "Spiderman has completed and cancel the schedule.");
+						_this.listener.afterScheduleCancel();
 						_this.isSchedule = false;
 					} else {
 						//阻塞，判断之前所有的网站是否都已经停止完全
@@ -146,11 +148,14 @@ public class Spiderman {
 						
 						//只有所有的网站资源都已被释放[特殊情况timeout]完全才重启Spiderman
 						_this.scheduleTimes++;
-						String strTimes = _this.scheduleTimes+"";
+						String strTimes = _this.scheduleTimes + "";
 						if (_this.maxScheduleTimes > 0)
 							strTimes += "/"+_this.maxScheduleTimes;
-						
+						//记录每一次调度执行的时间
+						_this.scheduleAt.add(new Date());
 						_this.listener.onInfo(Thread.currentThread(), null, "Spiderman has scheduled "+strTimes+" times.");
+						if (_this.scheduleTimes > 1)
+							_this.listener.beforeEveryScheduleExecute(_this.scheduleAt.get(_this.scheduleTimes-2));
 						_this.init()._startup().keepStrict(scheduleTime);
 					}
 				}

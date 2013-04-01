@@ -1,6 +1,7 @@
 package org.eweb4j.spiderman.spider;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ public interface SpiderListener {
     
     void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks);
     
-    public void onTaskSort(Thread currentThread, Task task, Collection<Task> afterSortTasks);
+    void onTaskSort(Thread currentThread, Task task, Collection<Task> afterSortTasks);
     
 	void onNewTasks(Thread thread, Task task, Collection<Task> newTasks);
 	
@@ -31,5 +32,18 @@ public interface SpiderListener {
 	void onInfo(Thread thread, Task task, String info);
 	
 	void onError(Thread thread, Task task, String err, Exception e);
+	
+	/**
+	 * 调度结束后回调此方法
+	 * @date 2013-4-1 下午03:17:23
+	 */
+	void afterScheduleCancel();
+	
+	/**
+	 * 每次调度执行前回调此方法
+	 * @date 2013-4-1 下午03:33:11
+	 * @param theLastTimeScheduledAt 上一次调度时间
+	 */
+	void beforeEveryScheduleExecute(Date theLastTimeScheduledAt);
 	
 }
