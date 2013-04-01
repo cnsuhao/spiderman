@@ -42,7 +42,7 @@ public class ParserUtil {
 	}
 
 	public static Object evalXpath(String html, String xpath, String attribute){
-		if (html == null){
+		if (html == null || html.trim().length() == 0){
 			return null;
 		}
 		
