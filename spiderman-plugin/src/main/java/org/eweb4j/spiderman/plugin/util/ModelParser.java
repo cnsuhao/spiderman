@@ -111,7 +111,11 @@ public class ModelParser extends DefaultHandler{
 			if (!"1".equals(isForceUseXmlParser))
 				return parseHtml(page);
 			HtmlCleaner cleaner = new HtmlCleaner();
-			cleaner.getProperties().setTreatUnknownTagsAsContent(true);
+//			cleaner.getProperties().setTreatUnknownTagsAsContent(true);
+			cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
+			//忽略注释
+			cleaner.getProperties().setOmitComments(true);
+			
 			TagNode rootNode = cleaner.clean(page.getContent());
 			String xml = ParserUtil.xml(rootNode, true);
 			page.setContent(xml);
@@ -121,6 +125,10 @@ public class ModelParser extends DefaultHandler{
 
 	private List<Map<String, Object>> parseXml(Page page, boolean isFromHtml) throws Exception{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		//忽略注释
+		factory.setIgnoringComments(true);
+		//忽略空元素
+		factory.setIgnoringElementContentWhitespace(true);
         factory.setNamespaceAware(!isFromHtml); // never forget this!
         DocumentBuilder builder = factory.newDocumentBuilder();
         String validXml = ParserUtil.checkUnicodeString(page.getContent());
@@ -359,6 +367,8 @@ public class ModelParser extends DefaultHandler{
 	private List<Map<String, Object>> parseHtml(Page page) throws Exception{
 		HtmlCleaner cleaner = new HtmlCleaner();
 //		cleaner.getProperties().setTreatUnknownTagsAsContent(true);
+		//忽略注释
+		cleaner.getProperties().setOmitComments(true);
 		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
 		String html = page.getContent();
 		fel.getContext().set("$page_content", html);

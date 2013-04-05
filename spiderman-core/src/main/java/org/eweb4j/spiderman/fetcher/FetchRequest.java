@@ -13,6 +13,7 @@ public class FetchRequest {
 
 	private String url;
 	private Map<String, List<String>> headers = new HashMap<String, List<String>>();
+	private Map<String, List<String>> cookies = new HashMap<String, List<String>>();
 	
 	public String getUrl() {
 		return this.url;
@@ -26,10 +27,18 @@ public class FetchRequest {
 	public void setHeaders(Map<String, List<String>> headers) {
 		this.headers = headers;
 	}
+	public Map<String, List<String>> getCookies() {
+		return this.cookies;
+	}
+	public void setCookies(Map<String, List<String>> cookies) {
+		this.cookies = cookies;
+	}
 	@Override
 	public String toString() {
 		return "FetchRequest [url=" + this.url + ", headers=" + this.headers
-				+ "]";
+				+ ", cookies=" + this.cookies + "]";
 	}
+	
+	
 	
 }

@@ -79,6 +79,7 @@ public class PageFetcherImpl implements PageFetcher{
 	private long lastFetchTime = 0;
 	private SpiderConfig config;
 	private Map<String, String> headers = new Hashtable<String, String>();
+	private Map<String, List<String>> cookies = new Hashtable<String, List<String>>();
 	private Site site;
 	
 	public PageFetcherImpl(){
@@ -111,6 +112,12 @@ public class PageFetcherImpl implements PageFetcher{
 		//设置Cookie
 		String name = c.name();
 		String value = c.value();
+		List<String> vals = this.cookies.get(name);
+		if (vals == null)
+			vals = new ArrayList<String>();
+		vals.add(value);
+		this.cookies.put(key, vals);
+		
 		BasicClientCookie clientCookie = new BasicClientCookie(name, value);
 		clientCookie.setPath(c.path());
 		clientCookie.setDomain(c.domain());
@@ -118,7 +125,10 @@ public class PageFetcherImpl implements PageFetcher{
 	}
 
 	public void addHeader(String key, String val) {
-		this.headers.put(key, val);
+		if (this.headers.containsKey(key))
+			this.headers.put(key, this.headers.get(key) + "; " + val);
+		else
+			this.headers.put(key, val);
 	}
 
 	/**
@@ -181,7 +191,6 @@ public class PageFetcherImpl implements PageFetcher{
 			}
 			if (this.site.getCookies() != null && this.site.getCookies().getCookie() != null){
 				for (org.eweb4j.spiderman.xml.Cookie cookie : this.site.getCookies().getCookie()){
-					System.out.println("cookie------>"+CommonUtil.toJson(cookie));
 					this.addCookie(cookie.getName(), cookie.getValue(), cookie.getHost(), cookie.getPath());
 				}
 			}
@@ -205,7 +214,7 @@ public class PageFetcherImpl implements PageFetcher{
 			get.addHeader("Accept-Encoding", "gzip");
 			for (Iterator<Entry<String, String>> it = headers.entrySet().iterator(); it.hasNext();){
 				Entry<String, String> entry = it.next();
-				get.setHeader(entry.getKey(), entry.getValue());
+				get.addHeader(entry.getKey(), entry.getValue());
 			}
 			
 			//同步信号量,在真正对服务端进行访问之前进行访问间隔的控制
@@ -232,6 +241,9 @@ public class PageFetcherImpl implements PageFetcher{
 				
 				hs.put(key, val);
 			}
+			
+			req.getCookies().putAll(this.cookies);
+			
 			fetchResult.setReq(req);
 			//执行get访问，获取服务端返回内容
 			HttpResponse response = httpClient.execute(get);

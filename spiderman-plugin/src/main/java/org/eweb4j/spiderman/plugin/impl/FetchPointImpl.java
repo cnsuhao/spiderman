@@ -8,6 +8,7 @@ import org.eweb4j.spiderman.plugin.util.SpiderConfig;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.spiderman.xml.Cookie;
+import org.eweb4j.spiderman.xml.Cookies;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.util.CommonUtil;
 
@@ -30,32 +31,30 @@ public class FetchPointImpl implements FetchPoint{
 	}
 	
 	public static void main(String[] args){
-		String url = "http://www.dealmates.com.my/kuala-lumpur/deals/all"; 
+		String url = "http://www.stardeal.my/deals/recent_deals"; 
 		PageFetcherImpl fetcher = new PageFetcherImpl();
 		SpiderConfig config = new SpiderConfig();
-		config.setFollowRedirects(false);
 		config.setCharset("utf-8");
 		config.setPolitenessDelay(200);
 		fetcher.setConfig(config);
 		
 		Site site = new Site();
-		
+		Cookies cookies = new Cookies();
 		Cookie c = new Cookie();
-		c.setHost(url.replace("http://", ""));
+		c.setHost("");
 		c.setPath("/");
-		c.setName("PHPSESSID");
-		c.setValue("cb731c948a731f5f9b4093a9ffa46d07");
-		
-		site.getCookies().getCookie().add(c);
-		
+		c.setName("CakeCookie[currentStateId]");
+		c.setValue("6");
+		cookies.getCookie().add(c);
+		site.setCookies(cookies);
 		fetcher.init(site);
 		try {
 			FetchRequest req = new FetchRequest();
 			req.setUrl(url);
 			FetchResult rs = fetcher.fetch(req);
 			System.out.println(rs); 
-			if (rs.getPage() != null)
-				System.out.println(rs.getPage().getContent());
+//			if (rs.getPage() != null)
+//				System.out.println(rs.getPage().getContent());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -20,6 +20,8 @@ public class Task {
 	public double sort = 10;
 	public String url;
 	public String sourceUrl;//task.url的来源
+//	public List<Header> headers = new ArrayList<Header>();
+//	public List<Cookie> cookies = new ArrayList<Cookie>();
 	
 	public String toString() {
 		return "Task [site=" + site.getName() + ", sort=" + sort + ", url=" + url + ", sourceUrl=" + sourceUrl + "]";
