@@ -113,8 +113,10 @@ public class ModelParser extends DefaultHandler{
 			HtmlCleaner cleaner = new HtmlCleaner();
 //			cleaner.getProperties().setTreatUnknownTagsAsContent(true);
 			cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
-			//忽略注释
-			cleaner.getProperties().setOmitComments(true);
+			String isIgCom = this.target.getModel().getIsIgnoreComments();
+			if ("1".equals(isIgCom) || "true".equals(isIgCom))
+				//忽略注释
+				cleaner.getProperties().setOmitComments(true);
 			
 			TagNode rootNode = cleaner.clean(page.getContent());
 			String xml = ParserUtil.xml(rootNode, true);
@@ -125,8 +127,10 @@ public class ModelParser extends DefaultHandler{
 
 	private List<Map<String, Object>> parseXml(Page page, boolean isFromHtml) throws Exception{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		//忽略注释
-		factory.setIgnoringComments(true);
+		String isIgCom = this.target.getModel().getIsIgnoreComments();
+		if ("1".equals(isIgCom) || "true".equals(isIgCom))
+			//忽略注释
+			factory.setIgnoringComments(true);
 		//忽略空元素
 		factory.setIgnoringElementContentWhitespace(true);
         factory.setNamespaceAware(!isFromHtml); // never forget this!
@@ -367,8 +371,10 @@ public class ModelParser extends DefaultHandler{
 	private List<Map<String, Object>> parseHtml(Page page) throws Exception{
 		HtmlCleaner cleaner = new HtmlCleaner();
 //		cleaner.getProperties().setTreatUnknownTagsAsContent(true);
-		//忽略注释
-		cleaner.getProperties().setOmitComments(true);
+		String isIgCom = this.target.getModel().getIsIgnoreComments();
+		if ("1".equals(isIgCom) || "true".equals(isIgCom))
+			//忽略注释
+			cleaner.getProperties().setOmitComments(true);
 		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
 		String html = page.getContent();
 		fel.getContext().set("$page_content", html);

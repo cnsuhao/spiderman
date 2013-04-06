@@ -23,6 +23,12 @@ public class Model {
 	private String isForceUseXmlParser;
 	
 	/**
+	 * 是否忽略<!---->注释内容,默认不忽略
+	 */
+	@AttrTag
+	private String isIgnoreComments;
+	
+	/**
 	 * XML命名空间设置
 	 */
 	private Namespaces namespaces;
@@ -98,6 +104,14 @@ public class Model {
 		}
 		
 		return fields;
+	}
+	
+	public String getIsIgnoreComments() {
+		return this.isIgnoreComments;
+	}
+
+	public void setIsIgnoreComments(String isIgnoreComments) {
+		this.isIgnoreComments = isIgnoreComments;
 	}
 
 	public String getCType() {

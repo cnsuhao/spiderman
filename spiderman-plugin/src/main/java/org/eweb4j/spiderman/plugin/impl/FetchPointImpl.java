@@ -31,7 +31,7 @@ public class FetchPointImpl implements FetchPoint{
 	}
 	
 	public static void main(String[] args){
-		String url = "http://www.stardeal.my/deals/recent_deals"; 
+		String url = "http://www.myooo.my/?val=669605939"; 
 		PageFetcherImpl fetcher = new PageFetcherImpl();
 		SpiderConfig config = new SpiderConfig();
 		config.setCharset("utf-8");
@@ -45,16 +45,14 @@ public class FetchPointImpl implements FetchPoint{
 		c.setPath("/");
 		c.setName("CakeCookie[currentStateId]");
 		c.setValue("6");
-		cookies.getCookie().add(c);
-		site.setCookies(cookies);
 		fetcher.init(site);
 		try {
 			FetchRequest req = new FetchRequest();
 			req.setUrl(url);
 			FetchResult rs = fetcher.fetch(req);
-			System.out.println(rs); 
-//			if (rs.getPage() != null)
-//				System.out.println(rs.getPage().getContent());
+//			System.out.println(rs); 
+			if (rs.getPage() != null)
+				System.out.println(rs.getPage().getContent());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
