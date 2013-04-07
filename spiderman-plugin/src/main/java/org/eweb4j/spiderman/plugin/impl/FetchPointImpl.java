@@ -31,20 +31,21 @@ public class FetchPointImpl implements FetchPoint{
 	}
 	
 	public static void main(String[] args){
-		String url = "http://www.myooo.my/?val=669605939"; 
+		long start = System.currentTimeMillis();
+		String url = "http://www.deal.com.sg/deals/singapore/phuket-3d2n-luxurious-4-star-star-duangjitt-resort-spa-includes-daily-departure-silk?utm_source=ilovedeals&utm_medium=referral&utm_campaign=cpc"; 
 		PageFetcherImpl fetcher = new PageFetcherImpl();
 		SpiderConfig config = new SpiderConfig();
 		config.setCharset("utf-8");
 		config.setPolitenessDelay(200);
 		fetcher.setConfig(config);
 		
+//		Cookies cookies = new Cookies();
+//		Cookie c = new Cookie();
+//		c.setHost("");
+//		c.setPath("/");
+//		c.setName("CakeCookie[currentStateId]");
+//		c.setValue("6");
 		Site site = new Site();
-		Cookies cookies = new Cookies();
-		Cookie c = new Cookie();
-		c.setHost("");
-		c.setPath("/");
-		c.setName("CakeCookie[currentStateId]");
-		c.setValue("6");
 		fetcher.init(site);
 		try {
 			FetchRequest req = new FetchRequest();
@@ -53,6 +54,8 @@ public class FetchPointImpl implements FetchPoint{
 //			System.out.println(rs); 
 			if (rs.getPage() != null)
 				System.out.println(rs.getPage().getContent());
+			
+			System.out.println(System.currentTimeMillis() - start);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

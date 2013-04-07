@@ -1,12 +1,12 @@
 package org.eweb4j.spiderman.plugin;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.eweb4j.spiderman.infra.SpiderIOC;
 import org.eweb4j.spiderman.infra.SpiderIOCs;
@@ -128,7 +128,7 @@ public class PluginManager {
 		final Collection<Impl> _impls = this.impls.get(pointName);
 		return new ExtensionPoint<T>() {
 			public Collection<T> getExtensions() {
-				Collection<T> result = new ArrayList<T>();
+				Collection<T> result = new Vector<T>();
 				for (Impl impl : _impls){
 					T t = null;
 					String type = impl.getType();

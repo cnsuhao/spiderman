@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -489,13 +490,15 @@ public class Spiderman {
 			if (seeds == null || seeds.getSeed() == null || seeds.getSeed().isEmpty()) {
 				seedUrls.add(this.site.getUrl());
 			}else{
-				for (Seed s : seeds.getSeed()){
+				for (Iterator<Seed> it = seeds.getSeed().iterator(); it.hasNext(); ){
+					Seed s = it.next();
 					seedUrls.add(s.getUrl());
 				}
 			}
 			
 			// 运行种子任务
-			for (String url : seedUrls) {
+			for (Iterator<String> it = seedUrls.iterator(); it.hasNext(); ) {
+				String url = it.next();
 				Task seedTask = new Task(new String(url), null, this.site, 10);
 				Spider seedSpider = new Spider();
 				seedSpider.init(seedTask, listener);
@@ -514,7 +517,8 @@ public class Spiderman {
 					Task task = null;
 					Collection<TaskPollPoint> taskPollPoints = site.taskPollPointImpls;
 					if (taskPollPoints != null && !taskPollPoints.isEmpty()){
-						for (TaskPollPoint point : taskPollPoints){
+						for (Iterator<TaskPollPoint> it = taskPollPoints.iterator(); it.hasNext(); ){
+							TaskPollPoint point = it.next();
 							task = point.pollTask();
 						}
 					}
@@ -550,7 +554,8 @@ public class Spiderman {
 					long cost = System.currentTimeMillis() - start;
 					if (cost >= times){ 
 //						 运行种子任务
-						for (String url : seedUrls) {
+						for (Iterator<String> it = seedUrls.iterator(); it.hasNext(); ) {
+							String url = it.next();
 							Task seedTask = new Task(new String(url), null, this.site, 10);
 							Spider seedSpider = new Spider();
 							seedSpider.init(seedTask, listener);

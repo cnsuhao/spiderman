@@ -2,6 +2,7 @@ package org.eweb4j.spiderman.spider;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,8 @@ public class Spider implements Runnable{
 			//扩展点：begin 蜘蛛开始
 			Collection<BeginPoint> beginPoints = task.site.beginPointImpls;
 			if (beginPoints != null && !beginPoints.isEmpty()){
-				for (BeginPoint point : beginPoints){
+				for (Iterator<BeginPoint> it = beginPoints.iterator(); it.hasNext(); ){
+					BeginPoint point = it.next();
 					task = point.confirmTask(task);
 				}
 			}
@@ -59,7 +61,8 @@ public class Spider implements Runnable{
 			FetchResult result = null;
 			Collection<FetchPoint> fetchPoints = task.site.fetchPointImpls;
 			if (fetchPoints != null && !fetchPoints.isEmpty()){
-				for (FetchPoint point : fetchPoints){
+				for (Iterator<FetchPoint> it = fetchPoints.iterator(); it.hasNext(); ){
+					FetchPoint point = it.next();
 					result = point.fetch(task, result);
 				}
 			}
@@ -76,7 +79,8 @@ public class Spider implements Runnable{
 			Collection<String> newUrls = null;
 			Collection<DigPoint> digPoints = task.site.digPointImpls;
 			if (digPoints != null && !digPoints.isEmpty()){
-				for (DigPoint point : digPoints){
+				for (Iterator<DigPoint> it = digPoints.iterator(); it.hasNext(); ){
+					DigPoint point = it.next();
 					newUrls = point.digNewUrls(result, task, newUrls);
 				}
 			}
@@ -93,7 +97,8 @@ public class Spider implements Runnable{
 			Collection<Task> validTasks = null;
 			Collection<DupRemovalPoint> dupRemovalPoints = task.site.dupRemovalPointImpls;
 			if (dupRemovalPoints != null && !dupRemovalPoints.isEmpty()){
-				for (DupRemovalPoint point : dupRemovalPoints){
+				for (Iterator<DupRemovalPoint> it = dupRemovalPoints.iterator(); it.hasNext(); ){
+					DupRemovalPoint point = it.next();
 					validTasks = point.removeDuplicateTask(task, newUrls, validTasks);
 				}
 			}
@@ -110,7 +115,8 @@ public class Spider implements Runnable{
 			//扩展点：task_sort 给任务排序
 			Collection<TaskSortPoint> taskSortPoints = task.site.taskSortPointImpls;
 			if (taskSortPoints != null && !taskSortPoints.isEmpty()){
-				for (TaskSortPoint point : taskSortPoints){
+				for (Iterator<TaskSortPoint> it = taskSortPoints.iterator(); it.hasNext(); ){
+					TaskSortPoint point = it.next();
 					validTasks = point.sortTasks(validTasks);
 				}
 			}
@@ -141,7 +147,8 @@ public class Spider implements Runnable{
 			Target target = null;
 			Collection<TargetPoint> targetPoints = task.site.targetPointImpls;
 			if (targetPoints != null && !targetPoints.isEmpty()){
-				for (TargetPoint point : targetPoints){
+				for (Iterator<TargetPoint> it = targetPoints.iterator(); it.hasNext(); ){
+					TargetPoint point = it.next();
 					target = point.confirmTarget(task, target);
 				}
 			}
@@ -166,7 +173,8 @@ public class Spider implements Runnable{
 			List<Map<String, Object>> models = null;
 			Collection<ParsePoint> parsePoints = task.site.parsePointImpls;
 			if (parsePoints != null && !parsePoints.isEmpty()){
-				for (ParsePoint point : parsePoints){
+				for (Iterator<ParsePoint> it = parsePoints.iterator(); it.hasNext(); ){
+					ParsePoint point = it.next();
 					models = point.parse(task, target, page, models);
 				}
 			}
@@ -175,8 +183,10 @@ public class Spider implements Runnable{
 				return ;
 			}
 			
-			for (Map<String,Object> model : models){
-				 for (Field f : target.getModel().getField()){
+			for (Iterator<Map<String, Object>> _it = models.iterator(); _it.hasNext(); ){
+				 Map<String,Object> model = _it.next();
+				 for (Iterator<Field> it = target.getModel().getField().iterator(); it.hasNext(); ){
+					 Field f = it.next();
 					 //去掉那些被定义成 参数 的field
 					 if ("1".equals(f.getIsParam()) || "true".equals(f.getIsParam()))
 						 model.remove(f.getName());
@@ -202,7 +212,8 @@ public class Spider implements Runnable{
 			List<Object> pojos = null;
 			Collection<PojoPoint> pojoPoints = task.site.pojoPointImpls;
 			if (pojoPoints != null && !pojoPoints.isEmpty()){
-				for (PojoPoint point : pojoPoints){
+				for (Iterator<PojoPoint> it = pojoPoints.iterator(); it.hasNext(); ){
+					PojoPoint point = it.next();
 					pojos = point.mapping(task, cls, models, pojos);
 				}
 			}
@@ -215,7 +226,8 @@ public class Spider implements Runnable{
 			//扩展点：end 蜘蛛完成工作，该收尾了
 			Collection<EndPoint> endPoints = task.site.endPointImpls;
 			if (endPoints != null && !endPoints.isEmpty()){
-				for (EndPoint point : endPoints){
+				for (Iterator<EndPoint> it = endPoints.iterator(); it.hasNext(); ){
+					EndPoint point = it.next();
 					models = point.complete(task, models);
 				}
 			}
@@ -231,7 +243,8 @@ public class Spider implements Runnable{
 	public Collection<Task> pushTask(Collection<Task> validTasks) throws Exception {
 		Collection<TaskPushPoint> taskPushPoints = task.site.taskPushPointImpls;
 		if (taskPushPoints != null && !taskPushPoints.isEmpty()){
-			for (TaskPushPoint point : taskPushPoints){
+			for (Iterator<TaskPushPoint> it = taskPushPoints.iterator(); it.hasNext(); ){
+				TaskPushPoint point = it.next();
 				validTasks = point.pushTask(validTasks);
 			}
 		}
