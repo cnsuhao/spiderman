@@ -155,13 +155,13 @@ Spiderman Sample | 案例
 				.keepStrict("2h");//存活时间，过了存活时间后马上关闭
 			
 			//启动爬虫 + 调度定时重启
-			Spiderman.me()
-				.listen(listener)//设置监听器
-				.schedule("10s")//调度，爬虫运行10s
-				.delay("2s")//每隔 10 + 2 秒后重启爬虫
-				.times(3)//调度 3 次
-				.startup()//启动
-				.blocking();//阻塞直到所有调度完成
+			//Spiderman.me()
+				//.listen(listener)//设置监听器
+				//.schedule("10s")//调度，爬虫运行10s
+				//.delay("2s")//每隔 10 + 2 秒后重启爬虫
+				//.times(3)//调度 3 次
+				//.startup()//启动
+				//.blocking();//阻塞直到所有调度完成
     	}
     }
 
