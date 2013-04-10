@@ -45,58 +45,123 @@ Spiderman Sample | 案例
     	
     	@Test
     	public void test() throws Exception {
-    		
-    		//启动EWeb4J框架
     		String err = EWeb4JConfig.start();
-    		if (err != null)
-    			throw new Exception(err);
-    		
-    		SpiderListener listener = new SpiderListenerAdaptor(){
-    			public void onInfo(Thread thread, Task task, String info) {
-    				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
-    				System.out.println(info);
-    			}
-    			public void onError(Thread thread, Task task, String err, Exception e) {
-    				e.printStackTrace();
-    			}
-    			
-    			public void onParse(Thread thread, Task task, List<Map<String, Object>> models) {
-    				synchronized (mutex) {
-    					String content = CommonUtil.toJson(models.get(0));
-    					
-    					try {
-    						File dir = new File(FileUtil.getTopClassPath(TestSpider.class) + "/Data/" + task.site.getName());
-    						if (!dir.exists())
-    							dir.mkdirs();
-    						File file = new File(dir+"/count_"+task.site.counter.getCount()+"_"+CommonUtil.getNowTime("yyyy_MM_dd_HH_mm_ss")+".json");
-    						FileUtil.writeFile(file, content);
-    						System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
-    						System.out.println(file.getAbsolutePath() + " create finished...");
-    					} catch (Exception e) {
-    						e.printStackTrace();
-    					}
-    				}
-    			}
-    		};
-    		
-    		// 启动爬虫
-		Spiderman.me()
-				.init(listener)// 初始化
-				.startup()// 启动
-				.keep("30s");// 存活时间，过了存活时间后马上关闭
-
-		// ------拿到引用后你还可以这样关闭-------------------------
-		// spiderman.shutdown();//等待正在活动的线程都死掉再关闭爬虫
-		// spiderman.shutdownNow();//马上关闭爬虫
+			if (err != null)
+				throw new Exception(err);
+			
+			SpiderListener listener = new SpiderListenerAdaptor(){
+				public void afterScheduleCancel(){
+					//调度结束回调
+				}
+				/**
+				 * 每次调度执行前回调此方法
+				 * @date 2013-4-1 下午03:33:11
+				 * @param theLastTimeScheduledAt 上一次调度时间
+				 */
+				public void beforeEveryScheduleExecute(Date theLastTimeScheduledAt){
+					System.err.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [LAST_SCHEDULE_AT] ~ ");
+					System.err.println("at -> " + CommonUtil.formatTime(theLastTimeScheduledAt));
+				}
+				public void onFetch(Thread thread, Task task, FetchResult result) {
+					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [FETCH] ~ ");
+					System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
+				}
+				public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {
+					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DIG] ~ ");
+					System.out.println(newUrls);
+				}
+				public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {
+	//				for (Task t : validTasks){
+	//					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DUPREMOVE] ~ ");
+	//					System.out.println(t.url+" from->"+t.sourceUrl);
+	//				}
+				}
+				public void onTaskSort(Thread currentThread, Task task, Collection<Task> afterSortTasks) {
+	//				for (Task t : afterSortTasks){
+	//					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [SORT] ~ ");
+	//					System.out.println(t.url+" from->"+t.sourceUrl);
+	//				}
+				}
+				public void onNewTasks(Thread thread, Task task, Collection<Task> newTasks) {
+	//				for (Task t : newTasks){
+	//					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [NEWTASK] ~ ");
+	//					System.out.println(t.sort + ",,,," + t.url+" from->"+t.sourceUrl);
+	//				}
+				}
+				public void onTargetPage(Thread thread, Task task, Page page) {
+	//				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [TARGET] ~ ");
+	//				System.out.println(page.getUrl());
+				}
+				public void onInfo(Thread thread, Task task, String info) {
+					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
+					System.out.println(info);
+				}
+				
+				public void onError(Thread thread, Task task, String err, Exception e) {
+					System.err.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [ERROR] ~ ");
+					e.printStackTrace();
+				}
+				
+				public void onParse(Thread thread, Task task, List<Map<String, Object>> models) {
+					final String projectRoot = FileUtil.getTopClassPath(TestSpider.class);
+					final File dir = new File(projectRoot+"/Data/"+task.site.getName()+"/"+task.target.getName());
+					try {
+						if (!dir.exists())
+							dir.mkdirs();
+						
+						for (Map<String, Object> map : models) {
+							String fileName = dir + "/count_" + task.site.counter.getCount();
+							StringBuilder sb = new StringBuilder();
+							for (Iterator<Entry<String,Object>> it = map.entrySet().iterator(); it.hasNext();){
+								Entry<String,Object> e = it.next();
+								boolean isBlank = false;
+								
+								if (e.getValue() == null)
+									isBlank = true;
+								else if (e.getValue() instanceof String && ((String)e.getValue()).trim().length() == 0)
+									isBlank = true;
+								else if (e.getValue() instanceof List && ((ArrayList<?>)e.getValue()).isEmpty())
+									isBlank = true;
+								else if (e.getValue() instanceof List && !((ArrayList<?>)e.getValue()).isEmpty()) {
+									if (((ArrayList<?>)e.getValue()).size() == 1 && String.valueOf(((ArrayList<?>)e.getValue()).get(0)).trim().length() == 0)
+									isBlank = true;
+								}
+									
+								if (isBlank){
+									if (sb.length() > 0)
+										sb.append("_");
+									sb.append(e.getKey());
+								}
+							}
+							String content = CommonUtil.toJson(map);
+							if (sb.length() > 0)
+								fileName = fileName + "_no_"+sb.toString()+"_";
+							
+							File file = new File(fileName+".json");
+							FileUtil.writeFile(file, content);
+							System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
+							System.out.println(fileName + " create finished...");
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			};
 		
-		// 定时重启爬虫
-		// Spiderman.me()
-			// .listen(listener)// 监听
-			// .schedule("10s")// 调度，爬虫运行10s
-			// .delay("2s")// 每隔 10 + 2 秒后重启爬虫
-			// .times(3)// 调度 3 次
-			// .startup()// 启动
-			// .blocking();// 阻塞当前线程直到所有调度完成
+			//启动爬虫
+			Spiderman.me()
+				.init(listener)//初始化
+				.startup()//启动
+				.keepStrict("2h");//存活时间，过了存活时间后马上关闭
+			
+			//启动爬虫 + 调度定时重启
+			Spiderman.me()
+				.listen(listener)//设置监听器
+				.schedule("10s")//调度，爬虫运行10s
+				.delay("2s")//每隔 10 + 2 秒后重启爬虫
+				.times(3)//调度 3 次
+				.startup()//启动
+				.blocking();//阻塞直到所有调度完成
     	}
     }
 
@@ -119,10 +184,13 @@ Spiderman Sample | 案例
     <?xml version="1.0" encoding="UTF-8"?>
 	<!--
 	  | Spiderman Java开源垂直网络爬虫 
+	  | 项目主页: https://gitcafe.com/laiweiwei/Spiderman
 	  | author: l.weiwei@163.com
 	  | blog: http://laiweiweihi.iteye.com,http://my.oschina.net/laiweiwei
 	  | qq: 493781187
-	  | time: 2013-01-08 16:12
+	  | email: l.weiwei@163.com
+	  | create: 2013-01-08 16:12
+	  | update: 2013-04-10 18:06
 	-->
 	<beans>
 		<!--
@@ -130,21 +198,25 @@ Spiderman Sample | 案例
 		  | url:种子链接
 		  | skipStatusCode:设置哪些状态码需要忽略，多个用逗号隔开
 		  | userAgent:设置爬虫标识
-		  | includeHttps:是否抓取https页
+		  | includeHttps:0|1是否抓取https页
+		  | isDupRemovalStrict:0|1是否严格去掉重复的TargetUrl，即已访问过一次的TargetUrl不会再被访问，若否，就算是重复的TargetUrl，只要它的来源URL不同，都会被访问
+		  | isFollowRedirects:0|1是否递归跟随30X返回的location继续抓取
 		  | reqDelay:{n}s|{n}m|{n}h|n每次请求之前延缓时间
 		  | enable:0|1是否开启本网站的抓取
 		  | charset:网站字符集
 		  | schedule:调度时间，每隔多长时间重新从种子链接抓取
 		  | thread:分配给本网站爬虫的线程数
 		  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
+		  | timeout:HTTP请求超时
 		-->
-		<site name="oschina" includeHttps="1" url="http://www.oschina.net/question?catalog=1&amp;show=&amp;p=1" reqDelay="1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+		<site name="oschina" includeHttps="1" url="http://www.oschina.net/question?catalog=1&amp;show=&amp;p=1" reqDelay="1s" enable="0" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 			<!--
 			  | 配置多个种子链接
+			  | name:种子名称
 			  | url:种子链接
 			-->
 			<!--seeds>
-				<seed url="" />
+				<seed name="" url="" />
 			</seeds-->
 			<!--
 			  | 告诉爬虫仅抓取以下这些host的链接，多数是应对二级或多级域名的情况
@@ -161,11 +233,11 @@ Spiderman Sample | 案例
 			<!--
 			  | HTTP Cookie
 			<cookies>
-				<cookie name="" value="" domain="" path="" />
+				<cookie name="" value="" host="" path="" />
 			</cookies>-->
 			<!--
 			  | 进入任务队列的URL规则
-			  | policy:多个rule的策略，暂时只实现了and，未来会有or
+			  | policy:多个rule的策略，and | or
 			-->
 			<queueRules policy="and">
 				<!--
@@ -180,32 +252,33 @@ Spiderman Sample | 案例
 			-->
 			<targets>
 				<!--
+				  | 限制目标URL的来源,一般来说，对应的就是网站的频道页，例如某个分类下的新闻列表页
+				-->
+				<sourceRules policy="and">
+					<rule type="regex" value="http://www\.oschina\.net/question\?catalog=1&amp;show=&amp;p=\d+">
+						<!--
+						  | 定义如何在来源页面上挖掘新的 URL
+						  | 这个节点跟 <model> 节点是一样的结构，只不过名称不叫model而是叫做digUrls而已
+						-->
+						<digUrls>
+							<field name="page_url" isArray="1">
+								<parsers>
+									<parser xpath="//div[@class='QuestionList']//ul[@class='pager']//li[@class='page']//a[@href]" attribute="href" />
+									<parser exp="'http://www.oschina.net/question'+$this" />
+								</parsers>
+							</field>
+							<field name="target_url" isArray="1"> 
+								<parsers>
+									<parser xpath="//div[@class='QuestionList']//ul//li[@class='question']//div[@class='qbody']/h2[1]//a[@href]" attribute="href" />
+								</parsers>
+							</field>
+						</digUrls>
+					</rule>
+				</sourceRules>
+				<!--
 				  | name:目标名称	
 				-->
 				<target name="question">
-					<!--
-					  | 限制目标URL的来源
-					-->
-					<sourceRules policy="and">
-						<rule type="regex" value="http://www\.oschina\.net/question\?catalog=1&amp;show=&amp;p=\d+">
-							<!--
-							  | 定义如何在来源页面上挖掘新的 URL
-							-->
-							<digUrls>
-								<field name="page_url" isArray="1">
-									<parsers>
-										<parser xpath="//div[@class='QuestionList']//ul[@class='pager']//li[@class='page']//a[@href]" attribute="href" />
-										<parser exp="'http://www.oschina.net/question'+$this" />
-									</parsers>
-								</field>
-								<field name="target_url" isArray="1"> 
-									<parsers>
-										<parser xpath="//div[@class='QuestionList']//ul//li[@class='question']//div[@class='qbody']/h2[1]//a[@href]" attribute="href" />
-									</parsers>
-								</field>
-							</digUrls>
-						</rule>
-					</sourceRules>
 					<!--
 					  | 目标URL的规则
 					-->
@@ -214,34 +287,54 @@ Spiderman Sample | 案例
 					</urlRules>
 					<!--
 					  | 目标网页的数据模型
+					  | cType: 目标网页的contentType
+					  | isForceUseXmlParser:0|1 是否强制使用XML的解析器来解析目标网页，此选项可以让HTML页面支持XPath2.0
+					  | isIgnoreComments:0|1 是否忽略注释
+					  | isArray:0|1 目标网页是否有多个数据模型，一般一些RSS XML页面上就会有很多个数据模型需要解析，即在一个xml页面上解析多个Model对象
+					  | xpath: 搭配 isArray 来使用，可选
 					-->
 					<model>
 						<!--
+						  | 目标网页的命名空间配置,一般用于xml页面
+						  | prefix: 前缀
+						  | uri: 关联的URI
+						<namespaces>
+							<namespace prefix="" uri="" />
+						</namespaces>
+						-->
+						<!--
 						  | 属性的配置
 						  | name:属性名称
-						  | parser:针对该属性的解析规则
+						  | isArray:0|1 是否是多值
+						  | isMergeArray:0|1 是否将多值合并，搭配isArray使用
+						  | isParam:0|1 是否作为参数提供给别的field节点使用，如果是，则生命周期不会保持到最后
+						  | isFinal:0|1 是否是不可变的参数，搭配isParam使用，如果是，第一次赋值之后不会再被改变
+						  | isAlsoParseInNextPage:0|1 是否在分页的下一页里继续解析，用于目标网页有分页的情况
+						  | isTrim:0|1 是否去掉前后空格
 						-->
 						<field name="title">
-							<!--
-							  | xpath: XPath规则，如果目标页面是XML，则可以使用2.0语法，否则HTML的话暂时只能1.0
-							  | attribute:当使用XPath解析后的内容不是文本而是一个Node节点对象的时候，可以给定一个属性名获取其属性值例如<img src="" />
-							  | regex:当使用XPath（包括attribute）规则获取到的文本内容不满足需求时，可以继续设置regex正则表达式进行解析
-							  | exp:当使用XPath获取的文本(如果获取的不是文本则会先执行exp而不是regex否则先执行regex)不满足需求时，可以继续这是exp表达式进行解析
-							  |     exp表达式有几个内置对象和方法:
-							  |     $output(Node): 这个是内置的output函数，作用是输出某个XML节点的结构内容。参数是一个XML节点对象，可以通过XPath获得
-							  |     $this: 当使用XPath获取到的是Node节点时，这个表示节点对象，否则表示Java的字符串对象,可以调用Java字符串API进行处理
-							  |     $Tags: 这个是内置的用于过滤标签的工具类 
-							  |            $Tags.xml($output($this)).rm('p').ok()
-							  |            $Tags.xml($this).rm('p').empty().ok()
-							  |     $Attrs: 这个是内置的用于过滤属性的工具类
-							  |            $Attrs.xml($this).rm('style').ok()
-							  |            $Attrs.xml($this).tag('img').rm('src').ok()
-							  |     
-							  |            $Tags和$Attrs可以一起使用: 
-							  |            $Tags.xml($this).rm('p').Attrs().rm('style').ok()
-							  |            $Attrs.xml($this).rm('style').Tags().rm('p').ok()
-							-->
 							<parsers>
+								<!--
+								  | xpath: XPath规则，如果目标页面是XML，则可以使用2.0语法，否则HTML的话暂时只能1.0
+								  | attribute:当使用XPath解析后的内容不是文本而是一个Node节点对象的时候，可以给定一个属性名获取其属性值例如<img src="" />
+								  | regex:当使用XPath（包括attribute）规则获取到的文本内容不满足需求时，可以继续设置regex正则表达式进行解析
+								  | exp:当使用XPath获取的文本(如果获取的不是文本则会先执行exp而不是regex否则先执行regex)不满足需求时，可以继续这是exp表达式进行解析
+								  |     exp表达式有几个内置对象和方法:
+								  |     $output(Node): 这个是内置的output函数，作用是输出某个XML节点的结构内容。参数是一个XML节点对象，可以通过XPath获得
+								  |     $this: 当使用XPath获取到的是Node节点时，这个表示节点对象，否则表示Java的字符串对象,可以调用Java字符串API进行处理
+								  |     $Tags: 这个是内置的用于过滤标签的工具类 
+								  |            $Tags.xml($output($this)).rm('p').ok()
+								  |            $Tags.xml($this).rm('p').empty().ok()
+								  |     $Attrs: 这个是内置的用于过滤属性的工具类
+								  |            $Attrs.xml($this).rm('style').ok()
+								  |            $Attrs.xml($this).tag('img').rm('src').ok()
+								  |     
+								  |            $Tags和$Attrs可以一起使用: 
+								  |            $Tags.xml($this).rm('p').Attrs().rm('style').ok()
+								  |            $Attrs.xml($this).rm('style').Tags().rm('p').ok()
+								  | skipErr:0|1 是否忽略错误消息
+								  | skipRgxFail:0|1 是否忽略正则匹配失败，如果是，则会取失败前的值
+								-->
 								<parser xpath="//div[@class='QTitle']/h1/text()"/>
 							</parsers>
 						</field>

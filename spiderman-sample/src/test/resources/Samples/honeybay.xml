@@ -1,46 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   | Spiderman Java开源垂直网络爬虫 
-  | 项目主页: https://gitcafe.com/laiweiwei/Spiderman
   | author: l.weiwei@163.com
-  | blog: http://laiweiweihi.iteye.com,http://my.oschina.net/laiweiwei
+  | blog: http://laiweiweihi.iteye.com
   | qq: 493781187
-  | email: l.weiwei@163.com
-  | create: 2013-01-08 16:12
-  | update: 2013-04-10 18:06
+  | time: 2013-01-08 16:12
 -->
 <beans>
 	<!--
 	  | name:名称
 	  | url:种子链接
-	  | skipStatusCode:设置哪些状态码需要忽略，多个用逗号隔开
-	  | userAgent:设置爬虫标识
-	  | includeHttps:0|1是否抓取https页
-	  | isDupRemovalStrict:0|1是否严格去掉重复的TargetUrl，即已访问过一次的TargetUrl不会再被访问，若否，就算是重复的TargetUrl，只要它的来源URL不同，都会被访问
-	  | isFollowRedirects:0|1是否递归跟随30X返回的location继续抓取
 	  | reqDelay:{n}s|{n}m|{n}h|n每次请求之前延缓时间
 	  | enable:0|1是否开启本网站的抓取
 	  | charset:网站字符集
 	  | schedule:调度时间，每隔多长时间重新从种子链接抓取
 	  | thread:分配给本网站爬虫的线程数
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
-	  | timeout:HTTP请求超时
 	-->
-	<site name="jackcow-my" country="Malaysia" isDupRemovalStrict="0"
-		url="http://www.jackcow.com" 
-		reqDelay="0.1s" enable="0" charset="utf-8" schedule="1h" thread="2" waitQueue="5s" >
-		<!--
-		  | 多个种子链接	
-		-->
-		<seeds>
-			<seed name="kl" url="http://www.jackcow.com/jack2/include_deal.php?cat=15&amp;loc=8" />
-			<seed name="penang" url="http://www.jackcow.com/jack2/include_deal.php?cat=15&amp;loc=9" />
-			<seed name="jb" url="http://www.jackcow.com/jack2/include_deal.php?cat=15&amp;loc=22" />
-		</seeds>
-		<!--validHosts>
-			<validHost value="www.groupon.sg" />
-			<validHost value="alldeals.groupon.sg" />
-		</validHosts-->
+	<site name="honeybay" country="Singapore" url="http://www.honeybay.com/api/allDealswithdetails" reqDelay="0.1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
+		<!--seeds>
+			<seed url="http://www.honeybay.com/c/homeliving" />
+			<seed url="http://www.honeybay.com/c/electronics" />
+			<seed url="http://www.honeybay.com/c/beauty" />
+			<seed url="http://www.honeybay.com/c/luxury" />
+			<seed url="http://www.honeybay.com/c/fashion" />
+			<seed url="http://www.honeybay.com/c/kids" />
+			<seed url="http://www.honeybay.com/c/travels" />
+			<seed url="http://www.honeybay.com/c/hobby" />
+			<seed url="http://www.honeybay.com/c/jewellery" />
+		</seeds-->
 		<!--
 		  | HTTP Header
 		<headers>
@@ -53,7 +41,7 @@
 		</cookies>-->
 		<!--
 		  | 进入任务队列的URL规则
-		  | policy:多个rule的策略，and | or
+		  | policy:多个rule的策略，暂时只实现了and，未来会有or
 		-->
 		<queueRules policy="and">
 			<!--
@@ -68,56 +56,6 @@
 		-->
 		<targets>
 			<!--
-			  | 限制目标URL的来源
-			-->
-			<sourceRules policy="and">
-				<rule type="regex" value="http://www\.jackcow\.com/jack2/include_deal\.php\?cat=15&amp;loc=\d+" >
-					<!--
-					  | 定义如何在来源页面上挖掘新的 URL
-					  | 这个节点跟 <model> 节点是一样的结构，只不过名称不叫model而是叫做digUrls而已
-					-->
-					<digUrls>
-						<field name="target_url" isArray="1">
-							<parsers>
-								<parser xpath="//div[@class='deal-holder2']//a[@href]" attribute="href" />
-								<parser exp="'http://www.jackcow.com/'+$this" />
-							</parsers>
-						</field>
-					</digUrls>
-					<!--
-					  | 递归从下一页抓取新URL
-					  | 这个节点跟 <model> 节点是一样的结构，只不过名称不叫model而是叫做nextPage而已
-					-->
-					<nextPage>
-						<!--城市参数，变量-->
-						<field name="loc" isParam="1">
-							<parsers>
-								<parser exp="$task_url" />
-								<parser regex="(?&lt;=(loc=))\d+" />
-							</parsers>
-						</field>
-						<!--最后的deal时间参数，变量-->
-						<field name="lastDealTime" isParam="1">
-							<parsers>
-								<parser xpath="(//li[@class='deal_id'])[last()]" attribute="id" />
-							</parsers>
-						</field>
-						<!--变量-->
-						<field name="baseUrl" isParam="1" isFinal="1">
-							<parsers>
-								<parser exp="'http://www.jackcow.com/jack2/include_deal_next.php?action=get'" />
-							</parsers>
-						</field>
-						<!--最终生成的下一页url-->
-						<field name="nextUrl">
-							<parsers>
-								<parser exp="$fields.baseUrl+'&amp;last_deal_time='+$fields.lastDealTime+'&amp;cat=15&amp;loc='+$fields.loc" />
-							</parsers>
-						</field>
-					</nextPage>
-				</rule>
-			</sourceRules>
-			<!--
 			  | name:目标名称	
 			-->
 			<target name="deal">
@@ -125,34 +63,16 @@
 				  | 目标URL的规则
 				-->
 				<urlRules policy="and">
-					<rule type="regex" value="http://www\.jackcow\.com/deals/.*" />
+					<rule type="equal" value="http://www.honeybay.com/api/allDealswithdetails" />
 				</urlRules>
 				<!--
 				  | 目标网页的数据模型
-				  | cType: 目标网页的contentType
-				  | isForceUseXmlParser:0|1 是否强制使用XML的解析器来解析目标网页，此选项可以让HTML页面支持XPath2.0
-				  | isIgnoreComments:0|1 是否忽略注释
-				  | isArray:0|1 目标网页是否有多个数据模型，一般一些RSS XML页面上就会有很多个数据模型需要解析，即在一个xml页面上解析多个Model对象
-				  | xpath: 搭配 isArray 来使用，可选
 				-->
-				<model>
-					<!--
-					  | 目标网页的命名空间配置
-					  | prefix: 前缀
-					  | uri: 关联的URI
-					-->
-					<!--namespaces>
-						<namespace prefix="" uri="" />
-					</namespaces-->
+				<model isArray="1" xpath="//deal">
 					<!--
 					  | 属性的配置
 					  | name:属性名称
-					  | isArray:0|1 是否是多值
-					  | isMergeArray:0|1 是否将多值合并，搭配isArray使用
-					  | isParam:0|1 是否作为参数提供给别的field节点使用，如果是，则生命周期不会保持到最后
-					  | isFinal:0|1 是否是不可变的参数，搭配isParam使用，如果是，第一次赋值之后不会再被改变
-					  | isAlsoParseInNextPage:0|1 是否在分页的下一页里继续解析，用于目标网页有分页的情况
-					  | isTrim:0|1 是否去掉前后空格
+					  | parser:针对该属性的解析规则
 					-->
 					<field name="name" isTrim="1">
 						<!--
@@ -173,57 +93,63 @@
 						  |            $Tags和$Attrs可以一起使用: 
 						  |            $Tags.xml($this).rm('p').Attrs().rm('style').ok()
 						  |            $Attrs.xml($this).rm('style').Tags().rm('p').ok()
-						  | skipErr:0|1 是否忽略错误消息
-						  | skipRgxFail:0|1 是否忽略正则匹配失败，如果是，则会取失败前的值
 						-->
 						<parsers>
-							<parser xpath="//div[@id='deal-summary-title']//h1/text()" />
+							<parser xpath="title/text()" />
 						</parsers>
 					</field>
 					<field name="url">
 						<parsers>
-							<parser exp="$task_url" />
+							<parser xpath="url/text()" />
 						</parsers>
 					</field>
 					<field name="oldImg" isArray="1">
 						<parsers>
-							<parser xpath="//div[@id='deal-summary-imageholder2']" attribute="style" />
-							<parser regex="(?&lt;=(url\()).[^)]*" />
+							<parser xpath="slide//slide_img_url/text()" />
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="image/text()" />
 						</parsers>
 					</field>
 					<field name="descOldImg" isArray="1">
 						<parsers>
-							<parser xpath="//div[@class='deal-info2']//img[@src]" attribute="src" />
+							<parser xpath="terms/text()" />
+							<parser exp="$Util.toHTML($this)" />
+							<parser exp="$ParserUtil.evalXpath($this,'//img[@src]','src')" />
 						</parsers>
 					</field>
 					<field name="cate">
 					</field>
 					<field name="price">
 						<parsers>
-							<parser xpath="//div[@id='deal-summary-price']/h1/text()" 
-									regex="\d+(,?\d+)*(\.?\d+)*" />
-							<parser exp="$this.replace(',','')" />
+							<parser xpath="deal_price/text()" regex="\d+(,?\d+)*(\.?\d+)*" exp="$this.replace(',','')" />
 						</parsers>
 					</field>
 					<field name="originalPrice">
 						<parsers>
-							<parser xpath="//div[@id='deal-summary-price']//strike/text()" 
-									regex="\d+(,?\d+)*(\.?\d+)*" />
-							<parser exp="$this.replace(',','')" />
+							<parser xpath="original_price/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" exp="$this.replace(',','')" />
 						</parsers>
 					</field>
 					<field name="countBought">
 						<parsers>
-							<parser xpath="//div[@id='deal-summary-bought']/h1/text()" 
-									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser xpath="already_sold/text()" regex="\d+(,?\d+)*(\.?\d+)*" />
 							<parser exp="$this.replace(',','')" />
 						</parsers>
 					</field>
 					<field name="expiryTime">
+						<parsers>
+							<parser xpath="time_left/text()" />
+							<parser exp="$Util.toLong($this)*1000" />
+							<parser exp="$Util.addLong($Util.getNow(), $Util.toLong($this))" />
+							<parser exp="$Util.String($this).substring(0, 10)" />
+						</parsers>
 					</field>
 					<field name="highlight" isTrim="1">
 						<parsers>
-							<parser xpath="//div[@id='notice']" exp="$output($this)" />
+							<parser xpath="highlight/text()" />
 							<!--attribute 黑名单-->
 							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
 							<!--tag 黑名单，去掉内嵌内容-->
@@ -235,19 +161,11 @@
 					</field>
 					<field name="condition" isTrim="1">
 						<parsers>
-							<parser xpath="//div[@id='systemreview']" exp="$output($this)" />
-							<!--attribute 黑名单-->
-							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
-							<!--tag 黑名单，去掉内嵌内容-->
-							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
-							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
-							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
-							<!--其他-->
 						</parsers>
 					</field>
 					<field name="description" isTrim="1">
 						<parsers>
-							<parser xpath="//div[@class='deal-info2']" exp="$output($this)" />
+							<parser xpath="terms/text()" exp="$Util.toHTML($this)" />
 							<!--attribute 黑名单-->
 							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
 							<!--tag 黑名单，去掉内嵌内容-->
@@ -255,31 +173,16 @@
 							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
 							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
 							<!--其他-->
-						</parsers>
-					</field>
-					<field name="postCode">
-						<parsers>
-							<parser xpath="//div[@id='partner']/text()" />
-							<parser regex="\d{5}" />
+							<parser exp="$this.substring(0, $this.indexOf('Highlights'))" />
 						</parsers>
 					</field>
 					<field name="address" isTrim="1">
-						<parsers>
-							<parser xpath="//div[@id='partner']/text()" />
-							<parser regex="(?&lt;=(Where To Get This Deal)).*(?=(\d{5}))" />
-							<parser exp="$this.replace('&lt;/h&gt;','')" />
-						</parsers>
+					</field>
+					<field name="postCode">
 					</field>
 					<field name="merchant" isTrim="1">
-						<parsers>
-							<parser xpath="//div[@id='partner']//strong/text()" />
-						</parsers>
 					</field>
 					<field name="phone">
-						<parsers>
-							<parser xpath="//div[@id='partner']/text()" />
-							<parser regex="\d{2,4}( |-| - )\d{3,4}[ -]?\d{4}" />
-						</parsers>
 					</field>
 				</model>
 			</target>

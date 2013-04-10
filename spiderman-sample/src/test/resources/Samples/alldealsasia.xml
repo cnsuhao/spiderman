@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<site name="alldealsasia" country="Singapore" url="http://www.alldealsasia.com/feeds/xml" enable="1" schedule="10m" charset="utf-8" thread="2" waitQueue="5s">
+		<queueRules policy="and">
+			<rule type="!regex" value="^.*\.(jpg|png|gif)$" />
+		</queueRules>
+		<targets>
+			<target name="deal">
+				<urlRules policy="and">
+					<rule type="equal" value="http://www.alldealsasia.com/feeds/xml" />
+				</urlRules>
+				<model isArray="1" xpath="//node">
+					<field name="name">
+						<parsers>
+							<parser xpath="Title/text()"/>
+						</parsers>
+					</field>
+					<field name="url">
+						<parsers>
+							<parser xpath="DealLink/text()" exp="$this.replace('affiliate//', '')"/>
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="Image1/text()"/>
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="Image2/text()"/>
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="Image3/text()"/>
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="Image4/text()"/>
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="Image5/text()"/>
+						</parsers>
+					</field>
+					<field name="descOldImg" isArray="1">
+						<parsers>
+							<parser xpath="Description/text()" regex="[^\s'=&quot;]+\.(gif|png|jpg|jpeg|bmp)(?=[&quot;']?)" />
+							<parser exp="'http://www.alldealsasia.com'+$this.replace('http://www.alldealsasia.com', '').replace('http://alldealsasia.com', '')" />
+						</parsers>
+					</field>
+					<field name="cate">
+						<parsers>
+							<parser xpath="Category/text()"/>
+						</parsers>
+					</field>
+					<field name="originalPrice">
+						<parsers>
+							<parser xpath="OriginalPrice/text()" regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="price">
+						<parsers>
+							<parser xpath="SalePrice/text()" regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="countBought">
+						<parsers>
+							<parser xpath="AlreadySold/text()" regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="expiryTime">
+						<parsers>
+							<parser xpath="DealEndTime/text()" 
+									exp="$Util.String($Util.parse('yyyy-MM-dd HH:mm', $this).getTime()).substring(0, 10)"/>
+						</parsers>
+					</field>
+					<field name="merchant">
+						<parsers>
+							<parser xpath="MerchantName/text()"/>
+						</parsers>
+					</field>
+					<field name="address">
+						<parsers>
+							<parser xpath="MerchantAddress/text()"/>
+						</parsers>
+					</field>
+					<field name="description">
+						<parsers>
+							<parser xpath="Description/text()" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+						</parsers>
+					</field>
+				</model>
+			</target>
+		</targets>
+		<plugins>
+			<plugin enable="1" name="spider_plugin" version="0.0.1" desc="这是一个官方实现的默认插件，实现了所有扩展点。">
+				<extensions>
+					<extension point="task_poll">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPollPointImpl" sort="0"/>
+					</extension>
+					<extension point="begin">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.BeginPointImpl" sort="0"/>
+					</extension>
+					<extension point="fetch">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.FetchPointImpl" sort="0"/>
+					</extension>
+					<extension point="dig">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DigPointImpl" sort="0"/>
+					</extension>
+					<extension point="dup_removal">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DupRemovalPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_sort">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskSortPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_push">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPushPointImpl" sort="0"/>
+					</extension>
+					<extension point="target">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TargetPointImpl" sort="0"/>
+					</extension>
+					<extension point="parse">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
+					</extension>
+					<extension point="end">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>
+					</extension>
+				</extensions>
+				<providers>
+					<provider>
+						<orgnization name="深圳优扣科技有限公司" website="" desc="致力于打造一流的社交分享购物社区!">
+							<author name="weiwei" website="http://laiweiweihi.iteye.com" email="l.weiwei@163.com" weibo="http://weibo.com/weiweimiss" desc="一个喜欢自由、音乐、绘画的IT老男孩" />
+						</orgnization>
+					</provider>
+				</providers>
+			</plugin>
+			
+			<plugin enable="0" name="hello_plugin" version="0.0.1" 
+				desc="这是一个样例插件，实现了begin扩展点。实现类有两个，其中一个使用了eweb4j的ioc容器来实例化。注意，任何插件都可以实现多个扩展点，实现相同扩展点的插件按照其实现类给定的sort排序从小到大进行顺序执行">
+				<extensions>
+					<!--extension point="begin">
+						<impl value="org.eweb4j.spiderman.plugin.Hello111" sort="1"/>
+						<impl type="ioc" value="hello222" sort="2"/>
+					</extension-->
+				</extensions>
+			</plugin>
+		</plugins>
+	</site>
+</beans>

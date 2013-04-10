@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  | Spiderman Java开源垂直网络爬虫 
+  | author: l.weiwei@163.com
+  | blog: http://laiweiweihi.iteye.com
+  | qq: 493781187
+  | time: 2013-01-08 16:12
+-->
+<beans>
+	<!--
+	  | name:名称
+	  | url:种子链接
+	  | reqDelay:{n}s|{n}m|{n}h|n每次请求之前延缓时间
+	  | isDupRemovalStrict 是否严格去重复URL，默认是，若是，则每个被访问的url都不会第二次访问，否则控制来自同一个页面的url都不会被第二次访问，即不同来源的url，就算是相同，也会被访问
+	  | enable:0|1是否开启本网站的抓取
+	  | charset:网站字符集
+	  | schedule:调度时间，每隔多长时间重新从种子链接抓取
+	  | thread:分配给本网站爬虫的线程数
+	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
+	-->
+	<site name="livingsocial-my" country="Malaysia" isDupRemovalStrict="0"
+		includeHttps="1"
+		url="http://livingsocial.com/malaysia" 
+		reqDelay="0.1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="5s" >
+		<!--
+		  | 多个种子链接	
+		-->
+		<seeds>
+			<seed name="kl" url="http://livingsocial.com/malaysia/cities/1964-klang-valley-kuala-lumpur" />
+			<seed name="kl" url="http://www.livingsocial.com/malaysia/cities/1964-klang-valley-kuala-lumpur/escapes" />
+			<seed name="jb" url="http://livingsocial.com/malaysia/cities/1970-johor" />
+			<seed name="jb" url="http://www.livingsocial.com/malaysia/cities/1970-johor/escapes" />
+			<seed name="penang" url="http://livingsocial.com/malaysia/cities/1966-penang" />
+			<seed name="penang" url="http://www.livingsocial.com/malaysia/cities/1966-penang/escapes" />
+		</seeds>
+		<validHosts>
+			<validHost value="www.livingsocial.com" />
+			<validHost value="livingsocial.com" />
+		</validHosts>
+		<!--
+		  | HTTP Header
+		<headers>
+			<header name="Referer" value="http://www.straitsdeal.com/deals/" />
+		</headers>-->
+		<!--
+		  | HTTP Cookie
+		<cookies>
+			<cookie name="" value="" host="" path="" />
+		</cookies>-->
+		<!--
+		  | 进入任务队列的URL规则
+		  | policy:多个rule的策略，暂时只实现了and，未来会有or
+		-->
+		<queueRules policy="and">
+			<!--
+			  | 规则
+			  | type:规则类型，包括 regex | equal | start | end | contains 所有规则可以在前面添加 "!" 表示取反
+			  | value:值
+			-->
+			<rule type="!regex" value="^.*\.(jpg|png|gif)$" />
+		</queueRules>
+		<!--
+		  | 抓取目标
+		-->
+		<targets>
+			<!--
+			  | 限制目标URL的来源，并定义如何发现目标URL
+			-->
+			<sourceRules policy="or">
+				<rule type="regex" value="http://(www\.)?livingsocial\.com/malaysia/cities/(1964\-klang\-valley\-kuala\-lumpur|1966-penang|1970-johor)(/escapes)?" >
+					<digUrls>
+						<field name="target_url" isArray="1">
+							<parsers>
+								<parser xpath="//ul[@class='unstyled cities-items']//a[@href]" attribute="href" />
+								<parser exp="$Util.resolveUrl('http://www.livingsocial.com', $this)" />
+							</parsers>
+						</field>
+					</digUrls>
+				</rule>
+				<rule type="regex" value="http://livingsocial\.com/specials/livingfun/.*">
+					<digUrls>
+						<field name="target_url" isArray="1">
+							<parsers>
+								<parser xpath="//ul[@class='unstyled cities-items']//a[@href]" attribute="href" />
+								<parser exp="$Util.resolveUrl('http://www.livingsocial.com', $this)" />
+							</parsers>
+						</field>
+					</digUrls>
+				</rule>
+			</sourceRules>
+				
+			<!--
+			  | name:目标名称	
+			-->
+			<target name="deal">
+				<!--
+				  | 目标URL的规则
+				-->
+				<urlRules policy="or">
+					<rule type="regex" value="http://www\.livingsocial\.com/(malaysia/)?cities/\d+\-.*/deals/.*" />
+				</urlRules>
+				<!--
+				  | 目标网页的数据模型
+				-->
+				<model>
+					<!--
+					  | 临时变量
+					-->
+					<field name="h1" isParam="1">
+						<parsers>
+							<parser xpath="//div[@class='ls-rail']/h1/text()" />
+						</parsers>
+					</field>
+					<!--
+					  | 临时变量
+					-->
+					<field name="h2" isParam="1">
+						<parsers>
+							<parser xpath="//div[@class='ls-rail']/h2/text()" />
+						</parsers>
+					</field>
+					<field name="name" isTrim="1">
+						<parsers>
+							<parser exp="$fields.h1+' '+$fields.h2" />
+						</parsers>
+					</field>
+					<field name="url">
+						<parsers>
+							<parser exp="$task_url" />
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="//div[@class='deal-image']" attribute="style" />
+							<parser regex="(?&lt;=(background-image: url\(')).[^']*" />
+						</parsers>
+					</field>
+					<field name="descOldImg" isArray="1">
+					</field>
+					<field name="cate">
+					</field>
+					<field name="price">
+						<parsers>
+							<parser xpath="//li[@id='deal-buy-box-price']/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="originalPrice">
+						<parsers>
+							<parser xpath="//li[@class='ls-deal_price']/del/span/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="countBought">
+						<parsers>
+							<parser xpath="//li[@id='deal-purchase-count']/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="expiryTime">
+						<parsers>
+							<parser xpath="//ul[@id='stats_deal_list']/li[last()]/div/text()" />
+							<parser regex="\d+" />
+							<parser exp="$Util.getTime(10, $Util.addDay($Util.newDate(), $Util.toInt($this)))" />
+						</parsers>
+					</field>
+					<field name="highlight" isTrim="1">
+					</field>
+					<field name="condition" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@id='fine-print-full']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+							<parser exp="$this.replace('the fine print','')" />
+						</parsers>
+					</field>
+					<field name="description" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@id='view-details-full']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+						</parsers>
+					</field>
+					<field name="postCode">
+					</field>
+					<field name="address" isTrim="1">
+					</field>
+					<field name="merchant" isTrim="1">
+					</field>
+					<field name="phone">
+					</field>
+				</model>
+			</target>
+			<!--
+			  | 旅游deal页面
+			-->
+			<target name="escape_deal">
+				<!--
+				  | 目标URL的规则
+				-->
+				<urlRules policy="and">
+					<rule type="regex" value="http://www\.livingsocial\.com/escapes/.*" />
+				</urlRules>
+				<!--
+				  | 目标网页的数据模型
+				-->
+				<model>
+					<!--
+					  | 临时变量
+					-->
+					<field name="h1" isParam="1">
+						<parsers>
+							<parser xpath="//div[@class='header']/h1/text()" />
+						</parsers>
+					</field>
+					<!--
+					  | 临时变量
+					-->
+					<field name="h3" isParam="1">
+						<parsers>
+							<parser xpath="//div[@class='header']/h3/text()" />
+						</parsers>
+					</field>
+					<field name="name" isTrim="1">
+						<parsers>
+							<parser exp="$fields.h1+' '+$fields.h3" />
+						</parsers>
+					</field>
+					<field name="url">
+						<parsers>
+							<parser exp="$task_url" />
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="//div[@id='slideshow']//img[@src]" attribute="src" />
+						</parsers>
+					</field>
+					<field name="descOldImg" isArray="1">
+					</field>
+					<field name="cate">
+					</field>
+					<field name="price">
+						<parsers>
+							<parser xpath="//div[@class='deal-price deal-price-sm']/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="price">
+						<parsers>
+							<parser xpath="//div[@class='deal-price deal-price-lg']/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="originalPrice">
+						<parsers>
+							<parser xpath="//p[@class='original-price']/del/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="countBought">
+						<parsers>
+							<parser xpath="//li[@class='purchased']/span[@class='value']/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="expiryTime">
+						<parsers>
+							<parser xpath="//ul[@class='deal-info']/li[last()]/span/text()" />
+							<parser regex="\d+" />
+							<parser exp="$Util.getTime(10, $Util.addDay($Util.newDate(), $Util.toInt($this)))" />
+						</parsers>
+					</field>
+					<field name="highlight" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@class='highlights']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+							<parser exp="$this.replace('Escape Kit','')" />
+						</parsers>
+					</field>
+					<field name="condition" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@class='fine-print']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+							<parser exp="$this.replace('The Fine Print','')" />
+						</parsers>
+					</field>
+					<field name="description" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@class='description']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+						</parsers>
+					</field>
+					<field name="postCode">
+						<parsers>
+							<parser xpath="//div[@class='meta']/text()" />
+							<parser regex="\d{5}" />
+						</parsers>
+					</field>
+					<field name="address" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@class='meta']/text()" />
+							<parser regex=".*(?=(\d{5}))" />
+						</parsers>
+					</field>
+					<field name="merchant" isTrim="1">
+					</field>
+					<field name="phone">
+						<parsers>
+							<parser xpath="//span[@class='phone']/text()" />
+							<parser regex="\d{2,4}( |-| - )\d{2,4}[ -]?\d{4}" />
+						</parsers>
+					</field>
+				</model>
+			</target>
+			<!--
+			  | HTTPS 协议下的deal页面
+			-->
+			<target name="https_deal">
+				<!--
+				  | 目标URL的规则
+				-->
+				<urlRules policy="and">
+					<rule type="regex" value="https://www\.livingsocial\.com/products/malaysia/.*\?preferred_city_id=\d+" />
+				</urlRules>
+				<!--
+				  | 目标网页的数据模型
+				-->
+				<model>
+					<!--
+					  | 目标网页的命名空间配置
+					  | prefix: 前缀
+					  | uri: 关联的URI
+					-->
+					<!--namespaces>
+						<namespace prefix="" uri="" />
+					</namespaces-->
+					<!--
+					  | 属性的配置
+					  | name:属性名称
+					  | parser:针对该属性的解析规则
+					-->
+					<field name="name" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@class='product-title-container with-countdown ']/h2/text()" />
+						</parsers>
+					</field>
+					<field name="url">
+						<parsers>
+							<parser exp="$task_url" />
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="//div[@class='slide img']" attribute="style" />
+							<parser regex="(?&lt;=(background: url\()).[^)]*" />
+						</parsers>
+					</field>
+					<field name="descOldImg" isArray="1">
+					</field>
+					<field name="cate">
+					</field>
+					<field name="price">
+						<parsers>
+							<parser xpath="//li[@id='product-price']/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="originalPrice">
+						<parsers>
+							<parser xpath="//li[@class='price-info']/span[@class='retail-price']/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="countBought">
+						<parsers>
+							<parser xpath="//span[@class='sold-num']/text()" 
+									regex="\d+(,?\d+)*(\.?\d+)*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<field name="expiryTime">
+						<parsers>
+							<parser xpath="//span[@class='offer-ends-at']" attribute="data-end-time" />
+							<parser regex="\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}" />
+							<parser exp="$this.replace('T',' ')" />
+							<parser exp="$Util.getTime(10, $Util.parse($this))" />
+						</parsers>
+					</field>
+					<field name="highlight" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@id='specifications']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+						</parsers>
+					</field>
+					<field name="condition" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@id='what_you_need_to_know']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+						</parsers>
+					</field>
+					<field name="description" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@id='description']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
+						</parsers>
+					</field>
+					<field name="postCode">
+					</field>
+					<field name="address" isTrim="1">
+					</field>
+					<field name="merchant" isTrim="1">
+					</field>
+					<field name="phone">
+					</field>
+				</model>
+			</target>
+		</targets>
+		<!--
+		  | 插件
+		-->
+		<plugins>
+			<!--
+			  | enable:是否开启
+			  | name:插件名
+			  | version:插件版本
+			  | desc:插件描述
+			-->
+			<plugin enable="1" name="spider_plugin" version="0.0.1" desc="这是一个官方实现的默认插件，实现了所有扩展点。">
+				<!--
+				  | 每个插件包含了对若干扩展点的实现
+				-->
+				<extensions>
+					<!--
+					  | point:扩展点名它们包括  task_poll, begin, fetch, dig, dup_removal, task_sort, task_push, target, parse, pojo, end
+					-->
+					<extension point="task_poll">
+						<!--
+						  | 扩展点实现类
+						  | type: 如何获取实现类 ,默认通过无参构造器实例化给定的类名，可以设置为ioc，这样就会从EWeb4J的IOC容器里获取
+						  | value: 当时type=ioc的时候填写IOC的bean_id，否则填写完整类名
+						  | sort: 排序，同一个扩展点有多个实现类，这些实现类会以责任链的方式进行执行，因此它们的执行顺序将变得很重要
+						-->
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPollPointImpl" sort="0"/>
+					</extension>
+					<extension point="begin">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.BeginPointImpl" sort="0"/>
+					</extension>
+					<extension point="fetch">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.FetchPointImpl" sort="0"/>
+					</extension>
+					<extension point="dig">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DigPointImpl" sort="0"/>
+					</extension>
+					<extension point="dup_removal">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DupRemovalPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_sort">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskSortPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_push">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPushPointImpl" sort="0"/>
+					</extension>
+					<extension point="target">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TargetPointImpl" sort="0"/>
+					</extension>
+					<extension point="parse">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
+					</extension>
+					<extension point="pojo">
+						<impl type="" value="sg.ilovedeals.shoplay.spiderman.PojoPointImpl" sort="0"/>
+					</extension>
+					<extension point="end">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>
+					</extension>
+				</extensions>
+				<providers>
+					<provider>
+						<orgnization name="深圳优扣科技有限公司" website="" desc="致力于打造一流的社交分享购物社区!">
+							<author name="weiwei" website="http://laiweiweihi.iteye.com" email="l.weiwei@163.com" weibo="http://weibo.com/weiweimiss" desc="一个喜欢自由、音乐、绘画的IT老男孩" />
+						</orgnization>
+					</provider>
+				</providers>
+			</plugin>
+		</plugins>
+	</site>
+</beans>

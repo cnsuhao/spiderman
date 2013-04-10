@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.spiderman.fetcher.FetchResult;
@@ -23,8 +21,6 @@ import org.junit.Test;
 
 public class TestSpider {
 	
-	private final Object mutex = new Object();
-	
 	public static void main(String[] args){
 		System.out.println(CommonUtil.getNow());
 		System.out.println(CommonUtil.formatTime(new Date(1363021265380L)));
@@ -33,7 +29,6 @@ public class TestSpider {
 	@Test
 	public void test() throws Exception {
 		
-		final ExecutorService picPool = Executors.newFixedThreadPool(50);
 		String err = EWeb4JConfig.start();
 		if (err != null)
 			throw new Exception(err);

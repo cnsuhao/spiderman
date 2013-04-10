@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<site name="coupree" country="Singapore" url="http://coupree.com/coupons.xml" reqDelay="0.1s" enable="1" charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
+		<queueRules policy="and">
+			<rule type="!regex" value="^.*\.(jpg|png|gif)$" />
+		</queueRules>
+		<targets>
+			<target name="deal">
+				<urlRules policy="and">
+					<rule type="equal" value="http://coupree.com/coupons.xml" />
+				</urlRules>
+				<model isArray="1" xpath="//coupon">
+					<field name="name" isTrim="1">
+						<parsers>
+							<parser xpath="title/text()" />
+						</parsers>
+					</field>
+					<field name="url">
+						<parsers>
+							<parser xpath="url/text()" />
+						</parsers>
+					</field>
+					<field name="oldImg" isArray="1">
+						<parsers>
+							<parser xpath="image_url/text()" />
+						</parsers>
+					</field>
+					<field name="descOldImg" isArray="1">
+					</field>
+					<field name="cate">
+						<parser xpath="type/text()" />
+					</field>
+					<field name="price">
+					</field>
+					<field name="originalPrice">
+					</field>
+					<field name="countBought">
+					</field>
+					<field name="expiryTime">
+						<parsers>
+							<parser xpath="end/text()" 
+									exp="$Util.parse('yyyy-MM-dd HH:mm:ss', $this).getTime()"/>
+							<parser exp="$Util.String($this).substring(0, 10)" />
+						</parsers>
+					</field>
+					<field name="highlight" isTrim="1">
+					</field>
+					<field name="condition" isTrim="1">
+					</field>
+					<field name="description" isTrim="1">
+						<parser xpath="description/text()" />
+					</field>
+					<field name="postCode">
+						<parsers>
+							<parser xpath="address/text()" regex="(?&lt;=(\D{1,255}))\d{6}" />
+						</parsers>
+					</field>
+					<field name="address" isTrim="1">
+						<parsers>
+							<parser xpath="address/text()" />
+						</parsers>
+					</field>
+					<field name="merchant" isTrim="1">
+					</field>
+					<field name="phone">
+					</field>
+				</model>
+			</target>
+		</targets>
+		<!--
+		  | 插件
+		-->
+		<plugins>
+			<!--
+			  | enable:是否开启
+			  | name:插件名
+			  | version:插件版本
+			  | desc:插件描述
+			-->
+			<plugin enable="1" name="spider_plugin" version="0.0.1" desc="这是一个官方实现的默认插件，实现了所有扩展点。">
+				<!--
+				  | 每个插件包含了对若干扩展点的实现
+				-->
+				<extensions>
+					<!--
+					  | point:扩展点名它们包括  task_poll, begin, fetch, dig, dup_removal, task_sort, task_push, target, parse, pojo, end
+					-->
+					<extension point="task_poll">
+						<!--
+						  | 扩展点实现类
+						  | type: 如何获取实现类 ,默认通过无参构造器实例化给定的类名，可以设置为ioc，这样就会从EWeb4J的IOC容器里获取
+						  | value: 当时type=ioc的时候填写IOC的bean_id，否则填写完整类名
+						  | sort: 排序，同一个扩展点有多个实现类，这些实现类会以责任链的方式进行执行，因此它们的执行顺序将变得很重要
+						-->
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPollPointImpl" sort="0"/>
+					</extension>
+					<extension point="begin">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.BeginPointImpl" sort="0"/>
+					</extension>
+					<extension point="fetch">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.FetchPointImpl" sort="0"/>
+					</extension>
+					<extension point="dig">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DigPointImpl" sort="0"/>
+					</extension>
+					<extension point="dup_removal">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DupRemovalPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_sort">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskSortPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_push">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPushPointImpl" sort="0"/>
+					</extension>
+					<extension point="target">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TargetPointImpl" sort="0"/>
+					</extension>
+					<extension point="parse">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
+					</extension>
+					<extension point="end">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>
+					</extension>
+				</extensions>
+				<providers>
+					<provider>
+						<orgnization name="深圳优扣科技有限公司" website="" desc="致力于打造一流的社交分享购物社区!">
+							<author name="weiwei" website="http://laiweiweihi.iteye.com" email="l.weiwei@163.com" weibo="http://weibo.com/weiweimiss" desc="一个喜欢自由、音乐、绘画的IT老男孩" />
+						</orgnization>
+					</provider>
+				</providers>
+			</plugin>
+		</plugins>
+	</site>
+</beans>
