@@ -19,7 +19,7 @@ package org.eweb4j.spiderman.plugin.util;
 
 public class SpiderConfig {
 
-	private String charset;
+	private String charset ;
 	
 	/**
 	 * The folder which will be used by crawler for storing the intermediate

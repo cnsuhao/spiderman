@@ -18,9 +18,11 @@
 package org.eweb4j.spiderman.plugin.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -39,8 +41,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpOptions;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -48,16 +58,23 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParamBean;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.eweb4j.mvc.Http;
 import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.fetcher.Page;
@@ -196,7 +213,7 @@ public class PageFetcherImpl implements PageFetcher{
 			}
 		}
 	}
-
+	
 	/**
 	 * 抓取目标url的内容
 	 * @date 2013-1-7 上午11:08:54
@@ -315,6 +332,179 @@ public class PageFetcherImpl implements PageFetcher{
 		return fetchResult;
 	}
 
+	/**
+	 * 请求
+	 * @date 2013-1-7 上午11:08:54
+	 * @param toFetchURL
+	 * @return
+	 */
+	public FetchResult request(FetchRequest req) throws Exception{
+		FetchResult fetchResult = new FetchResult();
+		HttpUriRequest request = null;
+		HttpEntity entity = null;
+		String toFetchURL = req.getUrl();
+		boolean isPost = false;
+		try {
+			if (Http.Method.GET.equalsIgnoreCase(req.getHttpMethod()))
+				request = new HttpGet(toFetchURL);
+			else if (Http.Method.POST.equalsIgnoreCase(req.getHttpMethod())){
+				request = new HttpPost(toFetchURL);
+				isPost = true;
+			}else if (Http.Method.PUT.equalsIgnoreCase(req.getHttpMethod()))
+				request = new HttpPut(toFetchURL);
+			else if (Http.Method.HEAD.equalsIgnoreCase(req.getHttpMethod()))
+				request = new HttpHead(toFetchURL);
+			else if (Http.Method.OPTIONS.equalsIgnoreCase(req.getHttpMethod()))
+				request = new HttpOptions(toFetchURL);
+			else if (Http.Method.DELETE.equalsIgnoreCase(req.getHttpMethod()))
+				request = new HttpDelete(toFetchURL);
+			else 
+				throw new Exception("Unknown http method name");
+			
+			//同步信号量,在真正对服务端进行访问之前进行访问间隔的控制
+			// TODO 针对每个请求有一个delay的参数设置
+			synchronized (mutex) {
+				//获取当前时间
+				long now = (new Date()).getTime();
+				//对同一个Host抓取时间间隔进行控制，若在设置的时限内则进行休眠
+				if (now - lastFetchTime < config.getPolitenessDelay()) 
+					Thread.sleep(config.getPolitenessDelay() - (now - lastFetchTime));
+				//不断更新最后的抓取时间，注意，是针对HOST的，不是针对某个URL的
+				lastFetchTime = (new Date()).getTime();
+			}
+			
+			//设置请求GZIP压缩，注意，前面必须设置GZIP解压缩处理
+			request.addHeader("Accept-Encoding", "gzip");
+			for (Iterator<Entry<String, String>> it = headers.entrySet().iterator(); it.hasNext();){
+				Entry<String, String> entry = it.next();
+				request.addHeader(entry.getKey(), entry.getValue());
+			}
+			
+			//记录请求信息
+			Header[] headers = request.getAllHeaders();
+			for (Header h : headers){
+				Map<String, List<String>> hs = req.getHeaders();
+				String key = h.getName();
+				List<String> val = hs.get(key);
+				if (val == null)
+					val = new ArrayList<String>();
+				val.add(h.getValue());
+				
+				hs.put(key, val);
+			}
+			req.getCookies().putAll(this.cookies);
+			fetchResult.setReq(req);
+			
+			HttpEntity reqEntity = null;
+			if (Http.Method.POST.equalsIgnoreCase(req.getHttpMethod())
+						|| Http.Method.PUT.equalsIgnoreCase(req.getHttpMethod())){
+				if (!req.getFiles().isEmpty()) {
+					reqEntity = new MultipartEntity( HttpMultipartMode.BROWSER_COMPATIBLE );
+					for (Iterator<Entry<String, List<File>>> it = req.getFiles().entrySet().iterator(); it.hasNext(); ){
+						Entry<String, List<File>> e = it.next();
+						String paramName = e.getKey();
+						for (File file : e.getValue()) {
+							// For File parameters
+							((MultipartEntity)reqEntity).addPart( paramName, new FileBody(file));
+						}
+					}
+					
+					for (Iterator<Entry<String, List<Object>>> it = req.getParams().entrySet().iterator(); it.hasNext(); ){
+						Entry<String, List<Object>> e = it.next();
+						String paramName = e.getKey();
+						for (Object paramValue : e.getValue()) {
+							// For usual String parameters
+							((MultipartEntity)reqEntity).addPart( paramName, new StringBody(String.valueOf(paramValue), "text/plain", Charset.forName( "UTF-8" )));
+						}
+					}
+				}else{
+					List<NameValuePair> params = new ArrayList<NameValuePair>(req.getParams().size());
+					for (Iterator<Entry<String, List<Object>>> it = req.getParams().entrySet().iterator(); it.hasNext(); ){
+						Entry<String, List<Object>> e = it.next();
+						String paramName = e.getKey();
+						for (Object paramValue : e.getValue()) {
+							 params.add(new BasicNameValuePair(paramName, String.valueOf(paramValue)));
+						}
+					}
+					reqEntity = new UrlEncodedFormEntity(params, HTTP.UTF_8);
+				}
+				
+				if (isPost)
+					((HttpPost)request).setEntity(((MultipartEntity)reqEntity));
+				else
+					((HttpPut)request).setEntity(((MultipartEntity)reqEntity) );
+			}
+			
+			//执行请求，获取服务端返回内容
+			HttpResponse response = httpClient.execute(request);
+			headers = response.getAllHeaders();
+			for (Header h : headers){
+				Map<String, List<String>> hs = fetchResult.getHeaders();
+				String key = h.getName();
+				List<String> val = hs.get(key);
+				if (val == null)
+					val = new ArrayList<String>();
+				val.add(h.getValue());
+				
+				hs.put(key, val);
+			}
+			//设置已访问URL
+			fetchResult.setFetchedUrl(toFetchURL);
+			String uri = request.getURI().toString();
+			if (!uri.equals(toFetchURL)) 
+				if (!URLCanonicalizer.getCanonicalURL(uri).equals(toFetchURL)) 
+					fetchResult.setFetchedUrl(uri);
+			
+			entity = response.getEntity();
+			//服务端返回的状态码
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode != HttpStatus.SC_OK) {
+				if (statusCode != HttpStatus.SC_NOT_FOUND) {
+					Header locationHeader = response.getFirstHeader("Location");
+					//如果是301、302跳转，获取跳转URL即可返回
+					if (locationHeader != null && (statusCode == HttpStatus.SC_MOVED_PERMANENTLY || statusCode == HttpStatus.SC_MOVED_TEMPORARILY)) 
+						fetchResult.setMovedToUrl(URLCanonicalizer.getCanonicalURL(locationHeader.getValue(), toFetchURL));
+				}
+				//只要不是OK的除了设置跳转URL外设置statusCode即可返回
+				//判断是否有忽略状态码的设置
+				if (this.site.getSkipStatusCode() != null && this.site.getSkipStatusCode().trim().length() > 0){
+					String[] scs = this.site.getSkipStatusCode().split(",");
+					for (String code : scs){
+						int c = CommonUtil.toInt(code);
+						//忽略此状态码，依然解析entity
+						if (statusCode == c){
+							assemPage(fetchResult, entity);
+							break;
+						}
+					}
+				}
+				fetchResult.setStatusCode(statusCode);
+				return fetchResult;
+			}
+
+			//处理服务端返回的实体内容
+			if (entity != null) {
+				fetchResult.setStatusCode(statusCode);
+				assemPage(fetchResult, entity);
+				return fetchResult;
+			}
+		} catch (Throwable e) {
+			fetchResult.setFetchedUrl(e.toString());
+			fetchResult.setStatusCode(Status.INTERNAL_SERVER_ERROR.ordinal());
+			return fetchResult;
+		} finally {
+			try {
+				if (entity == null && request != null) 
+					request.abort();
+			} catch (Exception e) {
+				throw e;
+			}
+		}
+		
+		fetchResult.setStatusCode(Status.UNSPECIFIED_ERROR.ordinal());
+		return fetchResult;
+	}
+	
 	private void assemPage(FetchResult fetchResult, HttpEntity entity)
 			throws Exception {
 		Page page = load(entity);
