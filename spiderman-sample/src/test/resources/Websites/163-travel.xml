@@ -26,7 +26,7 @@
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	  | timeout:HTTP请求超时
 	-->
-	<site name="163-travel" url="http://travel.163.com/special/cjgat/" reqDelay="1s" enable="1" charset="gbk" schedule="1h" thread="2" waitQueue="10s">
+	<site name="163-travel" enable="0" url="http://travel.163.com/special/cjgat/" reqDelay="1s" charset="gbk" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | name:种子名称

@@ -26,9 +26,7 @@
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	  | timeout:HTTP请求超时
 	-->
-	<site name="jackcow-my" country="Malaysia" isDupRemovalStrict="0"
-		url="http://www.jackcow.com" 
-		reqDelay="0.1s" enable="0" charset="utf-8" schedule="1h" thread="2" waitQueue="5s" >
+	<site name="jackcow-my" enable="0" url="http://www.jackcow.com"  country="Malaysia" isDupRemovalStrict="0" reqDelay="0.1s"  charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
 		<!--
 		  | 多个种子链接	
 		-->
