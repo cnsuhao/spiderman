@@ -97,7 +97,7 @@ Spiderman Sample | 案例
 					System.out.println(info);
 				}
 				
-				public void onError(Thread thread, Task task, String err, Exception e) {
+				public void onError(Thread thread, Task task, String err, Throwable e) {
 					System.err.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [ERROR] ~ ");
 					e.printStackTrace();
 				}
@@ -109,8 +109,9 @@ Spiderman Sample | 案例
 						if (!dir.exists())
 							dir.mkdirs();
 						
-						for (Map<String, Object> map : models) {
-							String fileName = dir + "/count_" + task.site.counter.getCount();
+						for (int i = 0; i < models.size(); i++) {
+						    Map<String, Object> map = models.get(i);
+							String fileName = dir + "/count_" + task.site.counter.getCount() + i;
 							StringBuilder sb = new StringBuilder();
 							for (Iterator<Entry<String,Object>> it = map.entrySet().iterator(); it.hasNext();){
 								Entry<String,Object> e = it.next();

@@ -84,62 +84,12 @@
 			  | name:目标名称	
 			-->
 			<target name="dic">
-				<!--
-				  | 目标URL的规则
-				-->
 				<urlRules policy="and">
 					<rule type="equal" value="http://www.discuzt.com/discuzcode-db.html" />
 				</urlRules>
-				<!--
-				  | 目标网页的数据模型
-				  | cType: 目标网页的contentType
-				  | isForceUseXmlParser:0|1 是否强制使用XML的解析器来解析目标网页，此选项可以让HTML页面支持XPath2.0
-				  | isIgnoreComments:0|1 是否忽略注释
-				  | isArray:0|1 目标网页是否有多个数据模型，一般一些RSS XML页面上就会有很多个数据模型需要解析，即在一个xml页面上解析多个Model对象
-				  | xpath: 搭配 isArray 来使用，可选
-				-->
 				<model isArray="1" xpath="//div[@class='box_a1']">
-					<!--
-					  | 目标网页的命名空间配置,一般用于xml页面
-					  | prefix: 前缀
-					  | uri: 关联的URI
-					<namespaces>
-						<namespace prefix="" uri="" />
-					</namespaces>
-					-->
-					<!--
-					  | 属性的配置
-					  | name:属性名称
-					  | isArray:0|1 是否是多值
-					  | isMergeArray:0|1 是否将多值合并，搭配isArray使用
-					  | isParam:0|1 是否作为参数提供给别的field节点使用，如果是，则生命周期不会保持到最后
-					  | isFinal:0|1 是否是不可变的参数，搭配isParam使用，如果是，第一次赋值之后不会再被改变
-					  | isAlsoParseInNextPage:0|1 是否在分页的下一页里继续解析，用于目标网页有分页的情况
-					  | isTrim:0|1 是否去掉前后空格
-					-->
 					<field name="title">
 						<parsers>
-							<!--
-							  | xpath: XPath规则，如果目标页面是XML，则可以使用2.0语法，否则HTML的话暂时只能1.0
-							  | attribute:当使用XPath解析后的内容不是文本而是一个Node节点对象的时候，可以给定一个属性名获取其属性值例如<img src="" />
-							  | regex:当使用XPath（包括attribute）规则获取到的文本内容不满足需求时，可以继续设置regex正则表达式进行解析
-							  | exp:当使用XPath获取的文本(如果获取的不是文本则会先执行exp而不是regex否则先执行regex)不满足需求时，可以继续这是exp表达式进行解析
-							  |     exp表达式有几个内置对象和方法:
-							  |     $output(Node): 这个是内置的output函数，作用是输出某个XML节点的结构内容。参数是一个XML节点对象，可以通过XPath获得
-							  |     $this: 当使用XPath获取到的是Node节点时，这个表示节点对象，否则表示Java的字符串对象,可以调用Java字符串API进行处理
-							  |     $Tags: 这个是内置的用于过滤标签的工具类 
-							  |            $Tags.xml($output($this)).rm('p').ok()
-							  |            $Tags.xml($this).rm('p').empty().ok()
-							  |     $Attrs: 这个是内置的用于过滤属性的工具类
-							  |            $Attrs.xml($this).rm('style').ok()
-							  |            $Attrs.xml($this).tag('img').rm('src').ok()
-							  |     
-							  |            $Tags和$Attrs可以一起使用: 
-							  |            $Tags.xml($this).rm('p').Attrs().rm('style').ok()
-							  |            $Attrs.xml($this).rm('style').Tags().rm('p').ok()
-							  | skipErr:0|1 是否忽略错误消息
-							  | skipRgxFail:0|1 是否忽略正则匹配失败，如果是，则会取失败前的值
-							-->
 							<parser xpath="h1/text()"/>
 						</parsers>
 					</field>
