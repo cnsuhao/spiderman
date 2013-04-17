@@ -26,7 +26,7 @@
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	  | timeout:HTTP请求超时
 	-->
-	<site name="oschina" enable="0" includeHttps="1" url="http://www.oschina.net/question?catalog=1&amp;show=&amp;p=1" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+	<site name="discuzt" enable="1" includeHttps="1" url="http://www.discuzt.com/discuzcode-db.html" reqDelay="1s" charset="gbk" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | name:种子名称
@@ -68,25 +68,13 @@
 		  | 抓取目标
 		-->
 		<targets>
-			<!--
-			  | 限制目标URL的来源,一般来说，对应的就是网站的频道页，例如某个分类下的新闻列表页
-			-->
 			<sourceRules policy="and">
-				<rule type="regex" value="http://www\.oschina\.net/question\?catalog=1&amp;show=&amp;p=\d+">
-					<!--
-					  | 定义如何在来源页面上挖掘新的 URL
-					  | 这个节点跟 <model> 节点是一样的结构，只不过名称不叫model而是叫做digUrls而已
-					-->
+				<rule type="equal" value="http://www.discuzt.com/discuzcode-db.html">
+					<!--暂时用这个防止重复抓取-->
 					<digUrls>
-						<field name="page_url" isArray="1">
+						<field name="target_url">
 							<parsers>
-								<parser xpath="//div[@class='QuestionList']//ul[@class='pager']//li[@class='page']//a[@href]" attribute="href" />
-								<parser exp="'http://www.oschina.net/question'+$this" />
-							</parsers>
-						</field>
-						<field name="target_url" isArray="1"> 
-							<parsers>
-								<parser xpath="//div[@class='QuestionList']//ul//li[@class='question']//div[@class='qbody']/h2[1]//a[@href]" attribute="href" />
+								<parser exp=" " />
 							</parsers>
 						</field>
 					</digUrls>
@@ -95,12 +83,12 @@
 			<!--
 			  | name:目标名称	
 			-->
-			<target name="question">
+			<target name="dic">
 				<!--
 				  | 目标URL的规则
 				-->
 				<urlRules policy="and">
-					<rule type="regex" value="http://www\.oschina\.net/question/\d+_\d+" />
+					<rule type="equal" value="http://www.discuzt.com/discuzcode-db.html" />
 				</urlRules>
 				<!--
 				  | 目标网页的数据模型
@@ -110,7 +98,7 @@
 				  | isArray:0|1 目标网页是否有多个数据模型，一般一些RSS XML页面上就会有很多个数据模型需要解析，即在一个xml页面上解析多个Model对象
 				  | xpath: 搭配 isArray 来使用，可选
 				-->
-				<model>
+				<model isArray="1" xpath="//div[@class='box_a1']">
 					<!--
 					  | 目标网页的命名空间配置,一般用于xml页面
 					  | prefix: 前缀
@@ -152,34 +140,12 @@
 							  | skipErr:0|1 是否忽略错误消息
 							  | skipRgxFail:0|1 是否忽略正则匹配失败，如果是，则会取失败前的值
 							-->
-							<parser xpath="//div[@class='QTitle']/h1/text()"/>
+							<parser xpath="h1/text()"/>
 						</parsers>
 					</field>
 					<field name="content">
 						<parsers>
-							<parser xpath="//div[@class='Content']//div[@class='detail']" exp="$output($this)" />
-							<!--attribute 黑名单-->
-							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
-							<!--tag 黑名单，去掉内嵌内容-->
-							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
-							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
-							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
-							<!--其他-->
-						</parsers>
-					</field>
-					<field name="author">
-						<parsers>
-							<parser xpath="//div[@class='stat']//a[@target='_blank']/text()"/>
-						</parsers>
-					</field>
-					<field name="tags" isArray="1">
-						<parsers>
-							<parser xpath="//div[@class='Tags']//a/text()"/>
-						</parsers>
-					</field>
-					<field name="answers" isArray="1">
-						<parsers>
-							<parser xpath="//li[@class='Answer']//div[@class='detail']/text()" />
+							<parser xpath="div[@class='boxf_1']/text()" />
 						</parsers>
 					</field>
 				</model>

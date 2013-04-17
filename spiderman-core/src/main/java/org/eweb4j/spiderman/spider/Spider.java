@@ -2,9 +2,11 @@ package org.eweb4j.spiderman.spider;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.fetcher.Page;
@@ -85,55 +87,13 @@ public class Spider implements Runnable{
 				}
 			}
 			
-			if (newUrls != null && !newUrls.isEmpty())
-				this.listener.onNewUrls(Thread.currentThread(), task, newUrls);
-			else
-				newUrls = new ArrayList<String>();
-			
 			if (task.site.isStop)
 				return ;
 			
-			//扩展点：dup_removal URL去重,然后变成Task
-			Collection<Task> validTasks = null;
-			Collection<DupRemovalPoint> dupRemovalPoints = task.site.dupRemovalPointImpls;
-			if (dupRemovalPoints != null && !dupRemovalPoints.isEmpty()){
-				for (Iterator<DupRemovalPoint> it = dupRemovalPoints.iterator(); it.hasNext(); ){
-					DupRemovalPoint point = it.next();
-					validTasks = point.removeDuplicateTask(task, newUrls, validTasks);
-				}
-			}
-			
-			if (newUrls != null && !newUrls.isEmpty())
-				this.listener.onDupRemoval(Thread.currentThread(), task, validTasks);
-			
-			if (validTasks == null)
-				validTasks = new ArrayList<Task>();
+			handleNewUrls(newUrls);
 			
 			if (task.site.isStop)
 				return ;
-			
-			//扩展点：task_sort 给任务排序
-			Collection<TaskSortPoint> taskSortPoints = task.site.taskSortPointImpls;
-			if (taskSortPoints != null && !taskSortPoints.isEmpty()){
-				for (Iterator<TaskSortPoint> it = taskSortPoints.iterator(); it.hasNext(); ){
-					TaskSortPoint point = it.next();
-					validTasks = point.sortTasks(validTasks);
-				}
-			}
-			
-			this.listener.onTaskSort(Thread.currentThread(), task, validTasks);
-			
-			if (validTasks == null)
-				validTasks = new ArrayList<Task>();
-			
-			if (task.site.isStop)
-				return ;
-			
-			//扩展点：task_push 将任务放入队列
-			validTasks = pushTask(validTasks);
-			
-			if (validTasks != null && !validTasks.isEmpty())
-				this.listener.onNewTasks(Thread.currentThread(), task, validTasks);
 			
 			Page page = result.getPage();
 			if (page == null) {
@@ -198,6 +158,23 @@ public class Spider implements Runnable{
 			// 统计任务完成数+1
 			this.task.site.counter.plus();
 			listener.onParse(Thread.currentThread(), task, models);
+			
+			if (task.digNewUrls != null && !task.digNewUrls.isEmpty()) {
+				Set<String> urls = new HashSet<String>(task.digNewUrls.size());
+				for (String s : task.digNewUrls){
+					if (s == null || s.trim().length() == 0)
+						continue;
+					
+					urls.add(s);
+				}
+				
+				if (!urls.isEmpty()) {
+					handleNewUrls(urls);
+					task.digNewUrls.clear();
+					task.digNewUrls = null;
+				}
+			}
+			
 			listener.onInfo(Thread.currentThread(), task, "site -> " + task.site.getName() + " task parse finished count ->" + task.site.counter.getCount());
 			
 			if (task.site.isStop)
@@ -238,6 +215,57 @@ public class Spider implements Runnable{
 			if (this.listener != null)
 				this.listener.onError(Thread.currentThread(), task, CommonUtil.getExceptionString(e), e);
 		}
+	}
+
+	private void handleNewUrls(Collection<String> newUrls) throws Exception {
+		if (newUrls != null && !newUrls.isEmpty())
+			this.listener.onNewUrls(Thread.currentThread(), task, newUrls);
+		else
+			newUrls = new ArrayList<String>();
+		
+		if (task.site.isStop)
+			return ;
+		
+		//扩展点：dup_removal URL去重,然后变成Task
+		Collection<Task> validTasks = null;
+		Collection<DupRemovalPoint> dupRemovalPoints = task.site.dupRemovalPointImpls;
+		if (dupRemovalPoints != null && !dupRemovalPoints.isEmpty()){
+			for (Iterator<DupRemovalPoint> it = dupRemovalPoints.iterator(); it.hasNext(); ){
+				DupRemovalPoint point = it.next();
+				validTasks = point.removeDuplicateTask(task, newUrls, validTasks);
+			}
+		}
+		
+		if (newUrls != null && !newUrls.isEmpty())
+			this.listener.onDupRemoval(Thread.currentThread(), task, validTasks);
+		
+		if (validTasks == null)
+			validTasks = new ArrayList<Task>();
+		
+		if (task.site.isStop)
+			return ;
+		
+		//扩展点：task_sort 给任务排序
+		Collection<TaskSortPoint> taskSortPoints = task.site.taskSortPointImpls;
+		if (taskSortPoints != null && !taskSortPoints.isEmpty()){
+			for (Iterator<TaskSortPoint> it = taskSortPoints.iterator(); it.hasNext(); ){
+				TaskSortPoint point = it.next();
+				validTasks = point.sortTasks(validTasks);
+			}
+		}
+		
+		this.listener.onTaskSort(Thread.currentThread(), task, validTasks);
+		
+		if (validTasks == null)
+			validTasks = new ArrayList<Task>();
+		
+		if (task.site.isStop)
+			return ;
+		
+		//扩展点：task_push 将任务放入队列
+		validTasks = pushTask(validTasks);
+		if (validTasks != null && !validTasks.isEmpty())
+			this.listener.onNewTasks(Thread.currentThread(), task, validTasks);
 	}
 
 	public Collection<Task> pushTask(Collection<Task> validTasks) throws Exception {

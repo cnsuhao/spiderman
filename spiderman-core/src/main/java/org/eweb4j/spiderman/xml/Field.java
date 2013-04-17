@@ -26,6 +26,12 @@ public class Field {
 	private String isFinal;
 	
 	/**
+	 * 是否用来提供挖掘新URL用
+	 */
+	@AttrTag
+	private String isForDigNewUrl;
+	
+	/**
 	 * 是否也在下一页里解析
 	 */
 	@AttrTag
@@ -98,6 +104,14 @@ public class Field {
 
 	public void setIsAlsoParseInNextPage(String isAlsoParseInNextPage) {
 		this.isAlsoParseInNextPage = isAlsoParseInNextPage;
+	}
+
+	public String getIsForDigNewUrl() {
+		return this.isForDigNewUrl;
+	}
+
+	public void setIsForDigNewUrl(String isForDigNewUrl) {
+		this.isForDigNewUrl = isForDigNewUrl;
 	}
 
 }

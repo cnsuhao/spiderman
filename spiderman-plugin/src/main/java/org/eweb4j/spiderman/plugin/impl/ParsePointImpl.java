@@ -57,10 +57,11 @@ public class ParsePointImpl implements ParsePoint{
 			Map<String, Object> finalFields = new HashMap<String, Object>();
 			parseNextPage(rule, target, task, page, results, visitedUrls, finalFields);
 		}
+		
 		return results;
 	}
 
-	//递归的额关键是 Page
+	//递归的关键是 Page
 	public void parseNextPage(Rule rule, Target target, Task task, Page page, List<Map<String, Object>> results, Set<String> visitedUrls, Map<String,Object> finalFields) throws Exception{
 //		System.out.println("parse.next->"+page.getUrl());
 		Model mdl = rule.getNextPage();

@@ -137,7 +137,7 @@ public class ModelParser extends DefaultHandler{
         DocumentBuilder builder = factory.newDocumentBuilder();
         String validXml = ParserUtil.checkUnicodeString(page.getContent());
         fel.getContext().set("$page_content", validXml);
-    	Document doc = builder.parse(new ByteArrayInputStream(validXml.getBytes()));
+    	Document doc = builder.parse(new ByteArrayInputStream(validXml.getBytes("UTF-8")));
         XPathFactory xfactory = XPathFactoryImpl.newInstance();
         XPath xpathParser = xfactory.newXPath();
         //设置命名空间
@@ -210,6 +210,8 @@ public class ModelParser extends DefaultHandler{
 			String isTrim = field.getIsTrim();
 			String isParam = field.getIsParam();
 			String isFinal = field.getIsFinal();
+			String isForDigNewUrl = field.getIsForDigNewUrl();
+			
 			boolean isFinalParam = ("1".equals(isParam) || "true".equals(isParam)) && ("1".equals(isFinal) || "true".equals(isFinal));
 			if (isFinalParam && finalFields != null && finalFields.containsKey(key))
 				continue;
@@ -292,7 +294,7 @@ public class ModelParser extends DefaultHandler{
 							values.addAll(newValues);
 						}
 					}
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					if ("1".equals(skipErr) || "true".equals(skipErr))
 						continue;
 					listener.onError(Thread.currentThread(), task, "key->"+key +" parse failed cause->"+e.toString(), e);
@@ -340,27 +342,48 @@ public class ModelParser extends DefaultHandler{
 					values.addAll(results);
 				}
 				
-				//最终完成
-				if ("1".equals(isArray)){
-					if ("1".equals(isMergeArray)){
+				//如果是DigNewUrl
+				if ("1".equals(isForDigNewUrl) || "true".equals(isForDigNewUrl)) {
+					if ("1".equals(isArray)){
+						for (Object val : values){
+							task.digNewUrls.add(String.valueOf(val));
+						}
+					}else{
+						if (!values.isEmpty())
+							task.digNewUrls.add(String.valueOf(values.get(0)));
+					}
+				}
+				
+				Object value = null;
+				if ("1".equals(isArray) || "true".equals(isArray)){
+					value = values;
+					if ("1".equals(isMergeArray) || "true".equals(isMergeArray)){
 						StringBuilder sb = new StringBuilder();
 						for (Object val : values){
 							sb.append(String.valueOf(val));
 						}
-						map.put(key, sb.toString());
+						value = sb.toString();
 					}else
-						map.put(key, values);
-				} else {
+						value = values;
+				}else{
 					if (values.isEmpty())
-						map.put(key, "");
+						value = "";
 					else
-						map.put(key, new ArrayList<Object>(values).get(0));
+						value = values.get(0);
 				}
 				
 				if(isFinalParam){
-					finalFields.put(key, map.get(key));
+					finalFields.put(key, value);
 				}
-			} catch (Exception e) {
+
+				if ("1".equals(isParam) || "true".equals(isParam)){
+					continue;
+				}
+				
+				//最终完成
+				map.put(key, value);
+				
+			} catch (Throwable e) {
 				listener.onError(Thread.currentThread(), task, "field->"+key+" parse failed cause->"+e.toString(), e);
 			}
 		}
@@ -407,9 +430,11 @@ public class ModelParser extends DefaultHandler{
 		for (Field field : fields){
 			String key = field.getName();
 			String isArray = field.getIsArray();
+			String isMergeArray = field.getIsMergeArray();
 			String isTrim = field.getIsTrim();
 			String isParam = field.getIsParam();
 			String isFinal = field.getIsFinal();
+			String isForDigNewUrl = field.getIsForDigNewUrl();
 			boolean isFinalParam = ("1".equals(isParam) || "true".equals(isParam)) && ("1".equals(isFinal) || "true".equals(isFinal));
 			if (isFinalParam && finalFields != null && finalFields.containsKey(key))
 				continue;
@@ -489,11 +514,12 @@ public class ModelParser extends DefaultHandler{
 							values.addAll(newValues);
 						}
 					}
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					if ("1".equals(skipErr) || "true".equals(skipErr))
 						continue;
-					
-					listener.onError(Thread.currentThread(), task, "field->"+key+" parse failed cause->"+e.toString(), e);
+					String parserInfo = CommonUtil.toJson(parser);
+					String err = "parser->" + parserInfo + " of field->" + key +" failed";
+					listener.onError(Thread.currentThread(), task, err, e);
 				}
 			}
 			
@@ -538,20 +564,48 @@ public class ModelParser extends DefaultHandler{
 					values.addAll(results);
 				}
 				
-				if (values.isEmpty()) 
-					values.add("");
+				//如果是DigNewUrl
+				if ("1".equals(isForDigNewUrl) || "true".equals(isForDigNewUrl)) {
+					if ("1".equals(isArray)){
+						for (Object val : values){
+							task.digNewUrls.add(String.valueOf(val));
+						}
+					}else{
+						if (!values.isEmpty())
+							task.digNewUrls.add(String.valueOf(values.get(0)));
+					}
+				}
 				
-				//最终解析完成
-				if ("1".equals(isArray)){
-					map.put(key, values);
+				Object value = null;
+				if ("1".equals(isArray) || "true".equals(isArray)){
+					value = values;
+					if ("1".equals(isMergeArray) || "true".equals(isMergeArray)){
+						StringBuilder sb = new StringBuilder();
+						for (Object val : values){
+							sb.append(String.valueOf(val));
+						}
+						value = sb.toString();
+					}else
+						value = values;
 				}else{
-					map.put(key, values.get(0).toString());
+					if (values.isEmpty())
+						value = "";
+					else
+						value = values.get(0);
 				}
 				
 				if(isFinalParam){
-					finalFields.put(key, map.get(key));
+					finalFields.put(key, value);
 				}
-			} catch (Exception e) {
+
+				if ("1".equals(isParam) || "true".equals(isParam)){
+					continue;
+				}
+				
+				//最终完成
+				map.put(key, value);
+				
+			} catch (Throwable e) {
 				listener.onError(Thread.currentThread(), task, "field->"+key+" parse failed cause->"+e.toString(), e);
 			}
 		}
@@ -573,8 +627,8 @@ public class ModelParser extends DefaultHandler{
 					else
 						newValue.add(newVal);
 				}
-			} catch (Exception e){
-//				listener.onError(Thread.currentThread(), task, "exp->"+exp+" eval failed", e);
+			} catch (Throwable e){
+				listener.onError(Thread.currentThread(), task, "exp->"+exp+" eval failed", e);
 			}
 		} else {
 			for (Object val : list){
@@ -594,7 +648,7 @@ public class ModelParser extends DefaultHandler{
 						else
 							newValue.add(newVal);
 					}
-				} catch (Exception e){
+				} catch (Throwable e){
 					if (!isValBlank)
 						listener.onError(Thread.currentThread(), task, "exp->"+exp+" eval failed", e);
 				} finally {
@@ -635,7 +689,7 @@ public class ModelParser extends DefaultHandler{
 						newVals.add(val);
 					}
 				}
-			} catch (Exception e){
+			} catch (Throwable e){
 				listener.onError(Thread.currentThread(), task, "regex->"+regex+" of "+obj+" parse failed", e);
 				if ("1".equals(skipRgxFail) || "true".equals(skipRgxFail))
 					continue;
@@ -649,7 +703,7 @@ public class ModelParser extends DefaultHandler{
 		}
 	}
 
-	public static void main(String[] args) throws Exception{
+	public static void main(String[] args) throws Throwable{
 //		File file = new File("C:/Users/vivi/Downloads/9000425.xml");
 //		String xml = FileUtil.readFile(file);
 //		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");

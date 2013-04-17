@@ -31,7 +31,7 @@ public interface SpiderListener {
 
 	void onInfo(Thread thread, Task task, String info);
 	
-	void onError(Thread thread, Task task, String err, Exception e);
+	void onError(Thread thread, Task task, String err, Throwable e);
 	
 	/**
 	 * 调度结束后回调此方法

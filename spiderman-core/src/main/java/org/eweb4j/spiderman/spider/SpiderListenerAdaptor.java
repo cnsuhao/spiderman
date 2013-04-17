@@ -24,7 +24,7 @@ public class SpiderListenerAdaptor implements SpiderListener{
 	public void onParse(Thread thread, Task task, List<Map<String, Object>> models) {}
 	public void onPojo(Thread thread, Task task, List<Object> pojos) {}
 	public void onInfo(Thread thread, Task task, String info) {}
-	public void onError(Thread thread, Task task, String err, Exception e) {}
+	public void onError(Thread thread, Task task, String err, Throwable e) {}
 	public void afterScheduleCancel() {}
 	public void beforeEveryScheduleExecute(Date theLastTimeScheduledAt){}
 }
