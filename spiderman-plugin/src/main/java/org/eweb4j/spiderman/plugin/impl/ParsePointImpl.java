@@ -123,7 +123,7 @@ public class ParsePointImpl implements ParsePoint{
 						list.addAll((List<Object>)value);
 					}else{
 						StringBuilder sb = new StringBuilder();
-						sb.append(result.get(key)).append(value);
+						sb.append(result.get(key)).append("_##_").append(value);
 						result.put(key, sb.toString());
 					}
 				}

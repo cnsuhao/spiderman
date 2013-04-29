@@ -70,7 +70,6 @@
 		<targets>
 			<sourceRules policy="and">
 				<rule type="equal" value="http://www.discuzt.com/discuzcode-db.html">
-					<!--暂时用这个防止重复抓取-->
 					<digUrls>
 						<field name="target_url">
 							<parsers>

@@ -117,6 +117,7 @@ public class Spider implements Runnable{
 				return ;
 			}
 			
+			task.target = target;
 			this.listener.onTargetPage(Thread.currentThread(), task, page);
 			
 			if (task.site.isStop)
