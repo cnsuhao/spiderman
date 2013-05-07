@@ -1,9 +1,9 @@
 package org.eweb4j.spiderman.plugin.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,6 +19,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import net.sf.saxon.lib.NamespaceConstant;
 import net.sf.saxon.xpath.XPathFactoryImpl;
 
 import org.eweb4j.spiderman.fetcher.Page;
@@ -30,6 +31,7 @@ import org.eweb4j.spiderman.xml.Namespaces;
 import org.eweb4j.spiderman.xml.Parsers;
 import org.eweb4j.spiderman.xml.Target;
 import org.eweb4j.util.CommonUtil;
+import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.xml.Attrs;
 import org.eweb4j.util.xml.Tags;
 import org.htmlcleaner.HtmlCleaner;
@@ -260,9 +262,19 @@ public class ModelParser extends DefaultHandler{
 							// EXP表达式
 							parseByExp(exp, values);
 						}else if (xpath.endsWith("/text()")){
+							expr = xpathParser.compile(xpath.replace("/text()", ""));
+					        result = expr.evaluate(item, XPathConstants.NODESET);
+							if (result == null)
+								continue;
+							
+							nodes = (NodeList) result;
+							if (nodes.getLength() == 0)
+								continue;
+							
 							for (int j = 0; j < nodes.getLength(); j++){
 								Node node = nodes.item(j);
-								values.add(node.getNodeValue());
+								String nodeValue = node.getTextContent();
+								values.add(nodeValue);
 							}
 							//正则
 							parseByRegex(regex, skipRgxFail, values);
@@ -704,32 +716,31 @@ public class ModelParser extends DefaultHandler{
 	}
 
 	public static void main(String[] args) throws Throwable{
-//		File file = new File("C:/Users/vivi/Downloads/9000425.xml");
-//		String xml = FileUtil.readFile(file);
-//		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
-//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//        factory.setNamespaceAware(true); // never forget this!
-//        DocumentBuilder builder = factory.newDocumentBuilder();
-//        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-//        XPathFactory xfactory = XPathFactoryImpl.newInstance();
-//        XPath xpath = xfactory.newXPath();
-//        XPathExpression expr = xpath.compile("//item");
-//        Object result = expr.evaluate(doc, XPathConstants.NODESET);
-//        NodeList nodes = (NodeList) result;
-//        
+		File file = new File("d:/tripadeal.xml");
+		String xml = FileUtil.readFile(file);
+		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true); // never forget this!
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+        XPathFactory xfactory = XPathFactoryImpl.newInstance();
+        XPath xpath = xfactory.newXPath();
+        XPathExpression expr = xpath.compile("//goods");
+        Object result = expr.evaluate(doc, XPathConstants.NODESET);
+        NodeList nodes = (NodeList) result;
+        
 //        FelEngine fel = new FelEngineImpl();
-//        for (int i = 0; i < nodes.getLength(); i++) {
-//        	if (i > 0)
-//        		break;
-//            
-//        	NodeList subs = (NodeList)xpath.compile("deal:image/text()").evaluate(nodes.item(i), XPathConstants.NODESET);
-//        	if (subs == null || subs.getLength() == 0)
-//             	continue;
-//            for (int j = 0; j < subs.getLength(); j++) {
-//            	Node item = subs.item(j);
-//             	String value = item.getNodeValue();
-//             	System.out.println(value);
-//            }
+        for (int i = 0; i < nodes.getLength(); i++) {
+        	if (i > 0)
+        		break;
+            
+        	NodeList subs = (NodeList)xpath.compile("long_title").evaluate(nodes.item(i), XPathConstants.NODESET);
+            for (int j = 0; j < subs.getLength(); j++) {
+            	Node item = subs.item(j);
+            	System.out.println(item.getTextContent());
+             	String value = item.getNodeValue();
+             	System.out.println(value);
+            }
              
 //        	FelContext ctx = fel.getContext();
 //        	ctx.set("$this", node);
@@ -744,22 +755,17 @@ public class ModelParser extends DefaultHandler{
 //    		
 //    		Object newVal =  MVEL.eval("org.eweb4j.util.CommonUtil.toXml($this, false)", ctx);
 //    		System.out.println(newVal);
-//        }
-
-//        	
-           
-//        }
-//        System.out.println("count->"+count);
+        }
         
-		HtmlCleaner cleaner = new HtmlCleaner();
-		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
-		TagNode tagNode = cleaner.clean(new URL("http://c1520.jizu.info/thread0806.php?fid=8&amp;search=&amp;page=1"));
-		String xml = ParserUtil.xml(tagNode,true);
-		System.out.println(xml);
-		Object[] nodes = tagNode.evaluateXPath("//div[@class='pages']//a[@href]");
-		for (Object n : nodes){
-			System.out.println(ParserUtil.xml(n, false));
-		}
+//		HtmlCleaner cleaner = new HtmlCleaner();
+//		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
+//		TagNode tagNode = cleaner.clean(new URL("http://c1520.jizu.info/thread0806.php?fid=8&amp;search=&amp;page=1"));
+//		String xml = ParserUtil.xml(tagNode,true);
+//		System.out.println(xml);
+//		Object[] nodes = tagNode.evaluateXPath("//div[@class='pages']//a[@href]");
+//		for (Object n : nodes){
+//			System.out.println(ParserUtil.xml(n, false));
+//		}
 //		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
 //		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 //        factory.setNamespaceAware(false); // never forget this!
