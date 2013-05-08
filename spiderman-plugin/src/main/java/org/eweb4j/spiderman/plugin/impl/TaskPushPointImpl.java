@@ -36,8 +36,10 @@ public class TaskPushPointImpl implements TaskPushPoint{
 				//如果不是在给定的合法host列表里则不给于抓取
 				ValidHosts vhs = task.site.getValidHosts();
 				if (vhs == null || vhs.getValidHost() == null || vhs.getValidHost().isEmpty()){
-					if (!CommonUtil.isSameHost(task.site.getUrl(), task.url))
+					if (!CommonUtil.isSameHost(task.site.getUrl(), task.url)) {
+						listener.onInfo(Thread.currentThread(), task, "task.url->"+task.url+"'s host is not the same as site.host->" + task.site.getUrl());
 						continue;
+					}
 				}else{
 					boolean isOk = false;
 					String taskHost = new URL(task.url).getHost();
