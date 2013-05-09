@@ -9,6 +9,7 @@
 		<module>spiderman-core</module>
 		<module>spiderman-plugin</module>
 		<module>spiderman-sample</module>
+		<module>spiderman-web</module>
 	</modules>
 
 	<developers>

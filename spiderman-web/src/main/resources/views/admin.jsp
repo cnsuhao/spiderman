@@ -23,11 +23,6 @@
 				<input <c:choose><c:when test="${scheduleStatus == 0}"> disabled="disabled" </c:when> <c:otherwise> onclick="window.location='${BaseURL}spiderman/cancel_schedule'" </c:otherwise> </c:choose> type="button" value="cancel" />
 			</div>
 			<div class="unit">
-				<label>Spiderman:</label>
-				<input <c:choose><c:when test="${serverStatus == '1' }"> disabled="disabled" </c:when> <c:otherwise> onclick="window.location='${BaseURL}spiderman/startServer'" </c:otherwise> </c:choose>  type="button" value="start" />
-				<input <c:choose><c:when test="${serverStatus == '0' }"> disabled="disabled" </c:when> <c:otherwise> onclick="window.location='${BaseURL}spiderman/stopServer'" </c:otherwise> </c:choose> type="button" value="stop" />
-			</div>
-			<div class="unit">
 				<label>Refresh:</label>
 				<input <c:choose><c:when test="${refreshStatus == '1'}"> disabled="disabled" </c:when> <c:otherwise> id="refresh_seconds" type="text" value="${refreshSeconds}" </c:otherwise> </c:choose> />
 				<input <c:choose><c:when test="${refreshStatus == '1'}"> disabled="disabled" </c:when> <c:otherwise> onclick="javascript:refresh()" </c:otherwise> </c:choose> type="button" value="refresh" />
