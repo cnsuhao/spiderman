@@ -44,6 +44,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.greenpineyu.fel.FelEngine;
 import com.greenpineyu.fel.FelEngineImpl;
+import com.greenpineyu.fel.context.FelContext;
 import com.greenpineyu.fel.function.CommonFunction;
 import com.greenpineyu.fel.function.Function;
 
@@ -106,9 +107,13 @@ public class ModelParser extends DefaultHandler{
 		if (contentType == null)
 			contentType = "text/html";
 		boolean isXml = "xml".equalsIgnoreCase(contentType) || contentType.contains("text/xml") || contentType.contains("application/rss+xml") || contentType.contains("application/xml");
+		boolean isJson = "json".equalsIgnoreCase(contentType) || contentType.contains("text/json") || contentType.contains("application/json");
 		if (isXml)
 			return parseXml(page, false);
-		else {
+		else if (isJson){
+			
+			return parseJson(page);
+		} else {
 			String isForceUseXmlParser = this.target.getModel().getIsForceUseXmlParser();
 			if (!"1".equals(isForceUseXmlParser))
 				return parseHtml(page);
@@ -127,6 +132,189 @@ public class ModelParser extends DefaultHandler{
 		}
 	}
 
+	private List<Map<String, Object>> parseJson(Page page) throws Exception {
+		String content = page.getContent();
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		String isModelArray = target.getModel().getIsArray();
+//		String modelJsonPath = target.getModel().getJsonPath();
+		final List<Field> fields = target.getModel().getField();
+		if ("1".equals(isModelArray) || "true".equals(isModelArray)) {
+			List<Map> models = CommonUtil.parseArray(content, Map.class);
+			for (Map model : models){
+				list.add(parseJsonMap(model, fields));
+			}
+		}else{
+			Map model = CommonUtil.parse(content, Map.class);
+			list.add(parseJsonMap(model, fields));
+		}
+		return list;
+	}
+	
+	private Map<String, Object> parseJsonMap(Map item, final List<Field> fields){
+		Map<String, Object> map = new HashMap<String, Object>();
+		if (finalFields != null)
+			map.putAll(finalFields);
+		
+		fel.getContext().set("$fields", map);
+		for (Field field : fields){
+			String key = field.getName();
+			String isArray = field.getIsArray();
+			String isMergeArray = field.getIsMergeArray();
+			String isTrim = field.getIsTrim();
+			String isParam = field.getIsParam();
+			String isFinal = field.getIsFinal();
+			String isForDigNewUrl = field.getIsForDigNewUrl();
+			boolean isFinalParam = ("1".equals(isParam) || "true".equals(isParam)) && ("1".equals(isFinal) || "true".equals(isFinal));
+			if (isFinalParam && finalFields != null && finalFields.containsKey(key))
+				continue;
+			
+			Parsers parsers = field.getParsers();
+			if (parsers == null)
+				continue;
+			
+			List<org.eweb4j.spiderman.xml.Parser> parserList = parsers.getParser();
+			if (parserList == null || parserList.isEmpty())
+				continue;
+			
+			//field最终解析出来的结果
+			List<Object> values = new ArrayList<Object>();
+			for (int i = 0; i < parserList.size(); i++) {
+				org.eweb4j.spiderman.xml.Parser parser = parserList.get(i);
+				String skipErr = parser.getSkipErr();
+//				String attribute = parser.getAttribute();
+				String exp = parser.getExp();
+				String regex = parser.getRegex();
+				String skipRgxFail = parser.getSkipRgxFail();
+				try {
+					//第一步获得的是一个List<String>对象，交给下面的步骤进行解析
+					List<Object> newValues = new ArrayList<Object>();
+					for (Object nodeVal : values){
+						newValues.add(nodeVal.toString());
+					}
+					//正则
+					parseByRegex(regex, skipRgxFail, newValues);
+					// EXP表达式
+					fel.getContext().set("$this", item);
+					parseByExp(exp, newValues);
+					
+					if (!newValues.isEmpty()) {
+						values.clear();
+						values.addAll(newValues);
+					}
+				} catch (Throwable e) {
+					if ("1".equals(skipErr) || "true".equals(skipErr))
+						continue;
+					String parserInfo = CommonUtil.toJson(parser);
+					String err = "parser->" + parserInfo + " of field->" + key +" failed";
+					listener.onError(Thread.currentThread(), task, err, e);
+				}
+			}
+			
+			try {
+				if (values.isEmpty()) 
+					values.add("");
+				
+				// 相同 key，若values不为空，继续沿用
+				if (map.containsKey(key)){
+					//将原来的值插入到前面
+					Object obj = map.get(key);
+					if (obj instanceof Collection) {
+						values.addAll(0, (Collection<?>) obj);
+					} else {
+						values.add(0, obj);
+					}
+				}
+				
+				//数组的话，需要去除空元素
+				if (values.size() >= 2){
+					List<Object> noRepeatValues = new ArrayList<Object>();
+					for (Iterator<Object> it = values.iterator(); it.hasNext(); ){
+						Object obj = it.next();
+						if (obj instanceof String) {
+							if (((String)obj) == null || ((String)obj).trim().length() == 0)
+								continue;
+						}
+						
+						noRepeatValues.add(obj);
+					}
+					values.clear();
+					values.addAll(noRepeatValues);
+				}
+				
+				//如果设置了trim
+				if ("1".equals(isTrim) || "true".equals(isTrim)) {
+					List<String> results = new ArrayList<String>(values.size());
+					for (Object obj : values){
+						results.add(String.valueOf(obj).trim());
+					}
+					values.clear();
+					values.addAll(results);
+				}
+				
+				//如果是DigNewUrl
+				if ("1".equals(isForDigNewUrl) || "true".equals(isForDigNewUrl)) {
+					if ("1".equals(isArray)){
+						for (Object val : values){
+							task.digNewUrls.add(String.valueOf(val));
+						}
+					}else{
+						if (!values.isEmpty())
+							task.digNewUrls.add(String.valueOf(values.get(0)));
+					}
+				}
+				
+				Object value = null;
+				if ("1".equals(isArray) || "true".equals(isArray)){
+					List<Object> newValues = new ArrayList<Object>();
+					for (Object val : values){
+						if (values.size() == 1 && val.getClass().isArray()){
+							Object[] newVals = (Object[])val;
+							for (Object nv : newVals){
+								if (nv == null || String.valueOf(nv).trim().length() == 0)
+									continue;
+								newValues.add(nv);
+							}
+						}
+					}
+					if (!newValues.isEmpty()){
+						values.clear();
+						values.addAll(newValues);
+					}
+					value = values;
+					if ("1".equals(isMergeArray) || "true".equals(isMergeArray)){
+						StringBuilder sb = new StringBuilder();
+						for (Object val : values){
+							sb.append(String.valueOf(val));
+						}
+						value = sb.toString();
+					}else
+						value = values;
+				}else{
+					if (values.isEmpty())
+						value = "";
+					else
+						value = values.get(0);
+				}
+				
+				if(isFinalParam){
+					finalFields.put(key, value);
+				}
+
+				if ("1".equals(isParam) || "true".equals(isParam)){
+					continue;
+				}
+				
+				//最终完成
+				map.put(key, value);
+				
+			} catch (Throwable e) {
+				listener.onError(Thread.currentThread(), task, "field->"+key+" parse failed cause->"+e.toString(), e);
+			}
+		}
+		
+		return map;
+	}
+	
 	private List<Map<String, Object>> parseXml(Page page, boolean isFromHtml) throws Exception{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		String isIgCom = this.target.getModel().getIsIgnoreComments();
@@ -368,6 +556,21 @@ public class ModelParser extends DefaultHandler{
 				
 				Object value = null;
 				if ("1".equals(isArray) || "true".equals(isArray)){
+					List<Object> newValues = new ArrayList<Object>();
+					for (Object val : values){
+						if (values.size() == 1 && val.getClass().isArray()){
+							Object[] newVals = (Object[])val;
+							for (Object nv : newVals){
+								if (nv == null || String.valueOf(nv).trim().length() == 0)
+									continue;
+								newValues.add(nv);
+							}
+						}
+					}
+					if (!newValues.isEmpty()){
+						values.clear();
+						values.addAll(newValues);
+					}
 					value = values;
 					if ("1".equals(isMergeArray) || "true".equals(isMergeArray)){
 						StringBuilder sb = new StringBuilder();
@@ -590,6 +793,21 @@ public class ModelParser extends DefaultHandler{
 				
 				Object value = null;
 				if ("1".equals(isArray) || "true".equals(isArray)){
+					List<Object> newValues = new ArrayList<Object>();
+					for (Object val : values){
+						if (values.size() == 1 && val.getClass().isArray()){
+							Object[] newVals = (Object[])val;
+							for (Object nv : newVals){
+								if (nv == null || String.valueOf(nv).trim().length() == 0)
+									continue;
+								newValues.add(nv);
+							}
+						}
+					}
+					if (!newValues.isEmpty()){
+						values.clear();
+						values.addAll(newValues);
+					}
 					value = values;
 					if ("1".equals(isMergeArray) || "true".equals(isMergeArray)){
 						StringBuilder sb = new StringBuilder();
@@ -716,6 +934,15 @@ public class ModelParser extends DefaultHandler{
 	}
 
 	public static void main(String[] args) throws Throwable{
+		FelEngine fel = new FelEngineImpl();
+		FelContext ctx = fel.getContext();
+		List<Map> ns = CommonUtil.parseArray("[{\"desc\":[\"fuck you !\"]}]", Map.class);
+    	ctx.set("$this", ns.get(0));
+		Object rs = fel.eval("$this.get('desc')");
+		System.out.println(rs);
+		
+		if (true) return ;
+		
 		File file = new File("d:/tripadeal.xml");
 		String xml = FileUtil.readFile(file);
 		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
