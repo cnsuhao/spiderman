@@ -44,7 +44,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.greenpineyu.fel.FelEngine;
 import com.greenpineyu.fel.FelEngineImpl;
-import com.greenpineyu.fel.context.FelContext;
 import com.greenpineyu.fel.function.CommonFunction;
 import com.greenpineyu.fel.function.Function;
 
@@ -300,10 +299,6 @@ public class ModelParser extends DefaultHandler{
 					finalFields.put(key, value);
 				}
 
-				if ("1".equals(isParam) || "true".equals(isParam)){
-					continue;
-				}
-				
 				//最终完成
 				map.put(key, value);
 				
@@ -591,13 +586,8 @@ public class ModelParser extends DefaultHandler{
 					finalFields.put(key, value);
 				}
 
-				if ("1".equals(isParam) || "true".equals(isParam)){
-					continue;
-				}
-				
 				//最终完成
 				map.put(key, value);
-				
 			} catch (Throwable e) {
 				listener.onError(Thread.currentThread(), task, "field->"+key+" parse failed cause->"+e.toString(), e);
 			}
@@ -934,16 +924,16 @@ public class ModelParser extends DefaultHandler{
 	}
 
 	public static void main(String[] args) throws Throwable{
-		FelEngine fel = new FelEngineImpl();
-		FelContext ctx = fel.getContext();
-		List<Map> ns = CommonUtil.parseArray("[{\"desc\":[\"fuck you !\"]}]", Map.class);
-    	ctx.set("$this", ns.get(0));
-		Object rs = fel.eval("$this.get('desc')");
-		System.out.println(rs);
+//		FelEngine fel = new FelEngineImpl();
+//		FelContext ctx = fel.getContext();
+//		List<Map> ns = CommonUtil.parseArray("[{\"desc\":[\"fuck you !\"]}]", Map.class);
+//    	ctx.set("$this", ns.get(0));
+//		Object rs = fel.eval("$this.get('desc')");
+//		System.out.println(rs);
+//		
+//		if (true) return ;
 		
-		if (true) return ;
-		
-		File file = new File("d:/tripadeal.xml");
+		File file = new File("d:/nex.xml");
 		String xml = FileUtil.readFile(file);
 		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -952,21 +942,21 @@ public class ModelParser extends DefaultHandler{
         Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
         XPathFactory xfactory = XPathFactoryImpl.newInstance();
         XPath xpath = xfactory.newXPath();
-        XPathExpression expr = xpath.compile("//goods");
+        XPathExpression expr = xpath.compile("//div[@id='lb2-wrapper']//div[@class='close']");
         Object result = expr.evaluate(doc, XPathConstants.NODESET);
         NodeList nodes = (NodeList) result;
-        
 //        FelEngine fel = new FelEngineImpl();
         for (int i = 0; i < nodes.getLength(); i++) {
-        	if (i > 0)
-        		break;
-            
-        	NodeList subs = (NodeList)xpath.compile("long_title").evaluate(nodes.item(i), XPathConstants.NODESET);
+        	NodeList subs = (NodeList)xpath.compile("../preceding-sibling::area[1]").evaluate(nodes.item(i), XPathConstants.NODESET);
             for (int j = 0; j < subs.getLength(); j++) {
             	Node item = subs.item(j);
-            	System.out.println(item.getTextContent());
+            	System.out.println("item->" + item);
+            	System.out.println("text->" + item.getTextContent());
              	String value = item.getNodeValue();
-             	System.out.println(value);
+             	System.out.println("value->" + value);
+             	Element e = (Element)item;
+				String attrVal = e.getAttribute("coords");
+				System.out.println("attr->" + attrVal);
             }
              
 //        	FelContext ctx = fel.getContext();
