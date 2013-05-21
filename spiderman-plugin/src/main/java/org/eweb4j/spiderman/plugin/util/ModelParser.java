@@ -19,7 +19,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import net.sf.saxon.lib.NamespaceConstant;
 import net.sf.saxon.xpath.XPathFactoryImpl;
 
 import org.eweb4j.spiderman.fetcher.Page;
@@ -31,7 +30,6 @@ import org.eweb4j.spiderman.xml.Namespaces;
 import org.eweb4j.spiderman.xml.Parsers;
 import org.eweb4j.spiderman.xml.Target;
 import org.eweb4j.util.CommonUtil;
-import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.xml.Attrs;
 import org.eweb4j.util.xml.Tags;
 import org.htmlcleaner.HtmlCleaner;
@@ -933,31 +931,31 @@ public class ModelParser extends DefaultHandler{
 //		
 //		if (true) return ;
 		
-		File file = new File("d:/nex.xml");
-		String xml = FileUtil.readFile(file);
-		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true); // never forget this!
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-        XPathFactory xfactory = XPathFactoryImpl.newInstance();
-        XPath xpath = xfactory.newXPath();
-        XPathExpression expr = xpath.compile("//div[@id='lb2-wrapper']//div[@class='close']");
-        Object result = expr.evaluate(doc, XPathConstants.NODESET);
-        NodeList nodes = (NodeList) result;
+//		File file = new File("d:/nex.xml");
+//		String xml = FileUtil.readFile(file);
+//		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
+//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        factory.setNamespaceAware(true); // never forget this!
+//        DocumentBuilder builder = factory.newDocumentBuilder();
+//        Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+//        XPathFactory xfactory = XPathFactoryImpl.newInstance();
+//        XPath xpath = xfactory.newXPath();
+//        XPathExpression expr = xpath.compile("//div[@id='lb2-wrapper']//div[@class='close']");
+//        Object result = expr.evaluate(doc, XPathConstants.NODESET);
+//        NodeList nodes = (NodeList) result;
 //        FelEngine fel = new FelEngineImpl();
-        for (int i = 0; i < nodes.getLength(); i++) {
-        	NodeList subs = (NodeList)xpath.compile("../preceding-sibling::area[1]").evaluate(nodes.item(i), XPathConstants.NODESET);
-            for (int j = 0; j < subs.getLength(); j++) {
-            	Node item = subs.item(j);
-            	System.out.println("item->" + item);
-            	System.out.println("text->" + item.getTextContent());
-             	String value = item.getNodeValue();
-             	System.out.println("value->" + value);
-             	Element e = (Element)item;
-				String attrVal = e.getAttribute("coords");
-				System.out.println("attr->" + attrVal);
-            }
+//        for (int i = 0; i < nodes.getLength(); i++) {
+//        	NodeList subs = (NodeList)xpath.compile("../preceding-sibling::area[1]").evaluate(nodes.item(i), XPathConstants.NODESET);
+//            for (int j = 0; j < subs.getLength(); j++) {
+//            	Node item = subs.item(j);
+//            	System.out.println("item->" + item);
+//            	System.out.println("text->" + item.getTextContent());
+//             	String value = item.getNodeValue();
+//             	System.out.println("value->" + value);
+//             	Element e = (Element)item;
+//				String attrVal = e.getAttribute("coords");
+//				System.out.println("attr->" + attrVal);
+//            }
              
 //        	FelContext ctx = fel.getContext();
 //        	ctx.set("$this", node);
@@ -972,17 +970,18 @@ public class ModelParser extends DefaultHandler{
 //    		
 //    		Object newVal =  MVEL.eval("org.eweb4j.util.CommonUtil.toXml($this, false)", ctx);
 //    		System.out.println(newVal);
-        }
+//        }
         
-//		HtmlCleaner cleaner = new HtmlCleaner();
-//		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
-//		TagNode tagNode = cleaner.clean(new URL("http://c1520.jizu.info/thread0806.php?fid=8&amp;search=&amp;page=1"));
-//		String xml = ParserUtil.xml(tagNode,true);
+		HtmlCleaner cleaner = new HtmlCleaner();
+		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
+		TagNode tagNode = cleaner.clean(new File("d:\\ion-orchard-447.html"));
+		String xml = ParserUtil.xml(tagNode, true);
 //		System.out.println(xml);
-//		Object[] nodes = tagNode.evaluateXPath("//div[@class='pages']//a[@href]");
-//		for (Object n : nodes){
-//			System.out.println(ParserUtil.xml(n, false));
-//		}
+		Object[] nodes = tagNode.evaluateXPath("//table[@id='clearformat']//tr[1]//td[1]/text()");
+		for (Object n : nodes){
+			System.out.println(n.toString().split("\\(")[0]);
+		}
+		
 //		System.setProperty("javax.xml.xpath.XPathFactory:"+NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
 //		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 //        factory.setNamespaceAware(false); // never forget this!

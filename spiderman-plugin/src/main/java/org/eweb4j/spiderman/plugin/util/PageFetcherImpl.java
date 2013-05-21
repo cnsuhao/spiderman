@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -221,6 +222,24 @@ public class PageFetcherImpl implements PageFetcher{
 	 * @return
 	 */
 	public FetchResult fetch(FetchRequest req) throws Exception{
+		if (req.getHttpMethod() != null && !Http.Method.GET.equals(req.getHttpMethod())) {
+			//获取到URL后面的QueryParam
+			String query = new URL(req.getUrl()).getQuery();
+			for (String q : query.split("\\&")) {
+				String[] qv = q.split("=");
+				String name = qv[0];
+				String val = qv[1];
+				List<Object> vals = req.getParams().get(name);
+				if (vals == null) {
+					vals = new ArrayList<Object>();
+					req.getParams().put(name, vals);
+				}
+				
+				vals.add(val);
+			}
+			
+			return request(req);
+		}
 		FetchResult fetchResult = new FetchResult();
 		HttpGet get = null;
 		HttpEntity entity = null;
@@ -430,9 +449,9 @@ public class PageFetcherImpl implements PageFetcher{
 				}
 				
 				if (isPost)
-					((HttpPost)request).setEntity(((MultipartEntity)reqEntity));
+					((HttpPost)request).setEntity(reqEntity);
 				else
-					((HttpPut)request).setEntity(((MultipartEntity)reqEntity) );
+					((HttpPut)request).setEntity(reqEntity);
 			}
 			
 			//执行请求，获取服务端返回内容

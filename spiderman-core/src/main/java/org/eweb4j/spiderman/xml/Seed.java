@@ -14,6 +14,9 @@ public class Seed {
 	
 	@AttrTag
 	private String url;
+	
+	@AttrTag
+	private String httpMethod;
 
 	public String getName() {
 		return name;
@@ -29,6 +32,14 @@ public class Seed {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public String getHttpMethod() {
+		return this.httpMethod;
+	}
+
+	public void setHttpMethod(String httpMethod) {
+		this.httpMethod = httpMethod;
 	}
 	
 }

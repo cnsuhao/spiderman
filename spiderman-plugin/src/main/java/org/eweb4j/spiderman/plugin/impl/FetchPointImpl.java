@@ -1,5 +1,13 @@
 package org.eweb4j.spiderman.plugin.impl;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.eweb4j.mvc.Http;
 import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.plugin.FetchPoint;
@@ -7,8 +15,6 @@ import org.eweb4j.spiderman.plugin.util.PageFetcherImpl;
 import org.eweb4j.spiderman.plugin.util.SpiderConfig;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.Task;
-import org.eweb4j.spiderman.xml.Cookie;
-import org.eweb4j.spiderman.xml.Cookies;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.util.CommonUtil;
 
@@ -30,13 +36,14 @@ public class FetchPointImpl implements FetchPoint{
 	public void destroy() {
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws Exception{
 		long start = System.currentTimeMillis();
-		String url = "http://www.deal.com.sg/deals/singapore/phuket-3d2n-luxurious-4-star-star-duangjitt-resort-spa-includes-daily-departure-silk?utm_source=ilovedeals&utm_medium=referral&utm_campaign=cpc"; 
+		String url = "http://www.ionorchard.com/load_tenant.php?id=44"; 
 		PageFetcherImpl fetcher = new PageFetcherImpl();
 		SpiderConfig config = new SpiderConfig();
 		config.setCharset("utf-8");
 		config.setPolitenessDelay(200);
+		config.setUserAgentString("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17");
 		fetcher.setConfig(config);
 		
 //		Cookies cookies = new Cookies();
@@ -49,9 +56,10 @@ public class FetchPointImpl implements FetchPoint{
 		fetcher.init(site);
 		try {
 			FetchRequest req = new FetchRequest();
+			req.setHttpMethod(Http.Method.POST);
 			req.setUrl(url);
 			FetchResult rs = fetcher.fetch(req);
-//			System.out.println(rs); 
+			System.out.println(rs); 
 			if (rs.getPage() != null)
 				System.out.println(rs.getPage().getContent());
 			
@@ -74,7 +82,6 @@ public class FetchPointImpl implements FetchPoint{
 					config.setIncludeHttpsPages(true);
 				if ("1".equals(task.site.getIsFollowRedirects()) || "true".equals(task.site.getIsFollowRedirects()))
 					config.setFollowRedirects(true);
-				
 				String sdelay = task.site.getReqDelay();
 				if (sdelay == null || sdelay.trim().length() == 0)
 					sdelay = "200";
@@ -102,6 +109,8 @@ public class FetchPointImpl implements FetchPoint{
 			
 			FetchRequest req = new FetchRequest();
 			req.setUrl(url);
+			req.setHttpMethod(task.httpMethod);
+			
 			
 			return site.fetcher.fetch(req);
 		}

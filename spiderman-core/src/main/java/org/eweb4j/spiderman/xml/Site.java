@@ -44,6 +44,9 @@ public class Site {
 	private String url;//网站url
 	
 	@AttrTag
+	private String httpMethod;
+	
+	@AttrTag
 	private String userAgent = "Spiderman[https://github.com/laiweiwei/spiderman]";//爬虫一些标识
 	
 	@AttrTag
@@ -300,6 +303,14 @@ public class Site {
 		this.cookies = cookies;
 	}
 	
+	public String getHttpMethod() {
+		return this.httpMethod;
+	}
+
+	public void setHttpMethod(String httpMethod) {
+		this.httpMethod = httpMethod;
+	}
+
 	private void destroyPoint(Collection<? extends Point> points, SpiderListener listener){
 		if (points == null)
 			return ;

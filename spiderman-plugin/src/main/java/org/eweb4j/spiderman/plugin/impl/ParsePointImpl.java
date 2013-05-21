@@ -89,6 +89,7 @@ public class ParsePointImpl implements ParsePoint{
 
 		FetchRequest req = new FetchRequest();
 		req.setUrl(nextUrl);
+		req.setHttpMethod(rule.getHttpMethod());
 		FetchResult fr = task.site.fetcher.fetch(req);
 		if (fr == null || fr.getPage() == null)
 			return ;
@@ -97,7 +98,7 @@ public class ParsePointImpl implements ParsePoint{
 		visitedUrls.add(nextUrl);
 
 		//解析nextPage
-		Task nextTask = new Task(nextUrl, task.url, task.site, 0);
+		Task nextTask = new Task(nextUrl, rule.getHttpMethod(), task.url, task.site, 0);
 		Model nextModel = new Model();
 		List<Field> isAlsoParseInNextPageFields = target.getModel().getIsAlsoParseInNextPageFields();
 		if (isAlsoParseInNextPageFields == null || isAlsoParseInNextPageFields.isEmpty())

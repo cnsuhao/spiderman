@@ -16,7 +16,7 @@ public class TargetPointImpl implements TargetPoint{
 	}
 	
 	public synchronized Target confirmTarget(Task task, Target target) throws Exception {
-		return Util.isTargetUrl(task);
+		return Util.matchTarget(task);
 	}
 
 }

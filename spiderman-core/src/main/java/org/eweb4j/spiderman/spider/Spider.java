@@ -24,6 +24,7 @@ import org.eweb4j.spiderman.plugin.TaskSortPoint;
 import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.spiderman.url.SourceUrlChecker;
 import org.eweb4j.spiderman.xml.Field;
+import org.eweb4j.spiderman.xml.Rule;
 import org.eweb4j.spiderman.xml.Rules;
 import org.eweb4j.spiderman.xml.Target;
 import org.eweb4j.util.CommonUtil;
@@ -125,8 +126,8 @@ public class Spider implements Runnable{
 			
 			//检查sourceUrl
 			Rules rules = task.site.getTargets().getSourceRules();
-			boolean isSourceUrlOk = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl);
-			if (!isSourceUrlOk){
+			Rule sourceRule = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl);
+			if (sourceRule == null){
 				return ;
 			}
 			

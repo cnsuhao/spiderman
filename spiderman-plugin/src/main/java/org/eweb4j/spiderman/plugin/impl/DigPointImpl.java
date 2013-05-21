@@ -81,10 +81,11 @@ public class DigPointImpl implements DigPoint{
 					isDig = true;
 				
 				//判断当前url是否是sourceUrl
-				boolean isSourceUrl = UrlRuleChecker.check(task.url, Arrays.asList(r), "and");
-				if (!isSourceUrl)
+				Rule sourceRule = UrlRuleChecker.check(task.url, Arrays.asList(r), "and");
+				if (sourceRule == null)
 					continue;
 				
+				task.httpMethod = sourceRule.getHttpMethod();
 				Map<String, Object> finalFields = new HashMap<String,Object>();
 				
 				//判断是否定义了digUrls
@@ -152,7 +153,7 @@ public class DigPointImpl implements DigPoint{
 		}
 
 		//解析nextPage,找出里面的目标URL
-		Task nextTask = new Task(nextUrl, task.url, task.site, 0);
+		Task nextTask = new Task(nextUrl, task.httpMethod, task.url, task.site, 0);
 
 		FetchRequest req = new FetchRequest();
 		req.setUrl(nextUrl);

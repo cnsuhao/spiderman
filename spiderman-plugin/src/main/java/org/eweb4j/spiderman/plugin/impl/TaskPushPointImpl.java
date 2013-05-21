@@ -9,6 +9,7 @@ import org.eweb4j.spiderman.plugin.util.Util;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.spiderman.url.SourceUrlChecker;
+import org.eweb4j.spiderman.xml.Rule;
 import org.eweb4j.spiderman.xml.Rules;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.spiderman.xml.Target;
@@ -57,16 +58,16 @@ public class TaskPushPointImpl implements TaskPushPoint{
 				boolean isValid = false;
 				try {
 					//如果是目标url且是从sourceUrl来的，就是有效的
-					Target tgt = Util.isTargetUrl(task);
+					Target tgt = Util.matchTarget(task);
 					Rules rules = site.getTargets().getSourceRules();
-					boolean isFromSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl);
-					if (tgt != null && isFromSourceUrl){
+					Rule fromSourceRule = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl);
+					if (tgt != null && fromSourceRule != null){
 						isValid = true;
 					}
 					
 					//如果它本身就是sourceUrl，也应该是有效的
-					boolean isSourceUrl = SourceUrlChecker.checkSourceUrl(rules, task.url);
-					if (isSourceUrl){
+					Rule sourceRule = SourceUrlChecker.checkSourceUrl(rules, task.url);
+					if (sourceRule != null){
 						isValid = true;
 					}
 				} catch (Exception e){

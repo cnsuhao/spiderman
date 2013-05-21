@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.eweb4j.spiderman.url.UrlRuleChecker;
+import org.eweb4j.spiderman.xml.Rule;
 import org.eweb4j.spiderman.xml.Rules;
 
 /**
@@ -50,8 +51,10 @@ public class TaskQueue {
 		
 		//检查是否匹配xml配置的url规则
 		Rules rules = task.site.getQueueRules();
-		if (!UrlRuleChecker.check(task.url, rules.getRule(), rules.getPolicy()))
+		Rule queueRule = UrlRuleChecker.check(task.url, rules.getRule(), rules.getPolicy()); 
+		if (queueRule == null)
 			return false;
+		
 		return queue.add(task);
 	}
 	

@@ -10,6 +10,9 @@ public class Rule {
 	@AttrTag
 	private String value;
 	
+	@AttrTag
+	private String httpMethod;
+	
 	private Model digUrls;
 	
 	private Model nextPage;
@@ -46,8 +49,18 @@ public class Rule {
 		this.nextPage = nextPage;
 	}
 
+	public String getHttpMethod() {
+		return this.httpMethod;
+	}
+
+	public void setHttpMethod(String httpMethod) {
+		this.httpMethod = httpMethod;
+	}
+
 	@Override
 	public String toString() {
-		return "Rule [type=" + this.type + ", value=" + this.value + "]";
+		return "Rule [type=" + this.type + ", value=" + this.value
+				+ ", httpMethod=" + this.httpMethod + "]";
 	}
+	
 }

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
@@ -486,20 +485,19 @@ public class Spiderman {
 			
 			// 获取种子url
 			Seeds seeds = site.getSeeds();
-			Collection<String> seedUrls = new HashSet<String>();
+			Collection<Task> seedTasks = new ArrayList<Task>();
 			if (seeds == null || seeds.getSeed() == null || seeds.getSeed().isEmpty()) {
-				seedUrls.add(this.site.getUrl());
+				seedTasks.add(new Task(this.site.getUrl(), this.site.getHttpMethod(), null, this.site, 10));
 			}else{
 				for (Iterator<Seed> it = seeds.getSeed().iterator(); it.hasNext(); ){
 					Seed s = it.next();
-					seedUrls.add(s.getUrl());
+					seedTasks.add(new Task(s.getUrl(), s.getHttpMethod(), null, this.site, 10));
 				}
 			}
 			
 			// 运行种子任务
-			for (Iterator<String> it = seedUrls.iterator(); it.hasNext(); ) {
-				String url = it.next();
-				Task seedTask = new Task(new String(url), null, this.site, 10);
+			for (Iterator<Task> it = seedTasks.iterator(); it.hasNext(); ) {
+				Task seedTask = it.next();
 				Spider seedSpider = new Spider();
 				seedSpider.init(seedTask, listener);
 //				this.site.pool.execute(seedSpider);
@@ -554,9 +552,8 @@ public class Spiderman {
 					long cost = System.currentTimeMillis() - start;
 					if (cost >= times){ 
 //						 运行种子任务
-						for (Iterator<String> it = seedUrls.iterator(); it.hasNext(); ) {
-							String url = it.next();
-							Task seedTask = new Task(new String(url), null, this.site, 10);
+						for (Iterator<Task> it = seedTasks.iterator(); it.hasNext(); ) {
+							Task seedTask = it.next();
 							Spider seedSpider = new Spider();
 							seedSpider.init(seedTask, listener);
 							seedSpider.run();
