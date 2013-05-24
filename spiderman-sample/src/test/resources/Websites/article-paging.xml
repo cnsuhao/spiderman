@@ -26,7 +26,7 @@
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	  | timeout:HTTP请求超时
 	-->
-	<site name="simlimsq" enable="1" isDupRemovalStrict="1" includeHttps="1" url="http://www.simlimsquare.com.sg/store_list-category-p1.php" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+	<site name="163-travel" enable="1" url="http://travel.163.com/special/cjgat/" reqDelay="1s" charset="gbk" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | name:种子名称
@@ -71,38 +71,47 @@
 			<!--
 			  | 限制目标URL的来源,一般来说，对应的就是网站的频道页，例如某个分类下的新闻列表页
 			-->
-			<sourceRules policy="or">
-				<rule type="regex" value="http://www\.simlimsquare\.com\.sg/store_list\-category\-p\d+\.php">
+			<sourceRules policy="and">
+				<rule type="regex" value="http://travel\.163\.com/special/cjgat(_\d+)?/">
 					<!--
 					  | 定义如何在来源页面上挖掘新的 URL
 					  | 这个节点跟 <model> 节点是一样的结构，只不过名称不叫model而是叫做digUrls而已
 					-->
-					<digUrls isForceUseXmlParser="1">
-						<field name="page_url" isArray="1">
+					<digUrls>
+						<field name="source_url" isArray="1">
 							<parsers>
-								<parser xpath="//div[@id='ineoPages']/p//a[@href]" attribute="href" />
-								<parser exp="'http://www.simlimsquare.com.sg/'+$this" />
+								<parser xpath="//div[@class='list-page']//a[@href]" attribute="href"/>
 							</parsers>
 						</field>
-						<field name="target_url" isArray="1"> 
+						<field name="target_url" isArray="1">
 							<parsers>
-								<parser xpath="//table[@width='550' and @border='0' and @cellspacing='0' and @cellpadding='0']//a[@href]" attribute="href" />
-								<parser exp="'http://www.simlimsquare.com.sg/'+$this" />
+								<parser xpath="//div[@class='list-item clearfix']//div[@class='item-top']//h2//a[@href]" attribute="href"/>
+								<parser exp="$this.replace('#p=891JUOOO17KK0006','')" />
 							</parsers>
 						</field>
 					</digUrls>
 				</rule>
-				<rule type="regex" value="http://www\.simlimsquare.com\.sg/store_list-category-[a-zA-Z_0-9]+\.php" />
 			</sourceRules>
 			<!--
 			  | name:目标名称	
 			-->
-			<target name="store">
+			<target name="article" isForceUseXmlParser="1">
 				<!--
 				  | 目标URL的规则
 				-->
 				<urlRules policy="and">
-					<rule type="regex" value="http://www\.simlimsquare.com\.sg/store_list-category-[a-zA-Z_0-9]+\.php" />
+					<rule type="regex" value="http://travel\.163\.com/\d{2}/\d{4}/\d{2}/\w[^_]+\.html">
+						<!--
+						  | 递归抓取详细页的分页
+						-->
+						<nextPage>
+							<field name="next_url">
+								<parsers>
+									<parser xpath="//div[@class='ep-pages']//a[@class='ep-pages-ctrl']" attribute="href" />
+								</parsers>
+							</field>
+						</nextPage>
+					</rule>
 				</urlRules>
 				<!--
 				  | 目标网页的数据模型
@@ -112,7 +121,7 @@
 				  | isArray:0|1 目标网页是否有多个数据模型，一般一些RSS XML页面上就会有很多个数据模型需要解析，即在一个xml页面上解析多个Model对象
 				  | xpath: 搭配 isArray 来使用，可选
 				-->
-				<model isForceUseXmlParser="1" isArray="1" xpath="/html/body/table/tbody/tr[2]/td/table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td/table/tbody/tr[2]/td[2]/table/tbody/tr[5]/td/table/tbody/tr/td/table/tbody//tr[position() > 1]">
+				<model>
 					<!--
 					  | 目标网页的命名空间配置,一般用于xml页面
 					  | prefix: 前缀
@@ -131,7 +140,7 @@
 					  | isAlsoParseInNextPage:0|1 是否在分页的下一页里继续解析，用于目标网页有分页的情况
 					  | isTrim:0|1 是否去掉前后空格
 					-->
-					<field name="category" isTrim="1">
+					<field name="title">
 						<parsers>
 							<!--
 							  | xpath: XPath规则，如果目标页面是XML，则可以使用2.0语法，否则HTML的话暂时只能1.0
@@ -154,43 +163,19 @@
 							  | skipErr:0|1 是否忽略错误消息
 							  | skipRgxFail:0|1 是否忽略正则匹配失败，如果是，则会取失败前的值
 							-->
-							<parser xpath="//td[@class='style8']/text()" regex="(?&lt;=STORE CATEGORIES - ).*" />
+							<parser xpath="//h1[@id='h1title']/text()" />
 						</parsers>
 					</field>
-					<field name="storeName" isTrim="1">
+					<field name="content" isArray="1" isAlsoParseInNextPage="1" isTrim="1">
 						<parsers>
-							<parser xpath="td[1]/text()" />
-						</parsers>
-					</field>
-					<field name="unitNumber" isTrim="1">
-						<parsers>
-							<parser xpath="td[2]/text()" />
-						</parsers>
-					</field>
-					<field name="telephone" isTrim="1">
-						<parsers>
-							<parser xpath="td[3]/text()" />
-						</parsers>
-					</field>
-					<field name="fax" isTrim="1">
-						<parsers>
-							<parser xpath="td[4]/text()" />
-						</parsers>
-					</field>
-					<field name="email" isTrim="1">
-						<parsers>
-							<parser xpath="td[5]//a/text()" regex=".*@.*\..*" />
-						</parsers>
-					</field>
-					<field name="website" isTrim="1">
-						<parsers>
-							<parser xpath="td[5]//a/text()" exp="$this.replace($fields.email, '')" />
-						</parsers>
-					</field>
-					<field name="newTargetUrl" isArray="1" isForDigNewUrl="1">
-						<parsers>
-							<parser xpath="//div[@id='ineoPages']/p//a[@href]" attribute="href" />
-							<parser exp="$Util.resolveUrl('http://www.simlimsquare.com.sg/', $this)" />
+							<parser xpath="//div[@id='endText']" exp="$output($this)" />
+							<!--attribute 黑名单-->
+							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容）-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+							<!--其他-->
 						</parsers>
 					</field>
 				</model>

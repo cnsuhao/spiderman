@@ -26,7 +26,7 @@
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	  | timeout:HTTP请求超时
 	-->
-	<site name="oschina" enable="0" includeHttps="1" url="http://www.oschina.net/question?catalog=1&amp;show=&amp;p=1" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+	<site name="oschina" enable="1" includeHttps="1" url="http://www.oschina.net/question?catalog=1&amp;show=&amp;p=1" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | name:种子名称
