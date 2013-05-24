@@ -52,7 +52,8 @@ public class TestSpider {
 			}
 			public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {
 				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DIG] ~ ");
-				System.out.println(newUrls);
+				System.out.println(newUrls.size() + ", " + newUrls);
+				System.out.println("\t from -> "+task.url);
 			}
 			public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {
 //				for (Task t : validTasks){

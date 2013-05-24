@@ -52,15 +52,17 @@ public class DigPointImpl implements DigPoint{
 			return null;
 		
 		Collection<String> urls = new ArrayList<String>();
+		
+		//如果是30X跳转，则将其跳转的URL作为新的URL加入进来
 		String moveUrl = result.getMovedToUrl();
 		if (moveUrl != null){
 			if (!moveUrl.equals(task.url))
 				urls.add(moveUrl);
 		}
 		
+		//如果当前URL里没有任何页面内容，就无需进一步解析内容里的URL了
 		if (result.getPage() == null) 
 			return urls;
-		
 		String html = result.getPage().getContent();
 		if (html == null) 
 			return urls;
@@ -74,40 +76,49 @@ public class DigPointImpl implements DigPoint{
 			visitedUrls.add(task.url);
 			
 			for (Rule r : rules.getRule()){
-				Model digModel = r.getDigUrls();
-				if (digModel == null)
-					continue;
-				if (!isDig)
-					isDig = true;
-				
-				//判断当前url是否是sourceUrl
+				//判断当前url是否是sourceUrl,只有当前url是sourceUrl时才需要去获取新URL
 				Rule sourceRule = UrlRuleChecker.check(task.url, Arrays.asList(r), "and");
 				if (sourceRule == null)
 					continue;
 				
-				task.httpMethod = sourceRule.getHttpMethod();
-				Map<String, Object> finalFields = new HashMap<String,Object>();
+				Model digModel = r.getDigUrls();
+				Model nextPage = r.getNextPage();
+				if (digModel != null || nextPage != null) {
+					//只要有一个Rule定义了digUrls或者nextPage，那么就被认为已经挖掘过了，这样就不会获取所有的URL
+					isDig = true;
+				}
 				
+				Map<String, Object> finalFields = new HashMap<String,Object>();
 				//判断是否定义了digUrls
-				Target tgt = new Target();
-				tgt.setName("dig_urls");
-				tgt.setModel(digModel);
-				Collection<String> newUrls = UrlUtils.digUrls(result.getPage(), task, r, tgt, listener, finalFields);
-//				System.out.println("newUrls->"+newUrls);
-//				System.out.println("from->"+task.url);
-				//解析Model获得urls
-				urls.addAll(newUrls);
+				if (digModel != null) {
+					//设置当前任务的httpMethod
+					task.httpMethod = sourceRule.getHttpMethod();
+					
+					//构造一个目标
+					Target tgt = new Target();
+					tgt.setName("dig_urls");
+					tgt.setModel(digModel);
+					Collection<String> newUrls = UrlUtils.digUrls(result.getPage(), task, r, tgt, listener, finalFields);
+	//				System.out.println("newUrls->"+newUrls);
+	//				System.out.println("from->"+task.url);
+					//解析Model获得urls
+					urls.addAll(newUrls);
+				}
+				
 				//如果配置了下一页，则进入递归解析
-				parseNextPage(r, task, result.getPage(), urls, visitedUrls, finalFields);
+				if (nextPage != null) {
+					parseNextPage(r, task, result.getPage(), urls, visitedUrls, finalFields);
+				}
 			}
 			
 		}
 		
+		//如果没有配置任何的digUrls和nextPage,就使用默认的策略，从当前URL里面获取所有URL
 		if (!isDig){
 			urls.addAll(UrlUtils.findAllUrls(html, task.url));
 		}
 		
-		//resolveUrl
+		//修复URL
 		String hostUrl = new StringBuilder("http://").append(new URL(task.site.getUrl()).getHost()).append("/").toString();
 		List<String> newUrls = new ArrayList<String>(urls.size());
 		for (String url : urls) {
@@ -141,7 +152,7 @@ public class DigPointImpl implements DigPoint{
 //		System.out.println("page--!!!!!!----->"+page.getUrl());
 		Collection<String> nextUrls = UrlUtils.digUrls(page, task, rule, tgt, listener, finalFields);
 //		System.out.println("visitedUrls-->>>>>>>>>>>>!!!!!!!!!!!!!!" + visitedUrls);
-//		System.out.println("nextUrls-->>>>>>>>>>>>!!!!!!!!!!!!!!" + nextUrls);
+		System.out.println("\tdig nextUrls->" + nextUrls);
 		if (nextUrls == null || nextUrls.isEmpty())
 			return ;
 		String nextUrl = new ArrayList<String>(nextUrls).get(0);
@@ -169,7 +180,7 @@ public class DigPointImpl implements DigPoint{
 
 		//暂时使用默认的发现新URL的逻辑
 		Collection<String> _urls = Util.findAllLinkHref(nextPageResult.getContent(), task.url);
-//		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-------- newUrls-------->" + _urls + ", from->"+nextUrl);
+//		System.out.println("NEXTPAGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-------- newUrls-------->" + _urls + ", \tfrom->"+nextUrl);
 		urls.addAll(_urls);
 
 		//递归

@@ -26,15 +26,13 @@
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	  | timeout:HTTP请求超时
 	-->
-	<site name="jackcow-my" enable="0" url="http://www.jackcow.com"  country="Malaysia" isDupRemovalStrict="0" reqDelay="0.1s"  charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
+	<site name="jackcow-my" enable="1" url="http://www.jackcow.com"  country="Malaysia" isDupRemovalStrict="0" reqDelay="0.1s"  charset="utf-8" schedule="1h" thread="2" waitQueue="5s">
 		<!--
 		  | 多个种子链接	
 		-->
-		<seeds>
-			<seed name="kl" url="http://www.jackcow.com/jack2/include_deal.php?cat=15&amp;loc=8" />
-			<seed name="penang" url="http://www.jackcow.com/jack2/include_deal.php?cat=15&amp;loc=9" />
-			<seed name="jb" url="http://www.jackcow.com/jack2/include_deal.php?cat=15&amp;loc=22" />
-		</seeds>
+		<!--seeds>
+			<seed name="" url="" />
+		</seeds-->
 		<!--validHosts>
 			<validHost value="www.groupon.sg" />
 			<validHost value="alldeals.groupon.sg" />
@@ -69,7 +67,10 @@
 			  | 限制目标URL的来源
 			-->
 			<sourceRules policy="and">
-				<rule type="regex" value="http://www\.jackcow\.com/jack2/include_deal\.php\?cat=15&amp;loc=\d+" >
+				<!--
+				  | 来自首页
+				-->
+				<rule type="equal" value="http://www.jackcow.com" >
 					<!--
 					  | 定义如何在来源页面上挖掘新的 URL
 					  | 这个节点跟 <model> 节点是一样的结构，只不过名称不叫model而是叫做digUrls而已
@@ -87,29 +88,17 @@
 					  | 这个节点跟 <model> 节点是一样的结构，只不过名称不叫model而是叫做nextPage而已
 					-->
 					<nextPage>
-						<!--城市参数，变量-->
-						<field name="loc" isParam="1">
-							<parsers>
-								<parser exp="$task_url" />
-								<parser regex="(?&lt;=(loc=))\d+" />
-							</parsers>
-						</field>
-						<!--最后的deal时间参数，变量-->
+						<!--当前页中最后那个deal的更新时间，参数 -->
 						<field name="lastDealTime" isParam="1">
 							<parsers>
+								<!-- 当前列表页中最后一个deal的更新时间 -->
 								<parser xpath="(//li[@class='deal_id'])[last()]" attribute="id" />
 							</parsers>
 						</field>
-						<!--变量-->
-						<field name="baseUrl" isParam="1" isFinal="1">
-							<parsers>
-								<parser exp="'http://www.jackcow.com/jack2/include_deal_next.php?action=get'" />
-							</parsers>
-						</field>
-						<!--最终生成的下一页url-->
+						<!--拼凑出下一页URL，注意里面这里$fields.lastDealTime引用了上面那个变量-->
 						<field name="nextUrl">
 							<parsers>
-								<parser exp="$fields.baseUrl+'&amp;last_deal_time='+$fields.lastDealTime+'&amp;cat=15&amp;loc='+$fields.loc" />
+								<parser exp="'http://www.jackcow.com/jack2/include_deal_next.php?action=get&amp;last_deal_time='+$fields.lastDealTime+'&amp;cat=&amp;loc='" />
 							</parsers>
 						</field>
 					</nextPage>
@@ -332,9 +321,6 @@
 					</extension>
 					<extension point="parse">
 						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
-					</extension>
-					<extension point="pojo">
-						<impl type="" value="sg.ilovedeals.shoplay.spiderman.PojoPointImpl" sort="0"/>
 					</extension>
 					<extension point="end">
 						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>

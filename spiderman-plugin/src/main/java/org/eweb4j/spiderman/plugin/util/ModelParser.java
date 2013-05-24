@@ -816,10 +816,6 @@ public class ModelParser extends DefaultHandler{
 					finalFields.put(key, value);
 				}
 
-				if ("1".equals(isParam) || "true".equals(isParam)){
-					continue;
-				}
-				
 				//最终完成
 				map.put(key, value);
 				
