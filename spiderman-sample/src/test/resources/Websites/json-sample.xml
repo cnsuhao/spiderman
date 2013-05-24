@@ -26,7 +26,7 @@
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	  | timeout:HTTP请求超时
 	-->
-	<site name="vivo-city" isDupRemovalStrict="1" enable="1" includeHttps="1" url="http://file.sytime.com:8088/vivo-city.txt" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+	<site name="vivo-city" isDupRemovalStrict="1" enable="0" includeHttps="1" url="http://file.sytime.com:8088/vivo-city.txt" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | name:种子名称

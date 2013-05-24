@@ -121,7 +121,7 @@
 				  | isArray:0|1 目标网页是否有多个数据模型，一般一些RSS XML页面上就会有很多个数据模型需要解析，即在一个xml页面上解析多个Model对象
 				  | xpath: 搭配 isArray 来使用，可选
 				-->
-				<model>
+				<model isIgnoreComments="1">
 					<!--
 					  | 目标网页的命名空间配置,一般用于xml页面
 					  | prefix: 前缀
@@ -168,7 +168,7 @@
 					</field>
 					<field name="content" isArray="1" isAlsoParseInNextPage="1" isTrim="1">
 						<parsers>
-							<parser xpath="//div[@id='endText']" exp="$output($this)" />
+							<parser xpath="(//div[@id='endText'])[1]" exp="$output($this)" />
 							<!--attribute 黑名单-->
 							<parser exp="$Attrs.xml($this).rm('class').rm('style').rm('width').rm('height').rm('usemap').rm('align').rm('border').rm('title').rm('alt').ok()" />
 							<!--tag 黑名单，去掉内嵌内容-->

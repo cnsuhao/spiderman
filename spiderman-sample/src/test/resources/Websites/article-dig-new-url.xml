@@ -26,7 +26,7 @@
 	  | waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	  | timeout:HTTP请求超时
 	-->
-	<site name="simlimsq" enable="1" isDupRemovalStrict="1" includeHttps="1" url="http://www.simlimsquare.com.sg/store_list-category-p1.php" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+	<site name="simlimsq" enable="0" isDupRemovalStrict="1" includeHttps="1" url="http://www.simlimsquare.com.sg/store_list-category-p1.php" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		  | 配置多个种子链接
 		  | name:种子名称

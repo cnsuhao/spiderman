@@ -23,6 +23,7 @@ import org.eweb4j.spiderman.xml.Model;
 import org.eweb4j.spiderman.xml.Rule;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.spiderman.xml.Target;
+import org.eweb4j.util.CommonUtil;
 
 public class ParsePointImpl implements ParsePoint{
 
@@ -46,7 +47,6 @@ public class ParsePointImpl implements ParsePoint{
 	
 	public List<Map<String, Object>> parse(Task task, Target target, Page page, List<Map<String, Object>> models) throws Exception {
 		List<Map<String, Object>> results = new ModelParser(task, target, listener).parse(page);
-		
 		//用来记录分页里已经解析的url
 		Set<String> visitedUrls = new HashSet<String>();
 		visitedUrls.add(task.url);
@@ -76,7 +76,7 @@ public class ParsePointImpl implements ParsePoint{
 //		System.out.println("page--!!!!!!----->"+page.getUrl());
 		Collection<String> nextUrls = UrlUtils.digUrls(page, task, rule, tgt, listener, finalFields);
 //		System.out.println("visitedUrls-->>>>>>>>>>>>!!!!!!!!!!!!!!" + visitedUrls);
-//		System.out.println("nextUrls-->>>>>>>>>>>>!!!!!!!!!!!!!!" + nextUrls);
+		System.out.println("\ttarget digNextUrl->" + nextUrls + " from->" + page.getUrl());
 		if (nextUrls == null || nextUrls.isEmpty())
 			return ;
 		String nextUrl = new ArrayList<String>(nextUrls).get(0);
@@ -98,12 +98,13 @@ public class ParsePointImpl implements ParsePoint{
 		visitedUrls.add(nextUrl);
 
 		//解析nextPage
-		Task nextTask = new Task(nextUrl, rule.getHttpMethod(), task.url, task.site, 0);
-		Model nextModel = new Model();
 		List<Field> isAlsoParseInNextPageFields = target.getModel().getIsAlsoParseInNextPageFields();
 		if (isAlsoParseInNextPageFields == null || isAlsoParseInNextPageFields.isEmpty())
 			return ;
 
+		Task nextTask = new Task(nextUrl, rule.getHttpMethod(), task.url, task.site, 0);
+		//构造一个model
+		Model nextModel = new Model();
 		nextModel.getField().addAll(isAlsoParseInNextPageFields);
 		tgt.setModel(nextModel);
 
@@ -113,6 +114,8 @@ public class ParsePointImpl implements ParsePoint{
 		if (nextMaps == null)
 			return ;
 
+//		System.out.println("\n\tfuck!!!!!->" + CommonUtil.toJson(nextMaps.get(0)) + " \n\tfrom->" + fr.getPage().getUrl());
+		
 		for (Map<String, Object> nextMap : nextMaps){
 			for (Iterator<Entry<String, Object>> it = nextMap.entrySet().iterator(); it.hasNext();){
 				Entry<String, Object> e = it.next();

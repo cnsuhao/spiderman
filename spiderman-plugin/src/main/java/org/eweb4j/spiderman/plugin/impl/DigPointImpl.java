@@ -67,7 +67,6 @@ public class DigPointImpl implements DigPoint{
 		if (html == null) 
 			return urls;
 		
-		// 如果定义了sourceUrl的digUrls，只是用这个方式发现新url
 		boolean isDig = false;
 		Rules rules = site.getTargets().getSourceRules();
 		if (rules != null && rules.getRule() != null && !rules.getRule().isEmpty()){
@@ -76,17 +75,17 @@ public class DigPointImpl implements DigPoint{
 			visitedUrls.add(task.url);
 			
 			for (Rule r : rules.getRule()){
-				//判断当前url是否是sourceUrl,只有当前url是sourceUrl时才需要去获取新URL
-				Rule sourceRule = UrlRuleChecker.check(task.url, Arrays.asList(r), "and");
-				if (sourceRule == null)
-					continue;
-				
 				Model digModel = r.getDigUrls();
 				Model nextPage = r.getNextPage();
 				if (digModel != null || nextPage != null) {
 					//只要有一个Rule定义了digUrls或者nextPage，那么就被认为已经挖掘过了，这样就不会获取所有的URL
 					isDig = true;
 				}
+				
+				//判断当前url是否是sourceUrl,只有当前url是sourceUrl时才需要去获取新URL
+				Rule sourceRule = UrlRuleChecker.check(task.url, Arrays.asList(r), "and");
+				if (sourceRule == null)
+					continue;
 				
 				Map<String, Object> finalFields = new HashMap<String,Object>();
 				//判断是否定义了digUrls
@@ -152,7 +151,7 @@ public class DigPointImpl implements DigPoint{
 //		System.out.println("page--!!!!!!----->"+page.getUrl());
 		Collection<String> nextUrls = UrlUtils.digUrls(page, task, rule, tgt, listener, finalFields);
 //		System.out.println("visitedUrls-->>>>>>>>>>>>!!!!!!!!!!!!!!" + visitedUrls);
-		System.out.println("\tdig nextUrls->" + nextUrls);
+		System.out.println("\tsource digNextUrl->" + nextUrls + " from->" + page.getUrl());
 		if (nextUrls == null || nextUrls.isEmpty())
 			return ;
 		String nextUrl = new ArrayList<String>(nextUrls).get(0);
