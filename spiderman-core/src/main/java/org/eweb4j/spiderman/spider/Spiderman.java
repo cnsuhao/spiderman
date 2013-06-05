@@ -108,7 +108,7 @@ public class Spiderman {
 					if (_this.maxScheduleTimes > 0 && _this.scheduleTimes >= _this.maxScheduleTimes){
 						_this.cancel();
 						_this.listener.onInfo(Thread.currentThread(), null, "Spiderman has completed and cancel the schedule.");
-						_this.listener.afterScheduleCancel();
+						_this.listener.onAfterScheduleCancel();
 						_this.isSchedule = false;
 					} else {
 						//阻塞，判断之前所有的网站是否都已经停止完全
@@ -155,7 +155,7 @@ public class Spiderman {
 						_this.scheduleAt.add(new Date());
 						_this.listener.onInfo(Thread.currentThread(), null, "Spiderman has scheduled "+strTimes+" times.");
 						if (_this.scheduleTimes > 1)
-							_this.listener.beforeEveryScheduleExecute(_this.scheduleAt.get(_this.scheduleTimes-2));
+							_this.listener.onBeforeEveryScheduleExecute(_this.scheduleAt.get(_this.scheduleTimes-2));
 						_this.init()._startup().keepStrict(scheduleTime);
 					}
 				}
@@ -176,17 +176,50 @@ public class Spiderman {
 	}
 	
 	public void shutdown(){
+		shutdown(false);
+	}
+	/**
+	 * 
+	 * @date 2013-6-3 下午05:57:25
+	 * @param isCallback 是否回调监听器方法，默认下，调度的话是会回调的，手动关闭则自由选择
+	 */
+	public void shutdown(boolean isCallback){
+		listener.onInfo(Thread.currentThread(), null, "isCallback->" + isCallback);
+		if (isCallback) {
+			//此处添加一个监听回调
+			listener.onBeforeShutdown();
+		}
 		if (sites != null) {
 			for (Site site : sites){
 				site.destroy(listener, false);
 				listener.onInfo(Thread.currentThread(), null, "Site[" + site.getName() + "] destroy... ");
 			}
 		}
-		if (pool != null)
+		if (pool != null) {
 			pool.shutdown();
+			listener.onInfo(Thread.currentThread(), null, "Spiderman shutdown... ");
+		}
+		
+		if (isCallback) {
+			//此处添加一个监听回调
+			listener.onAfterShutdown();
+		}
 	}
 	
 	public void shutdownNow(){
+		shutdownNow(false);
+	}
+	/**
+	 * 
+	 * @date 2013-6-3 下午05:57:25
+	 * @param isCallback 是否回调监听器方法，默认下，调度的话是会回调的，手动关闭则自由选择
+	 */
+	public void shutdownNow(boolean isCallback){
+		listener.onInfo(Thread.currentThread(), null, "isCallback->" + isCallback);
+		if (isCallback) {
+			//此处添加一个监听回调
+			listener.onBeforeShutdown();
+		}
 		if (sites != null) {
 			for (Site site : sites){
 				site.destroy(listener, true);
@@ -194,10 +227,16 @@ public class Spiderman {
 			}
 		}
 		
-		if (pool != null)
+		if (pool != null) {
 			pool.shutdownNow();
+			listener.onInfo(Thread.currentThread(), null, "Spiderman shutdown now... ");
+		}
 		
 		isShutdownNow = true;
+		if (isCallback) {
+			//此处添加一个监听回调
+			listener.onAfterShutdown();
+		}
 	}
 	
 	//-------- Schedule ------------
@@ -253,7 +292,7 @@ public class Spiderman {
 			Thread.sleep(time);
 		} catch (InterruptedException e) {
 		}
-		shutdownNow();
+		shutdownNow(true);
 		return this;
 	}
 	
@@ -266,7 +305,7 @@ public class Spiderman {
 			Thread.sleep(time);
 		} catch (InterruptedException e) {
 		}
-		shutdown();
+		shutdown(true);
 		return this;
 	}
 	

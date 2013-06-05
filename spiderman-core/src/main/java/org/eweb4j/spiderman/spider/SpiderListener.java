@@ -8,6 +8,7 @@ import java.util.Map;
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.task.Task;
+import org.eweb4j.spiderman.xml.Site;
 
 
 
@@ -37,13 +38,38 @@ public interface SpiderListener {
 	 * 调度结束后回调此方法
 	 * @date 2013-4-1 下午03:17:23
 	 */
-	void afterScheduleCancel();
+	void onAfterScheduleCancel();
 	
 	/**
 	 * 每次调度执行前回调此方法
 	 * @date 2013-4-1 下午03:33:11
 	 * @param theLastTimeScheduledAt 上一次调度时间
 	 */
-	void beforeEveryScheduleExecute(Date theLastTimeScheduledAt);
+	void onBeforeEveryScheduleExecute(Date theLastTimeScheduledAt);
 	
+	/**
+	 * 
+	 * Spiderman.shutdown()被调用之前回调此方法
+	 * @date 2013-6-3 下午05:00:43
+	 */
+	void onBeforeShutdown();
+	
+	/**
+	 * Spiderman.shutdown()被调用之后回调此方法
+	 * @date 2013-6-3 下午05:01:02
+	 */
+	void onAfterShutdown();
+	
+	/**
+	 * 
+	 * Spiderman.shutdown()被调用之前回调此方法
+	 * @date 2013-6-3 下午05:00:43
+	 */
+	void onBeforeShutdown(Site site);
+	
+	/**
+	 * Spiderman.shutdown()被调用之后回调此方法
+	 * @date 2013-6-3 下午05:01:02
+	 */
+	void onAfterShutdown(Site site);
 }

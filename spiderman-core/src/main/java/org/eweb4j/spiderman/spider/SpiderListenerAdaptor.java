@@ -8,6 +8,7 @@ import java.util.Map;
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.task.Task;
+import org.eweb4j.spiderman.xml.Site;
 
 /**
  * 爬虫监听适配器
@@ -25,6 +26,10 @@ public class SpiderListenerAdaptor implements SpiderListener{
 	public void onPojo(Thread thread, Task task, List<Object> pojos) {}
 	public void onInfo(Thread thread, Task task, String info) {}
 	public void onError(Thread thread, Task task, String err, Throwable e) {}
-	public void afterScheduleCancel() {}
-	public void beforeEveryScheduleExecute(Date theLastTimeScheduledAt){}
+	public void onAfterScheduleCancel() {}
+	public void onBeforeEveryScheduleExecute(Date theLastTimeScheduledAt){}
+	public void onBeforeShutdown() {}
+	public void onAfterShutdown() {}
+	public void onBeforeShutdown(Site site) {}
+	public void onAfterShutdown(Site site) {}
 }
