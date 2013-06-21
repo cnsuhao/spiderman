@@ -87,7 +87,8 @@ public class Spiderman {
 			loadPlugins();
 			initSites();
 			initPool();
-		} catch (Exception e){
+		} catch (Throwable e){
+			e.printStackTrace();
 			listener.onInfo(Thread.currentThread(),null, "Spiderman init error.");
 			listener.onError(Thread.currentThread(), null, "Spiderman init error.", e);
 		}
@@ -106,9 +107,22 @@ public class Spiderman {
 				public void run() {
 					//限制schedule的次数
 					if (_this.maxScheduleTimes > 0 && _this.scheduleTimes >= _this.maxScheduleTimes){
-						_this.cancel();
+						try {
+							_this.cancel();
+						} catch (Throwable e){
+							e.printStackTrace();
+							_this.listener.onError(Thread.currentThread(), null, e.toString(), e);
+						}
+						
 						_this.listener.onInfo(Thread.currentThread(), null, "Spiderman has completed and cancel the schedule.");
-						_this.listener.onAfterScheduleCancel();
+						
+						try {
+							_this.listener.onAfterScheduleCancel();
+						} catch (Throwable e) {
+							e.printStackTrace();
+							_this.listener.onError(Thread.currentThread(), null, e.toString(), e);
+						}
+						
 						_this.isSchedule = false;
 					} else {
 						//阻塞，判断之前所有的网站是否都已经停止完全
@@ -121,7 +135,12 @@ public class Spiderman {
 									_this.listener.onError(Thread.currentThread(), null, "timeout of restart blocking check...", new Exception());
 									for (Site site : _this.sites) {
 										if (!site.isStop){
-											site.destroy(_this.listener, _this.isShutdownNow);
+											try {
+												site.destroy(_this.listener, _this.isShutdownNow);
+											} catch (Throwable e){
+												e.printStackTrace();
+												_this.listener.onError(Thread.currentThread(), null, e.toString(), e);
+											}
 										}
 									}
 									break;
@@ -146,17 +165,25 @@ public class Spiderman {
 							}
 						}
 						
-						//只有所有的网站资源都已被释放[特殊情况timeout]完全才重启Spiderman
-						_this.scheduleTimes++;
-						String strTimes = _this.scheduleTimes + "";
-						if (_this.maxScheduleTimes > 0)
-							strTimes += "/"+_this.maxScheduleTimes;
-						//记录每一次调度执行的时间
-						_this.scheduleAt.add(new Date());
-						_this.listener.onInfo(Thread.currentThread(), null, "Spiderman has scheduled "+strTimes+" times.");
-						if (_this.scheduleTimes > 1)
-							_this.listener.onBeforeEveryScheduleExecute(_this.scheduleAt.get(_this.scheduleTimes-2));
-						_this.init()._startup().keepStrict(scheduleTime);
+						try {
+							//只有所有的网站资源都已被释放[特殊情况timeout]完全才重启Spiderman
+							_this.scheduleTimes++;
+							String strTimes = _this.scheduleTimes + "";
+							if (_this.maxScheduleTimes > 0)
+								strTimes += "/"+_this.maxScheduleTimes;
+							//记录每一次调度执行的时间
+							_this.scheduleAt.add(new Date());
+							
+							_this.listener.onInfo(Thread.currentThread(), null, "Spiderman has scheduled "+strTimes+" times.");
+							
+							if (_this.scheduleTimes > 1)
+								_this.listener.onBeforeEveryScheduleExecute(_this.scheduleAt.get(_this.scheduleTimes-2));
+							
+							_this.init()._startup().keepStrict(scheduleTime);
+						} catch (Throwable e) {
+							e.printStackTrace();
+							_this.listener.onError(Thread.currentThread(), null, e.toString(), e);
+						}
 					}
 				}
 			}, new Date(), (CommonUtil.toSeconds(scheduleTime).intValue() + CommonUtil.toSeconds(scheduleDelay).intValue())*1000);
@@ -218,7 +245,12 @@ public class Spiderman {
 		listener.onInfo(Thread.currentThread(), null, "isCallback->" + isCallback);
 		if (isCallback) {
 			//此处添加一个监听回调
-			listener.onBeforeShutdown();
+			try {
+				listener.onBeforeShutdown();
+			} catch (Throwable e){
+				e.printStackTrace();
+				listener.onError(Thread.currentThread(), null, e.toString(), e);
+			}
 		}
 		if (sites != null) {
 			for (Site site : sites){
@@ -235,7 +267,12 @@ public class Spiderman {
 		isShutdownNow = true;
 		if (isCallback) {
 			//此处添加一个监听回调
-			listener.onAfterShutdown();
+			try {
+				listener.onAfterShutdown();
+			} catch (Throwable e){
+				e.printStackTrace();
+				listener.onError(Thread.currentThread(), null, e.toString(), e);
+			}
 		}
 	}
 	
@@ -543,8 +580,8 @@ public class Spiderman {
 				seedSpider.run();
 			}
 			
-			final float times = CommonUtil.toSeconds(this.site.getSchedule()) * 1000;
-			long start = System.currentTimeMillis();
+//			final float times = CommonUtil.toSeconds(this.site.getSchedule()) * 1000;
+//			long start = System.currentTimeMillis();
 			while(true){
 				if (site.isStop)
 					break;
@@ -588,18 +625,18 @@ public class Spiderman {
 					if (site.pool == null)
 						break;
 					
-					long cost = System.currentTimeMillis() - start;
-					if (cost >= times){ 
-//						 运行种子任务
-						for (Iterator<Task> it = seedTasks.iterator(); it.hasNext(); ) {
-							Task seedTask = it.next();
-							Spider seedSpider = new Spider();
-							seedSpider.init(seedTask, listener);
-							seedSpider.run();
-						}
-						listener.onInfo(Thread.currentThread(), null, " shcedule FeedSpider of Site->"+site.getName()+" per "+times+", now cost time ->"+cost);
-						start = System.currentTimeMillis();//重新计时
-					}
+//					long cost = System.currentTimeMillis() - start;
+//					if (cost >= times){ 
+////						 运行种子任务
+//						for (Iterator<Task> it = seedTasks.iterator(); it.hasNext(); ) {
+//							Task seedTask = it.next();
+//							Spider seedSpider = new Spider();
+//							seedSpider.init(seedTask, listener);
+//							seedSpider.run();
+//						}
+//						listener.onInfo(Thread.currentThread(), null, " shcedule FeedSpider of Site->"+site.getName()+" per "+times+", now cost time ->"+cost);
+//						start = System.currentTimeMillis();//重新计时
+//					}
 				}
 			}
 		}

@@ -38,7 +38,9 @@ public class Site {
 	@AttrTag
 	private String isFollowRedirects;//是否自动跟随重定向网页，默认是
 	
-	private ValidHosts validHosts;//限制在同这些host里面抓取数据
+	private ValidHosts validHosts;//限制在这些host里面抓取数据
+	
+	private Options options;//一些其他的业务数据
 	
 	@AttrTag
 	private String url;//网站url
@@ -207,6 +209,14 @@ public class Site {
 		this.skipStatusCode = skipStatusCode;
 	}
 
+	public Options getOptions() {
+		return this.options;
+	}
+
+	public void setOptions(Options options) {
+		this.options = options;
+	}
+
 	public String getEnable() {
 		return enable;
 	}
@@ -311,6 +321,22 @@ public class Site {
 		this.httpMethod = httpMethod;
 	}
 
+	public String getOption(String name){
+		if (options == null)
+			return null;
+		
+		for (Option option: options.getOption()) {
+			if (option == null || option.getName() == null || option.getName().trim().length() == 0)
+				continue;
+			if (!option.getName().equals(name))
+				continue;
+			
+			return option.getValue();
+		}
+		
+		return null;
+	}
+	
 	private void destroyPoint(Collection<? extends Point> points, SpiderListener listener){
 		if (points == null)
 			return ;

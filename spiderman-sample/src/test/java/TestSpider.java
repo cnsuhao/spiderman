@@ -124,7 +124,7 @@ public class TestSpider {
 						if (sb.length() > 0)
 							fileName = fileName + "_no_"+sb.toString()+"_";
 						
-						File file = new File(fileName+".json");
+						File file = new File(fileName + "_" + CommonUtil.getNow() + ".json");
 						FileUtil.writeFile(file, content);
 						System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
 						System.out.println(fileName + " create finished...");
