@@ -26,7 +26,7 @@
 	| waitQueue:当任务队列空的时候爬虫等待多长时间再索取任务
 	| timeout:HTTP请求超时
 	-->
-	<site name="tlab" enable="1" userAgent="http://isaproxy-cnwx.proxy-cn.astrazeneca.net:8080/array.dll?Get.Routing.Script" includeHttps="1"
+	<site name="tlab" enable="0" userAgent="http://isaproxy-cnwx.proxy-cn.astrazeneca.net:8080/array.dll?Get.Routing.Script" includeHttps="1"
 	url="http://file.sytime.com:8088/Main.htm" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 		<!--
 		| 配置多个种子链接
