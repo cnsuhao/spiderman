@@ -18,9 +18,10 @@ import org.eweb4j.spiderman.spider.Spiderman;
 import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.util.CommonUtil;
 
-@Path("${action.package}")
+@Path("${spiderman.controller}")
 public class SpidermanControl extends SpiderListenerAdaptor{
 
+	private final static String control_action = Props.getMap("spiderman").get("controller");
 	private final static Log logger = LogFactory.getLogger(SpidermanControl.class);
 	private static Vector<String> logs = new Vector<String>();
 	private static Integer serverStatus = 0;
@@ -116,7 +117,7 @@ public class SpidermanControl extends SpiderListenerAdaptor{
 			model.put("delay", delay);
 		}
 		
-		return Props.getMap("spiderman").get("action.admin.result");
+		return Props.getMap("spiderman").get("admin_result");
 	}
 	
 
@@ -128,7 +129,7 @@ public class SpidermanControl extends SpiderListenerAdaptor{
 	public String doClearLogs(){
 		logs.clear();
 		this.onInfo(null, null, "clear logs...");
-		return "action:spiderman/admin@GET";
+		return "action:"+control_action+"/admin@GET";
 	}
 
 	/**
@@ -157,7 +158,7 @@ public class SpidermanControl extends SpiderListenerAdaptor{
 			}
 		}
 		
-		return "action:spiderman/admin@GET";
+		return "action:"+control_action+"/admin@GET";
 	}
 	
 	@Path("/cancel_schedule")
@@ -172,7 +173,7 @@ public class SpidermanControl extends SpiderListenerAdaptor{
 			}
 		}
 		
-		return "action:spiderman/admin@GET";
+		return "action:"+control_action+"/admin@GET";
 	}
 
 	/**
@@ -190,7 +191,7 @@ public class SpidermanControl extends SpiderListenerAdaptor{
 			}
 		}
 		
-		return "action:spiderman/admin@GET";
+		return "action:"+control_action+"/admin@GET";
 	}
 	
 	/**
@@ -203,6 +204,6 @@ public class SpidermanControl extends SpiderListenerAdaptor{
 			refreshStatus = 0;
 		}
 		
-		return "action:spiderman/admin@GET";
+		return "action:"+control_action+"/admin@GET";
 	}
 }

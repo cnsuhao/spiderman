@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	<display-name>shoplay-service-web</display-name>
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- eweb4j -->
+	<filter>
+		<filter-name>EWebFilter</filter-name>
+		<filter-class>org.eweb4j.mvc.EWebFilter</filter-class>
+		<init-param>
+			<param-name>StartFileName</param-name>
+			<param-value>eweb4j-start-config.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>ConfigBasePath</param-name>
+			<param-value>${RootPath}/WEB-INF/classes/</param-value>
+		</init-param>
+		<init-param>
+			<param-name>BaseURLKey</param-name>
+			<param-value>BaseURL</param-value>
+		</init-param>
+		<init-param>
+			<param-name>ReqParamMapKey</param-name>
+			<param-value>ReqParamMap</param-value>
+		</init-param>
+		<init-param>
+			<param-name>ForwardBasePath</param-name>
+			<param-value>/WEB-INF/classes/views/</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>EWebFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- eweb4j -->
+</web-app>

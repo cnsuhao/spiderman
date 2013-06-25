@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans>
+	<dataSource dsName="myDBInfo">
+		<dataBaseType>MYSQL</dataBaseType>
+		<property key="driverClass" value="com.mysql.jdbc.Driver"/>
+		<property key="jdbcUrl" value="jdbc:mysql://localhost:3306/mydb?useUnicode=true&amp;characterEncoding=utf8"/>
+		<property key="user" value="xxx"/>
+		<property key="password" value="xxx"/>
+		<property key="initialPoolSize" value="1" />
+		<property key="maxPoolSize" value="50" />
+		<property key="minPoolSize" value="1" />
+		<property key="acquireIncrement" value="1" />
+		<property key="maxStatements" value="1000" />
+		<property key="idleConnectionTestPeriod" value="30" />
+		<property key="maxIdleTime" value="30" />
+		<property key="autoCommitOnClose" value="true" />
+		<property key="testConnectionOnCheckout" value="false" />
+		<property key="testConnectionOnCheckin" value="false" />
+		<property key="acquireRetryAttempts" value="30" />
+		<property key="acquireRetryDelay" value="2000" />
+		<property key="breakAfterAcquireFailure" value="false" />
+		<property key="checkoutTimeout" value="5000" />
+	</dataSource>
+</beans>

@@ -8,7 +8,7 @@
 		.unit{padding:5px; border:solid 1px #000; height:auto; margin-top:3px; clear:both;}	
 		.unit label{text-align:right;width:100px; line-height: 30px; display:inline-block;}
 		.unit input{line-height: 30px; width:100px; height:30px;}
-		.log {font-size:11px; font-family:Courier; height:75%; overflow: auto; background:#f8f8f8;}
+		.log {font-size:11px; font-family:Courier; height:65%; overflow: auto; background:black;}
 		.log p{padding:2px;margin:0;}
 		</style>
 	</head>
@@ -19,8 +19,8 @@
 				<input <c:choose><c:when test="${scheduleStatus == '1'}"> disabled="disabled" </c:when> <c:otherwise> id="schedule_time" type="text" value="${time}" </c:otherwise> </c:choose> />
 				<label>delay:</label>
 				<input <c:choose><c:when test="${scheduleStatus == '1'}"> disabled="disabled" </c:when> <c:otherwise> id="schedule_delay" type="text" value="${delay}" </c:otherwise> </c:choose> />
-				<input <c:choose><c:when test="${scheduleStatus == '1'}"> disabled="disabled" </c:when> <c:otherwise> onclick="javascript:schedule()" </c:otherwise> </c:choose> type="button" value="schedule" />
-				<input <c:choose><c:when test="${scheduleStatus == 0}"> disabled="disabled" </c:when> <c:otherwise> onclick="window.location='${BaseURL}spiderman/cancel_schedule'" </c:otherwise> </c:choose> type="button" value="cancel" />
+				<input <c:choose><c:when test="${scheduleStatus == '1'}"> disabled="disabled" </c:when> <c:otherwise> onclick="javascript:schedule()" </c:otherwise> </c:choose> type="button" value="start" />
+				<input <c:choose><c:when test="${scheduleStatus == 0}"> disabled="disabled" </c:when> <c:otherwise> onclick="window.location='${BaseURL}spiderman/cancel_schedule'" </c:otherwise> </c:choose> type="button" value="stop" />
 			</div>
 			<div class="unit">
 				<label>Refresh:</label>
