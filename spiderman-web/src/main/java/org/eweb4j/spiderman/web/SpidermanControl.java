@@ -76,6 +76,10 @@ public class SpidermanControl extends SpiderListenerAdaptor{
 		logs.add("<font color='red'>"+logger.error(error+", " + CommonUtil.getExceptionString(e))+"</font>");
 	}
 	
+	public String index(){
+		return "action:"+control_action+"/admin@GET";
+	}
+	
 	@Path("/admin")
 	public String doAdmin(Map<String, Object> model){
 		synchronized (logs) {
