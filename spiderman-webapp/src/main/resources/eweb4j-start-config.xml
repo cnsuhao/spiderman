@@ -3,7 +3,7 @@
 <beans>
 	<eweb4j>
 		<reload>0</reload>
-		<debug>0</debug>
+		<debug>1</debug>
 		<locales>
 			<locale language="zh" country="CN"/>
 		</locales>
@@ -22,7 +22,7 @@
 		<orm>
 			<open>0</open>
 			<logs>
-				<log console="0" level="debug" file="logs/logs.log" size="5"/>
+				<log console="1" level="debug" file="logs/logs.log" size="5"/>
 			</logs>
 			<ddl generate="true" run="false" ds="myDBInfo"/>
 			<dataSource>com.mchange.v2.c3p0.ComboPooledDataSource</dataSource>
@@ -40,7 +40,7 @@
 		<mvc>
 			<open>1</open>
 			<logs>
-				<log console="0" level="debug" file="logs/logs.log" size="5"/>
+				<log console="1" level="debug" file="logs/logs.log" size="5"/>
 			</logs>
 			<upload tmp="${RootPath}/WEB-INF/tmp" maxMemorySize="4M" maxRequestSize="4M"/>
 			<scanActionPackage>
