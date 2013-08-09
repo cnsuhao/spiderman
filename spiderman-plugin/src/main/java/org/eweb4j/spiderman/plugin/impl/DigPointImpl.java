@@ -1,5 +1,6 @@
 package org.eweb4j.spiderman.plugin.impl;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,7 +119,14 @@ public class DigPointImpl implements DigPoint{
 		}
 		
 		//修复URL
-		String hostUrl = new StringBuilder("http://").append(new URL(task.site.getUrl()).getHost()).append("/").toString();
+		URL URL = new URL(task.site.getUrl());
+		String port = "";
+		if (URL.getPort() != -1){
+			port = ":"+URL.getPort();
+		}
+		
+		String hostUrl = new StringBuilder("http://").append(URL.getHost()).append(port).append("/").toString();
+			
 		List<String> newUrls = new ArrayList<String>(urls.size());
 		for (String url : urls) {
 			LinkNormalizer ln = new DefaultLinkNormalizer(hostUrl);
@@ -151,7 +159,7 @@ public class DigPointImpl implements DigPoint{
 //		System.out.println("page--!!!!!!----->"+page.getUrl());
 		Collection<String> nextUrls = UrlUtils.digUrls(page, task, rule, tgt, listener, finalFields);
 //		System.out.println("visitedUrls-->>>>>>>>>>>>!!!!!!!!!!!!!!" + visitedUrls);
-		System.out.println("\tsource digNextUrl->" + nextUrls + " from->" + page.getUrl());
+//		System.out.println("\tsource digNextUrl->" + nextUrls + " from->" + page.getUrl());
 		if (nextUrls == null || nextUrls.isEmpty())
 			return ;
 		String nextUrl = new ArrayList<String>(nextUrls).get(0);
@@ -186,7 +194,7 @@ public class DigPointImpl implements DigPoint{
 		parseNextPage(rule, nextTask, nextPageResult, urls, visitedUrls, finalFields);
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws MalformedURLException{
 		String s = "../../question?catalog=1&show=&p=1";
 		System.out.println(s.startsWith("http://www.oschina.net/question?catalog=1&show=&p="));
 		LinkNormalizer ln = new DefaultLinkNormalizer("http://www.oschina.net");
@@ -194,5 +202,15 @@ public class DigPointImpl implements DigPoint{
 		System.out.println(ts);
 		String newUrl = URLCanonicalizer.getCanonicalURL(ts);
 		System.out.println(newUrl);
+		
+		String url = "http://www.baidu.com:8090/weiwei";
+		URL URL = new URL(url);
+		String port = "";
+		if (URL.getPort() != -1){
+			port = ":"+URL.getPort();
+		}
+		
+		String hostUrl = new StringBuilder("http://").append(URL.getHost()).append(port).append("/").toString();
+		System.out.println(hostUrl);
 	}
 }
