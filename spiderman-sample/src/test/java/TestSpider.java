@@ -17,13 +17,24 @@ import org.eweb4j.spiderman.spider.Spiderman;
 import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.FileUtil;
+import org.eweb4j.util.xml.Tags;
 import org.junit.Test;
 
 public class TestSpider {
 	
 	public static void main(String[] args){
-		System.out.println(CommonUtil.getNow());
-		System.out.println(CommonUtil.formatTime(new Date(1363021265380L)));
+		String html = "" +
+				"<div class='test'>" +
+				"    <ul>" +
+				"        <li>1</li>" +
+				"    </ul>" +
+				"    <p style='width:100px; height:50px;'>This is p</p>" +
+				"</div>";
+		
+		System.out.println(Tags.me().xml(html).rm("ul").empty().Attrs().rm().ok());
+		
+		html = FileUtil.readFile(new File("d:/txt.html"));
+		System.out.println(Tags.me().xml(html).rm("li").empty().ok());
 	}
 	
 	@Test
@@ -47,14 +58,16 @@ public class TestSpider {
 				System.err.println("at -> " + CommonUtil.formatTime(theLastTimeScheduledAt));
 			}
 			public void onFetch(Thread thread, Task task, FetchResult result) {
-				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [FETCH] ~ ");
-				System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
+//				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [FETCH] ~ ");
+//				System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
 			}
-			public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {
+			
+			public void onDigUrls(Thread thread, Task task, String fieldName, Collection<String> urls) {
 				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DIG] ~ ");
-				System.out.println(newUrls.size() + ", " + newUrls);
+				System.out.println("field->" + fieldName + ", "+urls.size() + ", " + urls);
 				System.out.println("\t from -> "+task.url);
 			}
+			
 			public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {
 //				for (Task t : validTasks){
 //					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DUPREMOVE] ~ ");
@@ -65,6 +78,7 @@ public class TestSpider {
 //				for (Task t : afterSortTasks){
 //					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [SORT] ~ ");
 //					System.out.println(t.url+" from->"+t.sourceUrl);
+//					System.out.println("after->" + afterSortTasks);
 //				}
 			}
 			public void onNewTasks(Thread thread, Task task, Collection<Task> newTasks) {
@@ -76,6 +90,7 @@ public class TestSpider {
 			public void onTargetPage(Thread thread, Task task, Page page) {
 //				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [TARGET] ~ ");
 //				System.out.println(page.getUrl());
+//				System.out.println(page.getContent());
 			}
 			public void onInfo(Thread thread, Task task, String info) {
 				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");

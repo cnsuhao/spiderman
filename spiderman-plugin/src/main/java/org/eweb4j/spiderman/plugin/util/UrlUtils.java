@@ -1,6 +1,7 @@
 package org.eweb4j.spiderman.plugin.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -56,16 +57,19 @@ public final class UrlUtils {
 			//如果是参数，跳过
 			if ("1".equals(f.getIsParam()) || "true".equals(f.getIsParam()))
 				continue;
-
+			
 			for (Map<String, Object> model : models){
 				Object val = model.get(f.getName());
 				if (val == null)
 					continue;
+				
 				//如果url是数组
 				if ("1".equals(f.getIsArray()) || "true".equals(f.getIsArray())){
 					urls.addAll((List<String>)val);
+					lst.onDigUrls(Thread.currentThread(), task, f.getName(), (List<String>)val);
 				}else{
 					urls.add(String.valueOf(val));
+					lst.onDigUrls(Thread.currentThread(), task, f.getName(), Arrays.asList(String.valueOf(val)));
 				}
 			}
 		}

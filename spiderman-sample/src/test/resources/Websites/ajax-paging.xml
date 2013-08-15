@@ -140,6 +140,7 @@
 					  | isFinal:0|1 是否是不可变的参数，搭配isParam使用，如果是，第一次赋值之后不会再被改变
 					  | isAlsoParseInNextPage:0|1 是否在分页的下一页里继续解析，用于目标网页有分页的情况
 					  | isTrim:0|1 是否去掉前后空格
+					  | isForDigNewUrl:0|1 是否将返回值作为新URL放入任务队列
 					-->
 					<field name="name" isTrim="1">
 						<!--

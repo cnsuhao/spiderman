@@ -136,6 +136,7 @@
 							  |            $Tags和$Attrs可以一起使用: 
 							  |            $Tags.xml($this).rm('p').Attrs().rm('style').ok()
 							  |            $Attrs.xml($this).rm('style').Tags().rm('p').ok()
+							  |     $Util: 这个是内置的工具类，对应org.eweb4j.util.CommonUtil，详细API可查看文档
 							  | skipErr:0|1 是否忽略错误消息
 							  | skipRgxFail:0|1 是否忽略正则匹配失败，如果是，则会取失败前的值
 							-->

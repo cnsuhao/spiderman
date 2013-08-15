@@ -16,6 +16,7 @@ import org.eweb4j.spiderman.xml.Site;
  * @date 2013-1-7 上午11:39:57
  */
 public class SpiderListenerAdaptor implements SpiderListener{
+	public void onDigUrls(Thread thread, Task task, String fieldName, Collection<String> urls) {}
 	public void onFetch(Thread thread, Task task, FetchResult result) {}
 	public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {}
 	public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {}

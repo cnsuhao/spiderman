@@ -14,6 +14,8 @@ import org.eweb4j.spiderman.xml.Site;
 
 public interface SpiderListener {
 
+	void onDigUrls(Thread thread, Task task, String fieldName, Collection<String> urls);
+	
     void onNewUrls(Thread thread, Task task, Collection<String> newUrls);
 	
     void onFetch(Thread thread, Task task, FetchResult result);
