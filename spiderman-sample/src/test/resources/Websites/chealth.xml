@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans>
-	<site name="chealth" enable="1" includeHttps="1" 
+	<site name="chealth" enable="0" includeHttps="1" 
 		url="http://www.chealth.org.cn/mon/healthNews/article/healthNews_index1.html"
 		reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 		

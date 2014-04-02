@@ -44,8 +44,10 @@ public class TestSpider {
 		if (err != null)
 			throw new Exception(err);
 		
+		//实例化spiderman
+		final Spiderman spiderman = Spiderman.me();
 		SpiderListener listener = new SpiderListenerAdaptor(){
-			public void afterScheduleCancel(){
+			public void onAfterScheduleCancel(){
 				//调度结束回调
 			}
 			/**
@@ -53,7 +55,7 @@ public class TestSpider {
 			 * @date 2013-4-1 下午03:33:11
 			 * @param theLastTimeScheduledAt 上一次调度时间
 			 */
-			public void beforeEveryScheduleExecute(Date theLastTimeScheduledAt){
+			public void onBeforeEveryScheduleExecute(Date theLastTimeScheduledAt){
 				System.err.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [LAST_SCHEDULE_AT] ~ ");
 				System.err.println("at -> " + CommonUtil.formatTime(theLastTimeScheduledAt));
 			}
@@ -104,6 +106,10 @@ public class TestSpider {
 			}
 			
 			public void onParse(Thread thread, Task task, List<Map<String, Object>> models) {
+				if (task.site.counter.getCount() >= 50) {
+					onInfo(thread, task, "!!!!!shutdown...............");
+					spiderman.shutdownNow();
+				}
 				final String projectRoot = FileUtil.getTopClassPath(TestSpider.class);
 				final File dir = new File(projectRoot+"/Data/"+task.site.getName()+"/"+task.target.getName());
 				try {
@@ -151,11 +157,10 @@ public class TestSpider {
 		};
 		
 		//启动爬虫
-		Spiderman.me()
-			.init(listener)//初始化
-			.startup()//启动
-			.keepStrict("2h");//存活时间，过了存活时间后马上关闭
+		spiderman.init(listener)//初始化
+			.startup();//启动
 		
+		Thread.currentThread().join();
 		//启动爬虫 + 调度定时重启
 //		Spiderman.me()
 //			.listen(listener)//设置监听器

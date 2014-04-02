@@ -360,7 +360,7 @@ public class ModelParser extends DefaultHandler{
 		String isModelArray = target.getModel().getIsArray();
 		String modelXpath = target.getModel().getXpath();
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		if ("1".equals(isModelArray) || "tre".equals(isModelArray)){
+		if ("1".equals(isModelArray) || "true".equals(isModelArray)){
 			XPathExpression expr = xpathParser.compile(modelXpath);
 	        Object result = expr.evaluate(doc, XPathConstants.NODESET);
 //		    listener.onInfo(Thread.currentThread(), task, "modelXpath -> " + modelXpath + " parse result -> " + result);
