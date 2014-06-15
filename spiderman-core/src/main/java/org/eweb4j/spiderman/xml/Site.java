@@ -90,6 +90,9 @@ public class Site {
 	
 	private Plugins plugins;//插件
 	
+	@AttrTag
+	private String downloader;
+	
 	//------------------------------------------
 	@Skip
 	public TaskDbServer db = null;//每个网站都有属于自己的一个任务去重DB服务
@@ -265,7 +268,15 @@ public class Site {
 		this.targets = targets;
 	}
 
-	public Plugins getPlugins() {
+	public String getDownloader() {
+        return this.downloader;
+    }
+
+    public void setDownloader(String downloader) {
+        this.downloader = downloader;
+    }
+
+    public Plugins getPlugins() {
 		return plugins;
 	}
 
@@ -352,9 +363,15 @@ public class Site {
 	}
 	
 	public void destroy(SpiderListener listener, boolean isShutdownNow) {
+	    try {
+	        // 停止抓取器线程
+	        this.fetcher.close();
+	    } catch(Throwable e) {
+	        listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".Fetcher close failed.", e);
+	    }
 		try {
 			this.queue.stop();
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".TaskQueue stop failed.", e);
 		}
 		
@@ -363,7 +380,7 @@ public class Site {
 				this.pool.shutdownNow();
 			else
 				this.pool.shutdown();
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".ThreadPool shutdown failed.", e);
 		}
 		
@@ -373,7 +390,7 @@ public class Site {
 				this.taskPollPointImpls.clear();
 				this.taskPollPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".TaskPollPlugin destroy failed.", e);
 		}
 		
@@ -383,7 +400,7 @@ public class Site {
 				this.beginPointImpls.clear();
 				this.beginPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".BeginPlugin destroy failed.", e);
 		}
 		try {
@@ -392,7 +409,7 @@ public class Site {
 				this.fetchPointImpls.clear();
 				this.fetchPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".FetchPlugin destroy failed.", e);
 		}
 		try{
@@ -401,7 +418,7 @@ public class Site {
 				this.digPointImpls.clear();
 				this.digPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".DigPlugin destroy failed.", e);
 		}
 		try {
@@ -410,7 +427,7 @@ public class Site {
 				this.dupRemovalPointImpls.clear();
 				this.dupRemovalPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".DupRemovalPlugin destroy failed.", e);
 		}
 		
@@ -420,7 +437,7 @@ public class Site {
 				this.taskSortPointImpls.clear();
 				this.taskSortPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".TaskSortPlugin destroy failed.", e);
 		}
 		
@@ -430,7 +447,7 @@ public class Site {
 				this.taskPushPointImpls.clear();
 				this.taskPollPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".TaskPushPlugin destroy failed.", e);
 		}
 		
@@ -440,7 +457,7 @@ public class Site {
 				this.targetPointImpls.clear();
 				this.targetPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".TargetPlugin destroy failed.", e);
 		}
 		
@@ -450,7 +467,7 @@ public class Site {
 				this.parsePointImpls.clear();
 				this.parsePointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".ParserPlugin destroy failed.", e);
 		}
 		try{
@@ -459,7 +476,7 @@ public class Site {
 				this.pojoPointImpls.clear();
 				this.pojoPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".PojoPlugin destroy failed.", e);
 		}
 		
@@ -469,7 +486,7 @@ public class Site {
 				this.endPointImpls.clear();
 				this.endPointImpls = null;
 			}
-		}catch(Exception e){
+		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".EndPlugin destroy failed.", e);
 		}
 		
