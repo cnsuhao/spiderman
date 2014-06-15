@@ -2,6 +2,7 @@ package org.eweb4j.spiderman.plugin.util;
 
 import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
+import org.eweb4j.spiderman.fetcher.SpiderConfig;
 import org.eweb4j.spiderman.xml.Site;
 
 /**
@@ -16,15 +17,14 @@ public class HttpUtil {
 	}
 	
 	public static FetchResult fetch(FetchRequest req, SpiderConfig config) throws Exception{
-		PageFetcherImpl fetcher = new PageFetcherImpl();
+		HttpClientDownloader fetcher = new HttpClientDownloader();
 		if (config == null) {
 			config = new SpiderConfig();
 			config.setCharset("utf-8");
 			config.setIncludeHttpsPages(true);
 		}
-		fetcher.setConfig(config);
 		Site site = new Site();
-		fetcher.init(site);
+		fetcher.init(config, site);
 		
 		return fetcher.fetch(req);
 	}

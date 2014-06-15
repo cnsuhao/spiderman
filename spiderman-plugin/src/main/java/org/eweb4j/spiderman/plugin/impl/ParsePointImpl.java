@@ -23,7 +23,6 @@ import org.eweb4j.spiderman.xml.Model;
 import org.eweb4j.spiderman.xml.Rule;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.spiderman.xml.Target;
-import org.eweb4j.util.CommonUtil;
 
 public class ParsePointImpl implements ParsePoint{
 

@@ -80,6 +80,7 @@ import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.fetcher.PageFetcher;
+import org.eweb4j.spiderman.fetcher.SpiderConfig;
 import org.eweb4j.spiderman.fetcher.Status;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.util.CommonUtil;
@@ -89,7 +90,7 @@ import org.eweb4j.util.CommonUtil;
  * @author weiwei l.weiwei@163.com
  * @date 2013-1-7 上午11:04:50
  */
-public class PageFetcherImpl implements PageFetcher{
+public class HttpClientDownloader implements PageFetcher{
 
 	private ThreadSafeClientConnManager connectionManager;
 	private DefaultHttpClient httpClient;
@@ -99,9 +100,6 @@ public class PageFetcherImpl implements PageFetcher{
 	private Map<String, String> headers = new Hashtable<String, String>();
 	private Map<String, List<String>> cookies = new Hashtable<String, List<String>>();
 	private Site site;
-	
-	public PageFetcherImpl(){
-	}
 	
 	/**
 	 * 处理GZIP解压缩
@@ -119,10 +117,6 @@ public class PageFetcherImpl implements PageFetcher{
 		public long getContentLength() {
 			return -1;
 		}
-	}
-	
-	public void setConfig(SpiderConfig config){
-		this.config = config;
 	}
 	
 	public void addCookie(String key, String val, String host, String path) {
@@ -154,7 +148,8 @@ public class PageFetcherImpl implements PageFetcher{
 	 * @param aconfig
 	 * @param cookies
 	 */
-	public void init(Site _site) {
+	public void init(SpiderConfig config, Site _site) {
+	    this.config = config;
 		//设置HTTP参数
 		HttpParams params = new BasicHttpParams();
 		params.setParameter(CoreProtocolPNames.USER_AGENT, config.getUserAgentString());
@@ -632,6 +627,10 @@ public class PageFetcherImpl implements PageFetcher{
 		return httpClient;
 	}
 
+    public void close() throws Exception {
+        this.httpClient.close();
+    }
+	
 	/**
 	 * Proxy
 	 * if (config.getProxyHost() != null) {

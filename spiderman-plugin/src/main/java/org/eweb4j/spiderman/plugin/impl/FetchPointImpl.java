@@ -1,18 +1,12 @@
 package org.eweb4j.spiderman.plugin.impl;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.eweb4j.mvc.Http;
 import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
+import org.eweb4j.spiderman.fetcher.PageFetcher;
+import org.eweb4j.spiderman.fetcher.SpiderConfig;
 import org.eweb4j.spiderman.plugin.FetchPoint;
-import org.eweb4j.spiderman.plugin.util.PageFetcherImpl;
-import org.eweb4j.spiderman.plugin.util.SpiderConfig;
+import org.eweb4j.spiderman.plugin.util.HttpClientDownloader;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.spiderman.xml.Site;
@@ -39,12 +33,11 @@ public class FetchPointImpl implements FetchPoint{
 	public static void main(String[] args) throws Exception{
 		long start = System.currentTimeMillis();
 		String url = "http://www.ionorchard.com/load_tenant.php?id=44"; 
-		PageFetcherImpl fetcher = new PageFetcherImpl();
+		HttpClientDownloader fetcher = new HttpClientDownloader();
 		SpiderConfig config = new SpiderConfig();
 		config.setCharset("utf-8");
 		config.setPolitenessDelay(200);
 		config.setUserAgentString("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17");
-		fetcher.setConfig(config);
 		
 //		Cookies cookies = new Cookies();
 //		Cookie c = new Cookie();
@@ -53,7 +46,7 @@ public class FetchPointImpl implements FetchPoint{
 //		c.setName("CakeCookie[currentStateId]");
 //		c.setValue("6");
 		Site site = new Site();
-		fetcher.init(site);
+		fetcher.init(config, site);
 		try {
 			FetchRequest req = new FetchRequest();
 			req.setHttpMethod(Http.Method.POST);
@@ -72,7 +65,6 @@ public class FetchPointImpl implements FetchPoint{
 	public FetchResult fetch(Task task, FetchResult result) throws Exception {
 		synchronized (site) {
 			if (site.fetcher == null){
-				PageFetcherImpl fetcher = new PageFetcherImpl();
 				SpiderConfig config = new SpiderConfig();
 				if (task.site.getCharset() != null && task.site.getCharset().trim().length() > 0)
 					config.setCharset(task.site.getCharset());
@@ -99,9 +91,23 @@ public class FetchPointImpl implements FetchPoint{
 						config.setConnectionTimeout(to);
 				}
 				
-				fetcher.setConfig(config);
+				PageFetcher fetcher = null;
+				String downloader = site.getDownloader();
+				if (!CommonUtil.isBlank(downloader)) {
+    				try {
+    				    Class<?> cls = Class.forName(downloader);
+    				    fetcher = (PageFetcher) cls.newInstance();
+    				} catch (Throwable e) {
+    				    e.printStackTrace();
+    				}
+				}
 				
-				fetcher.init(site);
+				//默认是HttpClient下载器
+				if (fetcher == null) {
+				    fetcher = new HttpClientDownloader();
+				}
+				
+				fetcher.init(config, site);
 				site.fetcher = fetcher;
 			}
 			
