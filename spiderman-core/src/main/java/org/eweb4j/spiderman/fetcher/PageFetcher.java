@@ -14,4 +14,5 @@ public interface PageFetcher {
     public void init(SpiderConfig config, Site site) throws Exception;
 	public FetchResult fetch(FetchRequest req) throws Exception ;
 	public void close() throws Exception;
+	public Object getClient();
 }

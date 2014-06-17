@@ -39,6 +39,12 @@ public class Model {
 	@AttrTag
 	private String xpath;
 	
+	@AttrTag
+    private String parser;
+	
+	@AttrTag
+	private String delay;
+	
 	private List<Field> field = new ArrayList<Field>();
 
 	public String getClazz() {
@@ -137,5 +143,21 @@ public class Model {
 	public void setNamespaces(Namespaces namespaces) {
 		this.namespaces = namespaces;
 	}
+
+    public String getParser() {
+        return this.parser;
+    }
+
+    public void setParser(String parser) {
+        this.parser = parser;
+    }
+
+    public String getDelay() {
+        return this.delay;
+    }
+
+    public void setDelay(String delay) {
+        this.delay = delay;
+    }
 	
 }

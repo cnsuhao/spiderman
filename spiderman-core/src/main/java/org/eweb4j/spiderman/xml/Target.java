@@ -24,7 +24,10 @@ public class Target {
 	 * 目标的数据模型
 	 */
 	private Model model;
-
+	
+	@AttrTag
+    private String isSkip ;
+	
 	public String getName() {
 		return name;
 	}
@@ -48,5 +51,13 @@ public class Target {
 	public void setModel(Model model) {
 		this.model = model;
 	}
+
+    public String getIsSkip() {
+        return this.isSkip;
+    }
+
+    public void setIsSkip(String isSkip) {
+        this.isSkip = isSkip;
+    }
 
 }
