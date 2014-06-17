@@ -45,7 +45,7 @@ import com.greenpineyu.fel.FelEngineImpl;
 import com.greenpineyu.fel.function.CommonFunction;
 import com.greenpineyu.fel.function.Function;
 
-public class ModelParser extends DefaultHandler{
+public class DefaultModelParser extends DefaultHandler implements ModelParser{
 
 	private Task task = null;
 	private Target target = null;
@@ -75,7 +75,7 @@ public class ModelParser extends DefaultHandler{
 		}
 	};
 	
-	private void init(Task task, Target target, SpiderListener listener){
+	public void init(Task task, Target target, SpiderListener listener){
 		this.task = task;
 		this.target = target;
 		this.listener = listener;
@@ -93,11 +93,13 @@ public class ModelParser extends DefaultHandler{
 		fel.getContext().set("$source_url", this.task.sourceUrl);
 	}
 	
-	public ModelParser(Task task, Target target, SpiderListener listener) {
+	public DefaultModelParser() {}
+	
+	public DefaultModelParser(Task task, Target target, SpiderListener listener) {
 		init(task, target, listener);
 	}
 	
-	public List<Map<String, Object>> parse(Page page) throws Exception{
+	public List<Map<String, Object>> parse(Page page) throws Exception {
 		String contentType = this.target.getModel().getCType();
 		if (contentType == null || contentType.trim().length() == 0)
 			contentType = page.getContentType();
@@ -107,33 +109,29 @@ public class ModelParser extends DefaultHandler{
 		boolean isJson = "json".equalsIgnoreCase(contentType) || contentType.contains("text/json") || contentType.contains("application/json");
 		if (isXml)
 			return parseXml(page, false);
-		else if (isJson){
-			
-			return parseJson(page);
-		} else {
-			String isForceUseXmlParser = this.target.getModel().getIsForceUseXmlParser();
-			if (!"1".equals(isForceUseXmlParser))
-				return parseHtml(page);
-			HtmlCleaner cleaner = new HtmlCleaner();
-//			cleaner.getProperties().setTreatUnknownTagsAsContent(true);
-			cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
-			String isIgCom = this.target.getModel().getIsIgnoreComments();
-			if ("1".equals(isIgCom) || "true".equals(isIgCom))
-				//忽略注释
-				cleaner.getProperties().setOmitComments(true);
-			
-			TagNode rootNode = cleaner.clean(page.getContent());
-			String xml = ParserUtil.xml(rootNode, true);
-			page.setContent(xml);
-			return parseXml(page, true);
-		}
+		if (isJson)
+		    return parseJson(page);
+		
+		String isForceUseXmlParser = this.target.getModel().getIsForceUseXmlParser();
+		if (!"1".equals(isForceUseXmlParser))
+			return parseHtml(page);
+		HtmlCleaner cleaner = new HtmlCleaner();
+		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
+		String isIgCom = this.target.getModel().getIsIgnoreComments();
+		if ("1".equals(isIgCom) || "true".equals(isIgCom))
+			//忽略注释
+			cleaner.getProperties().setOmitComments(true);
+		
+		TagNode rootNode = cleaner.clean(page.getContent());
+		String xml = ParserUtil.xml(rootNode, true);
+		page.setContent(xml);
+		return parseXml(page, true);
 	}
 
 	private List<Map<String, Object>> parseJson(Page page) throws Exception {
 		String content = page.getContent();
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		String isModelArray = target.getModel().getIsArray();
-//		String modelJsonPath = target.getModel().getJsonPath();
 		final List<Field> fields = target.getModel().getField();
 		if ("1".equals(isModelArray) || "true".equals(isModelArray)) {
 			List<Map> models = CommonUtil.parseArray(content, Map.class);
@@ -363,7 +361,6 @@ public class ModelParser extends DefaultHandler{
 		if ("1".equals(isModelArray) || "true".equals(isModelArray)){
 			XPathExpression expr = xpathParser.compile(modelXpath);
 	        Object result = expr.evaluate(doc, XPathConstants.NODESET);
-//		    listener.onInfo(Thread.currentThread(), task, "modelXpath -> " + modelXpath + " parse result -> " + result);
 	        if (result != null){
 		        NodeList nodes = (NodeList) result;
 		        if (nodes.getLength() > 0){

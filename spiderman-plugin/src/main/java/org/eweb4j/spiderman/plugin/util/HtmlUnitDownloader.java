@@ -60,6 +60,10 @@ public class HtmlUnitDownloader implements PageFetcher{
 	public HtmlUnitDownloader() {
 	}
 	
+	public Object getClient() {
+        return this.client;
+    }
+	
 	public void addCookie(String key, String val, String host, String path) {
         Cookie c = new Cookie(key, val, host, path);
         //设置Cookie

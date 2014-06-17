@@ -54,6 +54,9 @@ public class WebDriverDownloader implements PageFetcher{
 	
 	public WebDriverDownloader() {
 	}
+	public Object getClient() {
+	    return this.client;
+	}
 	
 	public void addCookie(String key, String val, String host, String path) {
         Cookie c = new Cookie(key, val, host, path);
@@ -65,8 +68,6 @@ public class WebDriverDownloader implements PageFetcher{
             vals = new ArrayList<String>();
         vals.add(value);
         this.cookies.put(key, vals);
-        org.openqa.selenium.Cookie cok = new org.openqa.selenium.Cookie(key,val,host,path, null);
-        this.client.manage().addCookie(cok);
     }
 
     public void addHeader(String key, String val) {
@@ -128,8 +129,17 @@ public class WebDriverDownloader implements PageFetcher{
 			req.getCookies().putAll(this.cookies);
 			
 			fetchResult.setReq(req);
+			
 			//执行get访问，获取服务端返回内容
-			this.client.get(toFetchURL);
+            this.client.get(toFetchURL);
+            if (this.site.getCookies() != null && this.site.getCookies().getCookie() != null){
+                for (org.eweb4j.spiderman.xml.Cookie cookie : this.site.getCookies().getCookie()){
+                    org.openqa.selenium.Cookie cok = new org.openqa.selenium.Cookie(cookie.getName(), cookie.getValue(), cookie.getHost(), cookie.getPath(), null);
+                    this.client.manage().addCookie(cok);
+                }
+            }
+            
+            this.client.get(toFetchURL);
 			WebElement html = this.client.findElement(By.tagName("html"));
 			//设置已访问URL
 			fetchResult.setFetchedUrl(toFetchURL);
@@ -166,10 +176,25 @@ public class WebDriverDownloader implements PageFetcher{
 
     public void close() throws Exception {
         for (String h : this.client.getWindowHandles()) {
+            WebDriver d = this.client.switchTo().window(h);
             try {
-                this.client.switchTo().window(h).quit();
+                d.quit();
             } catch (Throwable e) {
             }
+            try {
+                d.quit();
+            } catch (Throwable e) {
+            }
+        }
+        try {
+            this.client.close();
+            
+        } catch (Throwable e) {
+        }
+        
+        try {
+            this.client.quit();
+        } catch (Throwable e) {
         }
     }
 	

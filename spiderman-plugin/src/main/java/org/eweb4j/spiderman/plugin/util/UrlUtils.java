@@ -16,6 +16,7 @@ import org.eweb4j.spiderman.task.Task;
 import org.eweb4j.spiderman.xml.Field;
 import org.eweb4j.spiderman.xml.Rule;
 import org.eweb4j.spiderman.xml.Target;
+import org.eweb4j.util.CommonUtil;
 
 /**
  * Code copied from HtmlUnit
@@ -50,7 +51,19 @@ public final class UrlUtils {
 		Collection<String> urls = new ArrayList<String>();
 		if (tgt.getModel() == null)
 			return urls;
-		ModelParser parser = new ModelParser(task, tgt, lst);
+		ModelParser parser = null;
+        if (!CommonUtil.isBlank(tgt.getModel().getParser())) {
+            try {
+                Class<?> parserCls = Thread.currentThread().getContextClassLoader().loadClass(tgt.getModel().getParser());
+                parser = (ModelParser)parserCls.newInstance();
+                parser.init(task, tgt, lst);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        if (parser == null)
+            parser = new DefaultModelParser(task, tgt, lst);
+        
 		parser.setFinalFields(finalFields);
 		List<Map<String, Object>> models = parser.parse(pg);
 		for (Field f : tgt.getModel().getField()){

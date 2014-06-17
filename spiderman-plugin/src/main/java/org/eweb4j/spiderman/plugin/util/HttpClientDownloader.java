@@ -101,6 +101,10 @@ public class HttpClientDownloader implements PageFetcher{
 	private Map<String, List<String>> cookies = new Hashtable<String, List<String>>();
 	private Site site;
 	
+	public Object getClient() {
+        return this.httpClient;
+    }
+	
 	/**
 	 * 处理GZIP解压缩
 	 * @author weiwei l.weiwei@163.com
