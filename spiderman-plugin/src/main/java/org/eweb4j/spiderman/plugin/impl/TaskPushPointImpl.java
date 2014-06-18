@@ -51,8 +51,10 @@ public class TaskPushPointImpl implements TaskPushPoint{
 						}
 					}
 					
-					if (!isOk)
+					if (!isOk) {
+					    listener.onInfo(Thread.currentThread(), task, "task.url->"+task.url+"'s host is not in the validHosts");
 						continue;
+					}
 				}
 				
 				boolean isValid = false;
@@ -60,8 +62,10 @@ public class TaskPushPointImpl implements TaskPushPoint{
 					//如果是目标url且是从sourceUrl来的，就是有效的
 					Target tgt = Util.matchTarget(task);
 					Rules rules = site.getTargets().getSourceRules();
-					Rule fromSourceRule = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl);
-					if (tgt != null && fromSourceRule != null){
+//					Rule fromSourceRule = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl);
+					if (tgt != null 
+//					        && fromSourceRule != null
+					        ){
 						isValid = true;
 					}
 					

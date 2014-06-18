@@ -45,11 +45,11 @@ public class DupRemovalPointImpl implements DupRemovalPoint {
 			Task newTask = new Task(url, null, task.url, site, 10);
 			try {
 				Target tgt = Util.matchTarget(newTask);
-				Rule fromSourceRule = SourceUrlChecker.checkSourceUrl(site.getTargets().getSourceRules(), newTask.sourceUrl);
-				// 如果是目标url，但不是来自来源url，跳过
-				if (tgt != null && fromSourceRule == null) {
-					continue;
-				}
+//				Rule fromSourceRule = SourceUrlChecker.checkSourceUrl(site.getTargets().getSourceRules(), newTask.sourceUrl);
+//				//如果是目标url，但不是来自来源url，跳过
+//				if (tgt != null && fromSourceRule == null) {
+//					continue;
+//				}
 
 				// 默认是严格限制重复URL的访问，只要是重复的URL，都只能访问一次
 				String docKey = CommonUtil.md5(newTask.url);

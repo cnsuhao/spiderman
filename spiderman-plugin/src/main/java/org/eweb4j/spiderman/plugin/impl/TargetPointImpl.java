@@ -17,7 +17,7 @@ public class TargetPointImpl implements TargetPoint{
 	
 	public synchronized Target confirmTarget(Task task, Target target) throws Exception {
 		Target tgt = Util.matchTarget(task);
-		if ("1".equals(tgt.getIsSkip()))
+		if (tgt != null && "1".equals(tgt.getIsSkip()))
 		    return null;
 		
 		return tgt;
