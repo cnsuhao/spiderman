@@ -293,8 +293,15 @@ public class WebDriverModelParser implements ModelParser{
 		if ("1".equals(isModelArray) || "true".equals(isModelArray)){
 		    List<WebElement> nodes = client.findElements(By.xpath(modelXpath));
 	        if (nodes != null && nodes.size() > 0){
-		        for (int i = 0; i < nodes.size(); i++) {
-					list.add(parseToMap(nodes.get(i), fields));
+	            int size = nodes.size();
+		        for (int i = 0; i < size; i++) {
+		            Map<String, Object> map = parseToMap(nodes.get(i), fields);
+		            try {
+		                this.listener.onParseOne(Thread.currentThread(), task, size, i, map);
+		                list.add(map);
+		            } catch (Throwable e) {
+		                this.listener.onError(Thread.currentThread(), task, "throw an exception on parse one data.", e);
+		            }
 		        }
 	        }
 		} else if (!CommonUtil.isBlank(modelXpath)) {
@@ -507,6 +514,7 @@ public class WebDriverModelParser implements ModelParser{
 
 				//最终完成
 				map.put(key, value);
+				listener.onParseField(Thread.currentThread(), task, selector, key, value);
 			} catch (Throwable e) {
 				listener.onError(Thread.currentThread(), task, "field->"+key+" parse failed cause->"+e.toString(), e);
 			}
