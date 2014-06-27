@@ -28,6 +28,10 @@ public interface SpiderListener {
 	
 	void onTargetPage(Thread thread, Task task, Page page);
 	
+	void onParseField(Thread thread, Task task, Object selector, String field, Object value);
+	
+	void onParseOne(Thread thread, Task task, int size, int index, Map<String, Object> model);
+	
 	void onParse(Thread thread, Task task, List<Map<String, Object>> models);
 	
 	void onPojo(Thread thread, Task task, List<Object> pojos);
