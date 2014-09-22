@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<site name="alibaba-search" enable="0" includeHttps="1" url="http://s.1688.com/selloffer/offer_search.htm?keywords=%C3%E6%B0%FC&amp;beginPage=1"
+	      reqDelay="1s" charset="GBK" schedule="1h" thread="2" waitQueue="10s">
+	    <validHosts>
+			<validHost value="s.1688.com" />
+		</validHosts>
+		<queueRules policy="and">
+			<rule type="!regex" value="^.*\.(jpg|png|gif)$" />
+		</queueRules>
+		<!--
+		  | 抓取目标
+		    限制目标URL的来源,一般来说，对应的就是网站的频道页，例如某个分类下的新闻列表页
+		-->
+		<targets>
+			<sourceRules policy="and">
+				<rule type="regex" value="http://s\.1688\.com/selloffer/offer_search\.htm?keywords=%C3%E6%B0%FC&amp;beginPage=6">
+					<digUrls>
+						 <field name="source_url" isArray="1">
+							<parsers>
+							    <parser xpath="//div[@class='page-bottom']//a[@href]" attribute="href"/>
+							    <parser exp="$output($this)" />
+							</parsers>
+						</field>
+					 <field name="target_url">
+							<parsers>
+								<parser xpath="//ul[@id='sw_maindata_asyncload']//li[@p4p]" attribute="p4p"/>
+							</parsers>
+						</field>
+					</digUrls>
+				</rule>
+			</sourceRules>
+			
+			<target name="article" isForceUseXmlParser="1" isArray="1">
+				<urlRules policy="and">
+					<rule type="regex" value=".*" />
+				</urlRules>
+				 <!--
+                  | 目标网页的数据模型
+                  | cType: 目标网页的contentType
+                  | isForceUseXmlParser:0|1 是否强制使用XML的解析器来解析目标网页，此选项可以让HTML页面支持XPath2.0
+                  | isIgnoreComments:0|1 是否忽略注释
+                  | isArray:0|1 目标网页是否有多个数据模型，一般一些RSS XML页面上就会有很多个数据模型需要解析，即在一个xml页面上解析多个Model对象
+                  | xpath: 搭配 isArray 来使用，可选
+                -->
+				<model>
+				  <field name="title" isArray="1">
+						<parsers>
+							<parser xpath="//ul[@id='sw_maindata_asyncload']//div[@class='sm-offerShopwindow-photo']//div[@class='su-photo220']//a//img[@alt]" attribute="alt" />
+						</parsers>
+					</field>
+					
+					<field name="url" isArray="1">
+						<parsers>
+							<parser xpath="//ul[@id='sw_maindata_asyncload']//div[@class='sm-offerShopwindow-photo']//div[@class='su-photo220']//a[@href]" attribute="href" />
+							
+							<!--attribute 黑名卿-->
+							
+							<!--  <parser xpath="//a[@href]" attribute="href" />
+							<parser exp="$output($this)" />-->
+							
+							<!--tag 黑名单，去掉内嵌内容-->
+							<parser exp="$Tags.xml($this).rm('map').rm('iframe').rm('object').empty().ok()" />
+							<!--tag 白名单，保留的标签，除此之外都要删除（不删除其他标签内嵌内容-->
+							<parser exp="$Tags.xml($this).kp('br').kp('h1').kp('h2').kp('h3').kp('h4').kp('h5').kp('h6').kp('table').kp('th').kp('tr').kp('td').kp('img').kp('p').kp('a').kp('ul').kp('ol').kp('li').kp('td').kp('em').kp('i').kp('u').kp('er').kp('b').kp('strong').ok()" />
+						</parsers>
+					</field>
+				</model>
+			</target>
+		</targets>
+		<plugins>
+			<plugin enable="1" name="spider_plugin" version="0.0.1" desc="这是一个官方实现的默认插件，实现了所有扩展点。">
+				<extensions>
+					<extension point="task_poll">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPollPointImpl" sort="0"/>
+					</extension>
+					<extension point="begin">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.BeginPointImpl" sort="0"/>
+					</extension>
+					<extension point="fetch">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.FetchPointImpl" sort="0"/>
+					</extension>
+					<extension point="dig">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DigPointImpl" sort="0"/>
+					</extension>
+					<extension point="dup_removal">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DupRemovalPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_sort">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskSortPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_push">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPushPointImpl" sort="0"/>
+					</extension>
+					<extension point="target">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TargetPointImpl" sort="0"/>
+					</extension>
+					<extension point="parse">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
+					</extension>
+					<extension point="end">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>
+					</extension>
+				</extensions>
+			</plugin>
+		</plugins>
+	</site>
+</beans>

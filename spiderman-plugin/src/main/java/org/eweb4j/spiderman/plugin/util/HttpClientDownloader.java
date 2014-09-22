@@ -90,7 +90,7 @@ import org.eweb4j.util.CommonUtil;
  * @author weiwei l.weiwei@163.com
  * @date 2013-1-7 上午11:04:50
  */
-public class HttpClientDownloader implements PageFetcher{
+public class HttpClientDownloader extends PageFetcher{
 
 	private ThreadSafeClientConnManager connectionManager;
 	private DefaultHttpClient httpClient;
@@ -349,7 +349,7 @@ public class HttpClientDownloader implements PageFetcher{
 		fetchResult.setStatusCode(Status.UNSPECIFIED_ERROR.ordinal());
 		return fetchResult;
 	}
-
+	
 	/**
 	 * 请求
 	 * @date 2013-1-7 上午11:08:54
@@ -634,7 +634,7 @@ public class HttpClientDownloader implements PageFetcher{
     public void close() throws Exception {
         this.httpClient.close();
     }
-	
+
 	/**
 	 * Proxy
 	 * if (config.getProxyHost() != null) {

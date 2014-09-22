@@ -1,6 +1,7 @@
 package org.eweb4j.spiderman.xml;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.eweb4j.spiderman.fetcher.PageFetcher;
@@ -20,6 +21,8 @@ import org.eweb4j.spiderman.spider.Counter;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.TaskDbServer;
 import org.eweb4j.spiderman.task.TaskQueue;
+import org.eweb4j.util.CommonUtil;
+import org.eweb4j.util.RegexList;
 import org.eweb4j.util.xml.AttrTag;
 import org.eweb4j.util.xml.Skip;
 
@@ -28,6 +31,9 @@ public class Site {
 
 	@AttrTag
 	private String name;//网站名
+	
+	@AttrTag
+	private String code;//网站编码
 	
 	@AttrTag
 	private String country;//网站所属国家
@@ -49,7 +55,7 @@ public class Site {
 	private String httpMethod;
 	
 	@AttrTag
-	private String userAgent = "Spiderman[https://github.com/laiweiwei/spiderman]";//爬虫一些标识
+	private String userAgent = "Spiderman[https://git.oschina.net/l-weiwei/spiderman]";//爬虫一些标识
 	
 	@AttrTag
 	private String includeHttps; //是否抓取https页
@@ -180,6 +186,19 @@ public class Site {
 		this.validHosts = validHosts;
 	}
 
+	public static void main(String[] args) {
+	    String exp = "http://bf.win007.com/football/Next_{yyyyMMdd}.htm";
+	    List<String> list = CommonUtil.findByRegex(exp, RegexList.path_var_regexp);
+	    if (list != null) {
+	        for (String s : list) {
+	            String fmt = s.replace("{", "").replace("}", "");
+	            String time = CommonUtil.getNowTime(fmt);
+	            exp = exp.replace(s, time);
+	        }
+	    }
+	    System.out.println(exp);
+	}
+	
 	public String getUrl() {
 		return url;
 	}
@@ -496,4 +515,14 @@ public class Site {
 //		this.counter = null;
 //		this.fetcher = null;
 	}
+
+    public String getCode() {
+        return this.code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+	
+	
 }

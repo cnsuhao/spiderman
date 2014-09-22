@@ -77,22 +77,29 @@ public class Spiderman {
 		return listen(listener).init();
 	}
 	
+	public Spiderman init(File file){
+        if (this.listener == null)
+            this.listener = new SpiderListenerAdaptor();
+        isShutdownNow = false;
+        sites = null;
+        pool = null;
+        try {
+            if (file == null)
+                loadConfigFiles();
+            else
+                loadConfigFile(file);
+            initSites();
+            initPool();
+        } catch (Throwable e){
+            e.printStackTrace();
+            this.listener.onError(Thread.currentThread(), null, e.toString(), e);
+        }
+        return this;
+    }
+	
 	public Spiderman init(){
-		if (this.listener == null)
-			this.listener = new SpiderListenerAdaptor();
-		isShutdownNow = false;
-		sites = null;
-		pool = null;
-		try {
-			loadPlugins();
-			initSites();
-			initPool();
-		} catch (Throwable e){
-			e.printStackTrace();
-			listener.onInfo(Thread.currentThread(),null, "Spiderman init error.");
-			listener.onError(Thread.currentThread(), null, "Spiderman init error.", e);
-		}
-		return this;
+	    File file = null;
+		return this.init(file);
 	}
 	
 	public Spiderman listen(SpiderListener listener){
@@ -101,6 +108,10 @@ public class Spiderman {
 	}
 	
 	public Spiderman startup() {
+	    return this.startup(null);
+	} 
+	
+	public Spiderman startup(final File file) {
 		if (isSchedule) {
 			final Spiderman _this = this;
 			timer.schedule(new TimerTask() {
@@ -179,7 +190,7 @@ public class Spiderman {
 							if (_this.scheduleTimes > 1)
 								_this.listener.onBeforeEveryScheduleExecute(_this.scheduleAt.get(_this.scheduleTimes-2));
 							
-							_this.init()._startup().keepStrict(scheduleTime);
+							_this.init(file)._startup().keepStrict(scheduleTime);
 						} catch (Throwable e) {
 							e.printStackTrace();
 							_this.listener.onError(Thread.currentThread(), null, e.toString(), e);
@@ -198,6 +209,7 @@ public class Spiderman {
 		for (Site site : sites){
 			pool.execute(new Spiderman._Executor(site));
 			listener.onInfo(Thread.currentThread(), null, "spider tasks of site[" + site.getName() + "] start... ");
+			listener.onStartup(site);
 		}
 		return this;
 	}
@@ -241,12 +253,12 @@ public class Spiderman {
 	 * @date 2013-6-3 下午05:57:25
 	 * @param isCallback 是否回调监听器方法，默认下，调度的话是会回调的，手动关闭则自由选择
 	 */
-	public void shutdownNow(boolean isCallback){
+	public void shutdownNow(boolean isCallback, Object... args){
 		listener.onInfo(Thread.currentThread(), null, "isCallback->" + isCallback);
 		if (isCallback) {
 			//此处添加一个监听回调
 			try {
-				listener.onBeforeShutdown();
+				listener.onBeforeShutdown(args);
 			} catch (Throwable e){
 				e.printStackTrace();
 				listener.onError(Thread.currentThread(), null, e.toString(), e);
@@ -256,6 +268,7 @@ public class Spiderman {
 			for (Site site : sites){
 				site.destroy(listener, true);
 				listener.onInfo(Thread.currentThread(), null, "Site[" + site.getName() + "] destroy... ");
+				listener.onAfterShutdown(site, args);
 			}
 		}
 		
@@ -268,7 +281,7 @@ public class Spiderman {
 		if (isCallback) {
 			//此处添加一个监听回调
 			try {
-				listener.onAfterShutdown();
+				listener.onAfterShutdown(args);
 			} catch (Throwable e){
 				e.printStackTrace();
 				listener.onError(Thread.currentThread(), null, e.toString(), e);
@@ -346,7 +359,7 @@ public class Spiderman {
 		return this;
 	}
 	
-	private void loadPlugins() throws Exception{
+	private void loadConfigFiles() throws Exception{
 		File siteFolder = new File(Settings.website_xml_folder());
 		if (!siteFolder.exists())
 			throw new Exception("can not found WebSites folder -> " + siteFolder.getAbsolutePath());
@@ -378,17 +391,32 @@ public class Spiderman {
 				continue;
 			if (!file.getName().endsWith(".xml"))
 				continue;
-			XMLReader reader = BeanXMLUtil.getBeanXMLReader(file);
-			reader.setBeanName("site");
-			reader.setClass("site", Site.class);
-			Site site = reader.readOne();
-			if (site == null)
-				throw new Exception("site xml file error -> " + file.getAbsolutePath());
-			if ("1".equals(site.getEnable())){
-				sites.add(site);
-				listener.onInfo(Thread.currentThread(), null, "site.xmlfile->"+file.getAbsolutePath() + " loading... -> ok");
-			}
+			this.loadConfigFile(file);
 		}
+	}
+	
+	public void loadConfigFile(File file) throws Exception {
+	    if (!file.exists())
+            return;
+        if (!file.isFile())
+            return;
+        if (!file.getName().endsWith(".xml"))
+            return;
+        XMLReader reader = BeanXMLUtil.getBeanXMLReader(file);
+        reader.setBeanName("site");
+        reader.setClass("site", Site.class);
+        Site site = reader.readOne();
+        if (site == null)
+            throw new Exception("site xml file error -> " + file.getAbsolutePath());
+        
+        if (!"1".equals(site.getEnable())) {
+//            String err = file.getAbsolutePath() + "'s site.enable != 1" ;
+//            this.listener.onInitError(site, err, new Exception(err));
+            return;
+//            throw new Exception(err);
+        }
+        sites = new ArrayList<Site>();
+        sites.add(site);
 	}
 	
 	private void initSites() throws Exception{

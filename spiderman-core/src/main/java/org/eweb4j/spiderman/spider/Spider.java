@@ -127,7 +127,8 @@ public class Spider implements Runnable{
 			//检查sourceUrl
 			Rules rules = task.site.getTargets().getSourceRules();
 			Rule sourceRule = SourceUrlChecker.checkSourceUrl(rules, task.sourceUrl);
-			if (sourceRule == null){
+			if (sourceRule == null) {
+			    listener.onInfo(Thread.currentThread(), task, "target url->"+task.url+"'s source url->"+task.sourceUrl+" is not match the SourceRules");
 				return ;
 			}
 			

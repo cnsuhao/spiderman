@@ -38,7 +38,11 @@ public interface SpiderListener {
 
 	void onInfo(Thread thread, Task task, String info);
 	
+	void onStartup(Site site);
+	
 	void onError(Thread thread, Task task, String err, Throwable e);
+	
+	void onInitError(Site site, String err, Throwable e);
 	
 	/**
 	 * 调度结束后回调此方法
@@ -58,24 +62,24 @@ public interface SpiderListener {
 	 * Spiderman.shutdown()被调用之前回调此方法
 	 * @date 2013-6-3 下午05:00:43
 	 */
-	void onBeforeShutdown();
+	void onBeforeShutdown(Object... args);
 	
 	/**
 	 * Spiderman.shutdown()被调用之后回调此方法
 	 * @date 2013-6-3 下午05:01:02
 	 */
-	void onAfterShutdown();
+	void onAfterShutdown(Object... args);
 	
 	/**
 	 * 
 	 * Spiderman.shutdown()被调用之前回调此方法
 	 * @date 2013-6-3 下午05:00:43
 	 */
-	void onBeforeShutdown(Site site);
+	void onBeforeShutdown(Site site, Object... args);
 	
 	/**
 	 * Spiderman.shutdown()被调用之后回调此方法
 	 * @date 2013-6-3 下午05:01:02
 	 */
-	void onAfterShutdown(Site site);
+	void onAfterShutdown(Site site, Object... args);
 }

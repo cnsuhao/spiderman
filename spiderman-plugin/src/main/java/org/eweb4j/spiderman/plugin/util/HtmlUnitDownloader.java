@@ -47,7 +47,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  * @author weiwei l.weiwei@163.com
  * @date 2013-1-7 上午11:04:50
  */
-public class HtmlUnitDownloader implements PageFetcher{
+public class HtmlUnitDownloader extends PageFetcher{
 
     private WebClient client = null;
 	private final Object mutex = new Object();

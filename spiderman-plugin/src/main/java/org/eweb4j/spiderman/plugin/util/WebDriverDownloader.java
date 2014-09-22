@@ -42,7 +42,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
  * @author weiwei l.weiwei@163.com
  * @date 2013-1-7 上午11:04:50
  */
-public class WebDriverDownloader implements PageFetcher{
+public class WebDriverDownloader extends PageFetcher{
 
     private WebDriver client = null;
 	private final Object mutex = new Object();

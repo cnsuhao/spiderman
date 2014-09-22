@@ -14,6 +14,8 @@ public interface ModelParser {
     
     public void setFinalFields(Map<String, Object> finalFields);
     
+    public void setBeforeModel(Map<String, Object> beforeModel);
+    
     public List<Map<String, Object>> parse(Page page) throws Exception;
     
 }

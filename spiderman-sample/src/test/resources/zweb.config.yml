@@ -1,0 +1,16 @@
+app: 
+  name: sf
+  mode: prod
+plugins: 
+  - id: druid 
+    class: zweb.plugins.DruidPlugin
+    enabled: 1
+  - id: db 
+    class: net.zweb.core.db.DbPlugin
+    enabled: 1
+db: 
+  dataSources:
+    default: 
+      url: jdbc:mysql://localhost:3306/score_forecast_db?useUnicode=true&characterEncoding=utf8
+      user: root
+      pwd: root

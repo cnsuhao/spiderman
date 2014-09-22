@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<site name="alibaba" enable="0" includeHttps="1" url="http://corp.1688.com/company/category_company_list_1032285_1.htm"
+	reqDelay="1s" charset="GBK" schedule="1h" thread="2" waitQueue="10s">
+		<validHosts>
+			<validHost value="corp.1688.com" />
+			<validHost value="www.1688.com" />
+			<validHost value="exodus.1688.com" />
+			<validHost value="jump.taobao.com" />
+			<validHost value="pass.1688.com" />
+		</validHosts>
+		<queueRules policy="and">
+			<rule type="!regex" value="^.*\.(jpg|png|gif)$" />
+		</queueRules>
+		<!--
+		| 抓取目标
+		限制目标URL的来源,一般来说，对应的就是网站的频道页，例如某个分类下的新闻列表页
+		-->
+		<targets>
+			<sourceRules policy="and">
+				<rule type="regex" value="http://corp\.1688\.com/company/category_company_list_1032285_(\d+)\.htm?.*">
+					<digUrls>
+						<field name="source_url" isArray="1">
+							<parsers>
+								<parser xpath="//li[@class='pagination']//a[@href]" attribute="href"/>
+							</parsers>
+						</field>
+						<field name="target_url" isArray="1">
+							<parsers>
+								<parser xpath="//div[@class='category-body']//ul//li//a[@href]" attribute="href" />
+								<!-- 研究发现这个列表抓取的公司详细页链接不是最终显示的，需要经过处理 -->
+								<parser exp="$this.replace('exodus','www').replace('/detail','')" />
+							</parsers>
+						</field>
+					</digUrls>
+				</rule>
+			</sourceRules>
+			<!-- 这个目标是用来临时让爬虫正常跟着网页跳转,完成一些令牌认证 -->
+			<target name="temp">
+				<urlRules policy="or">
+					<rule type="start" value="http://jump.taobao.com/jump?" />
+					<rule type="start" value="http://pass.1688.com/add?" />
+					<!--rule type="regex" value="http://exodus\.1688\.com/company/.*\.html\?fromSite=company_site" /-->
+				</urlRules>
+			</target>
+			<!-- 这个目标是用来抓取公司信息的 -->
+			<target name="company" isForceUseXmlParser="1">
+				<urlRules policy="and">
+					<rule type="regex" value="http://www\.1688\.com/company/.*\.html\?fromSite=company_site" />
+				</urlRules>
+				<!--
+				| 目标网页的数据模型
+				| cType: 目标网页的contentType
+				| isForceUseXmlParser:0|1 是否强制使用XML的解析器来解析目标网页，此选项可以让HTML页面支持XPath2.0
+				| isIgnoreComments:0|1 是否忽略注释
+				| isArray:0|1 目标网页是否有多个数据模型，一般一些RSS XML页面上就会有很多个数据模型需要解析，即在一个xml页面上解析多个Model对象
+				| xpath: 搭配 isArray 来使用，可选
+				-->
+				<model>
+					<field name="title">
+						<parsers>
+							<parser xpath="//h1[@class='company-name']/text()" />
+						</parsers>
+					</field>
+				</model>
+			</target>
+		</targets>
+		<plugins>
+			<plugin enable="1" name="spider_plugin" version="0.0.1" desc="这是一个官方实现的默认插件，实现了所有扩展点。">
+				<extensions>
+					<extension point="task_poll">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPollPointImpl" sort="0"/>
+					</extension>
+					<extension point="begin">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.BeginPointImpl" sort="0"/>
+					</extension>
+					<extension point="fetch">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.FetchPointImpl" sort="0"/>
+					</extension>
+					<extension point="dig">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DigPointImpl" sort="0"/>
+					</extension>
+					<extension point="dup_removal">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DupRemovalPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_sort">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskSortPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_push">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPushPointImpl" sort="0"/>
+					</extension>
+					<extension point="target">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TargetPointImpl" sort="0"/>
+					</extension>
+					<extension point="parse">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
+					</extension>
+					<extension point="end">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>
+					</extension>
+				</extensions>
+			</plugin>
+		</plugins>
+	</site>
+</beans>

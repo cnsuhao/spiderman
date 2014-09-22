@@ -46,20 +46,43 @@ public class ParsePointImpl implements ParsePoint{
 //		this.page = page;
 //	}
 	
-	public List<Map<String, Object>> parse(Task task, Target target, Page page, List<Map<String, Object>> models) throws Exception {
+	private ModelParser buildParser(Task task, Target target) {
 	    ModelParser parser = null;
-	    if (!CommonUtil.isBlank(target.getModel().getParser())) {
-	        try {
-	            Class<?> parserCls = Thread.currentThread().getContextClassLoader().loadClass(target.getModel().getParser());
-	            parser = (ModelParser)parserCls.newInstance();
-	            parser.init(task, target, listener);
-	        } catch (Throwable e) {
-	            e.printStackTrace();
-	        }
-	    }
-	    if (parser == null)
-	        parser = new DefaultModelParser(task, target, listener);
+        if (!CommonUtil.isBlank(target.getModel().getParser())) {
+            try {
+                Class<?> parserCls = Thread.currentThread().getContextClassLoader().loadClass(target.getModel().getParser());
+                parser = (ModelParser)parserCls.newInstance();
+                parser.init(task, target, listener);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        if (parser == null)
+            parser = new DefaultModelParser(task, target, listener);
+        
+        return parser;
+	}
+	
+	public List<Map<String, Object>> parse(Task task, Target target, Page page, List<Map<String, Object>> models) throws Exception {
 	    
+	    //执行Before
+        Map<String, Object> beforeModel =null;
+        Model before = target.getBefore();
+        if (before != null && before.getField() != null && !before.getField().isEmpty()) {
+            Target tgt = new Target();
+            tgt.setModel(before);
+            tgt.setName("before_"+target.getName());
+            tgt.setUrlRules(target.getUrlRules());
+            ModelParser beforeParser = this.buildParser(task, tgt);
+            List<Map<String, Object>> beforeModels = beforeParser.parse(page);
+            if (beforeModels != null && !beforeModels.isEmpty())
+                beforeModel = beforeModels.get(0);
+        }
+        
+	    ModelParser parser = this.buildParser(task, target);
+	    parser.setBeforeModel(beforeModel);
+	    
+	    //解析Models
 	    List<Map<String, Object>> results = parser.parse(page);
 		//用来记录分页里已经解析的url
 		Set<String> visitedUrls = new HashSet<String>();

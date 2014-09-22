@@ -21,6 +21,11 @@ public class Target {
 	private Rules urlRules ;
 	
 	/**
+	 * 在解析最终的Model之前要解析的Model，然后当做参数传入，使用$before.xxx来使用
+	 */
+	private Model before;
+	
+	/**
 	 * 目标的数据模型
 	 */
 	private Model model;
@@ -48,7 +53,15 @@ public class Target {
 		return model;
 	}
 
-	public void setModel(Model model) {
+	public Model getBefore() {
+        return this.before;
+    }
+
+    public void setBefore(Model before) {
+        this.before = before;
+    }
+
+    public void setModel(Model model) {
 		this.model = model;
 	}
 

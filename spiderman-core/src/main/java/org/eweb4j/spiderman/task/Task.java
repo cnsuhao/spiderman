@@ -19,6 +19,10 @@ public class Task {
 		this.sort = sort;
 		this.httpMethod = httpMethod;
 	}
+	
+	public Task(Site site) {
+	    this.site = site;
+	}
 
 	public Site site ;
 	public Target target;

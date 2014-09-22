@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans>
-	<site name="tuofu" enable="1" isDupRemovalStrict="1" includeHttps="1" url="http://toefl.xdf.cn/list_1077_1.html" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
+	<site name="tuofu" enable="0" isDupRemovalStrict="1" includeHttps="1" url="http://toefl.xdf.cn/list_1077_1.html" reqDelay="1s" charset="utf-8" schedule="1h" thread="2" waitQueue="10s">
 		<queueRules policy="and">
 			<rule type="!regex" value="^.*\.(jpg|png|gif)$" />
 		</queueRules>

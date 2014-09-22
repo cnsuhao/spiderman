@@ -33,13 +33,15 @@ public class WebDriverModelParser implements ModelParser{
 	private SpiderListener listener = null;
 	private FelEngine fel = new FelEngineImpl();
 	private Map<String, Object> finalFields = null;
+	private Map<String, Object> beforeModel = null;
 	private WebDriver client;
 	   
-	public Map<String, Object> getFinalFields() {
-	  return this.finalFields;
-	}
 	public void setFinalFields(Map<String, Object> finalFields) {
 	  this.finalFields = finalFields;
+	}
+	
+	public void setBeforeModel(Map<String, Object> beforeModel) {
+	    this.beforeModel = beforeModel;
 	}
 	
 	private final static Function fun = new CommonFunction() {
@@ -74,6 +76,9 @@ public class WebDriverModelParser implements ModelParser{
 		fel.getContext().set("$listener", this.listener);
 		fel.getContext().set("$task_url", this.task.url);
 		fel.getContext().set("$source_url", this.task.sourceUrl);
+		fel.getContext().set("$Task", this.task);
+        fel.getContext().set("$Site", this.task.site);
+        fel.getContext().set("$Fetcher", this.task.site.fetcher);
 	}
 	
 	public WebDriverModelParser() {}
@@ -126,6 +131,9 @@ public class WebDriverModelParser implements ModelParser{
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (finalFields != null)
 			map.putAll(finalFields);
+		if (this.beforeModel != null) {
+		    fel.getContext().set("$before", new HashMap<String, Object>(this.beforeModel));
+		}
 		
 		fel.getContext().set("$fields", map);
 		for (Field field : fields){
@@ -291,7 +299,8 @@ public class WebDriverModelParser implements ModelParser{
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		
 		if ("1".equals(isModelArray) || "true".equals(isModelArray)){
-		    List<WebElement> nodes = client.findElements(By.xpath(modelXpath));
+//		    List<WebElement> nodes = client.findElements(By.xpath(modelXpath));
+		    List<WebElement> nodes = promiseForXpath(client, modelXpath);
 	        if (nodes != null && nodes.size() > 0){
 	            int size = nodes.size();
 		        for (int i = 0; i < size; i++) {
@@ -305,7 +314,8 @@ public class WebDriverModelParser implements ModelParser{
 		        }
 	        }
 		} else if (!CommonUtil.isBlank(modelXpath)) {
-		    WebElement ele = client.findElement(By.xpath(modelXpath));
+//		    WebElement ele = client.findElement(By.xpath(modelXpath));
+		    WebElement ele = promise2ForXpath(client, modelXpath);
 		    fel.getContext().set("$model_content", ParserUtil.checkUnicodeString(ele.getAttribute("outerHTML")));
 			list.add(parseToMap(ele, fields));
 		} else {
@@ -318,7 +328,9 @@ public class WebDriverModelParser implements ModelParser{
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (finalFields != null)
 			map.putAll(finalFields);
-		
+		if (this.beforeModel != null) {
+            fel.getContext().set("$before", new HashMap<String, Object>(this.beforeModel));
+        }
 		fel.getContext().set("$fields", map);
 		for (Field field : fields){
 			String key = field.getName();
@@ -357,7 +369,8 @@ public class WebDriverModelParser implements ModelParser{
 					if (xpath != null && xpath.trim().length() > 0) {
 						
 						if (attribute != null && attribute.trim().length() > 0){
-						    List<WebElement> nodes = selector.findElements(By.xpath(xpath));
+//						    List<WebElement> nodes = selector.findElements(By.xpath(xpath));
+						    List<WebElement> nodes = promiseForXpath(selector, xpath);
 	                        if (nodes == null || nodes.isEmpty())
 	                            continue;
 							for (int j = 0; j < nodes.size(); j++){
@@ -372,10 +385,10 @@ public class WebDriverModelParser implements ModelParser{
 							parseByExp(exp, values);
 						}else if (xpath.endsWith("/text()")){
 						    String _xpath = xpath.replace("/text()", "");
-						    List<WebElement> _nodes = selector.findElements(By.xpath(_xpath));
-	                        if (_nodes == null || _nodes.isEmpty())
-	                            continue;
-	                        
+						    List<WebElement> _nodes = promiseForXpath(selector, _xpath);
+						    
+						    if (_nodes == null || _nodes.isEmpty())
+                                continue;
                             for (int j = 0; j < _nodes.size(); j++){
                                 WebElement node = _nodes.get(j);
                                 String textValue = node.getText();
@@ -387,7 +400,8 @@ public class WebDriverModelParser implements ModelParser{
 							// EXP表达式
 							parseByExp(exp, values);
 						} else {
-						    List<WebElement> nodes = selector.findElements(By.xpath(xpath));
+//						    List<WebElement> nodes = selector.findElements(By.xpath(xpath));
+						    List<WebElement> nodes = promiseForXpath(selector, xpath);
 	                        if (nodes == null || nodes.isEmpty())
 	                            continue;
 							for (int j = 0; j < nodes.size(); j++){
@@ -522,6 +536,40 @@ public class WebDriverModelParser implements ModelParser{
 		
 		return map;
 	}
+
+	private WebElement promise2ForXpath(SearchContext selector, String _xpath) {
+        WebElement _node = null;
+        while (true) {
+            try {
+                _node = selector.findElement(By.xpath(_xpath));
+                break;
+            } catch (Throwable e) {
+                try {
+                    Thread.currentThread().sleep(1000);
+                } catch (InterruptedException e1) {
+                }
+                continue;
+            }
+        }
+        return _node;
+    }
+	
+    private List<WebElement> promiseForXpath(SearchContext selector, String _xpath) {
+        List<WebElement> _nodes = null;
+        while (true) {
+            try {
+                _nodes = selector.findElements(By.xpath(_xpath));
+                break;
+            } catch (Throwable e) {
+                try {
+                    Thread.currentThread().sleep(1000);
+                } catch (InterruptedException e1) {
+                }
+                continue;
+            }
+        }
+        return _nodes;
+    }
 	
 	private void parseByExp(String exp, Collection<Object> list) {
 		if (exp == null || exp.trim().length() == 0)

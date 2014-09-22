@@ -52,12 +52,14 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 	private SpiderListener listener = null;
 	private FelEngine fel = new FelEngineImpl();
 	private Map<String, Object> finalFields = null;
+	private Map<String, Object> beforeModel = null;
 	   
-	public Map<String, Object> getFinalFields() {
-	  return this.finalFields;
-	}
 	public void setFinalFields(Map<String, Object> finalFields) {
 	  this.finalFields = finalFields;
+	}
+	
+	public void setBeforeModel(Map<String, Object> beforeModel) {
+	    this.beforeModel = beforeModel;
 	}
 	
 	private final static Function fun = new CommonFunction() {
@@ -91,6 +93,9 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 		fel.getContext().set("$listener", this.listener);
 		fel.getContext().set("$task_url", this.task.url);
 		fel.getContext().set("$source_url", this.task.sourceUrl);
+		fel.getContext().set("$Task", this.task);
+		fel.getContext().set("$Site", this.task.site);
+		fel.getContext().set("$Fetcher", this.task.site.fetcher);
 	}
 	
 	public DefaultModelParser() {}
@@ -149,7 +154,9 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (finalFields != null)
 			map.putAll(finalFields);
-		
+		if (this.beforeModel != null) {
+            fel.getContext().set("$before", new HashMap<String, Object>(this.beforeModel));
+        }
 		fel.getContext().set("$fields", map);
 		for (Field field : fields){
 			String key = field.getName();
@@ -379,7 +386,9 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (finalFields != null)
 			map.putAll(finalFields);
-		
+		if (this.beforeModel != null) {
+            fel.getContext().set("$before", new HashMap<String, Object>(this.beforeModel));
+        }
 		fel.getContext().set("$fields", map);
 		for (Field field : fields){
 			String key = field.getName();
@@ -624,7 +633,9 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (finalFields != null)
 			map.putAll(finalFields);
-		
+		if (this.beforeModel != null) {
+            fel.getContext().set("$before", new HashMap<String, Object>(this.beforeModel));
+        }
 		fel.getContext().set("$fields", map);
 		
 		for (Field field : fields){
