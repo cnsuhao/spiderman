@@ -20,6 +20,24 @@ Spiderman - Java开源Web数据抽取工具
 * 然后，打开目标页面，分析页面的HTML结构，得到你想要数据的XPath，具体XPath怎么获取请看下文。
 * 最后，在一个xml配置文件里填写好参数，运行Spiderman吧！
 
+近期更新
+----
+1. &lt;parser 的表达式支持发起HTTP请求获取内容了：
+    &lt;parser exp="$Fetcher.get('http://www.baidu.com')"
+
+2. &lt;target节点添加 &lt;before节点配置，该配置与&lt;model一样可以用来解析网页内容，主要的区别是该节点会在&lt;model节点解析之前进行工作，其解析后的结果将会作为model的上下文$before.xxx来使用
+
+3. 重构下载器，支持多种下载器实现，允许在xml里面配置自己实现的下载器实现类，官方默认提供了三种，分别是默认的基于HttpClient的下载器、基于WebUnit的下载器、基于Selenium WebDriver的实现
+    &lt;site downloader="org.eweb4j.spiderman.plugin.util.WebDriverDownloader"
+    或者
+    &lt;site downloader="xxx.YourDownloader">
+
+4. 与第三点一样，重构了模型解析器，使得现在支持多种不同的实现类，且允许开发者在xml上指定自己实现的解析器，目前官方提供了两种解析器，分别是DefaultModelParser，WebDriverModelParser 
+     &lt;before parser="xxx.xxx.xxx.YourModelParser"
+     或者
+     &lt;model parser="xxx.YourModelParser"
+5. 其他一些零碎的更新、BUG修复等。
+
 XPath获取技巧？
 --------------
 * 首先，下载xpathonclick插件，[猛击这里](https://chrome.google.com/webstore/search/xpathonclick)
@@ -436,22 +454,3 @@ Spiderman Sample | 案例
 		</site>
 	</beans>
 ----
-
-近期更新
-----
-这次的更新：
-1. <parser 的表达式支持发起HTTP请求获取内容了：
-    <parser exp="$Fetcher.get('http://www.baidu.com')" />
-
-2. <target节点添加 <before>节点配置，该配置与<model>一样可以用来解析网页内容，主要的区别是该节点会在<model节点解析之前进行工作，其解析后的结果将会作为model的上下文$before.xxx来使用
-
-3. 重构下载器，支持多种下载器实现，允许在xml里面配置自己实现的下载器实现类，官方默认提供了三种，分别是默认的基于HttpClient的下载器、基于WebUnit的下载器、基于Selenium WebDriver的实现
-    <site downloader="org.eweb4j.spiderman.plugin.util.WebDriverDownloader">
-    或者
-    <site downloader="xxx.YourDownloader">
-
-4. 与第三点一样，重构了模型解析器，使得现在支持多种不同的实现类，且允许开发者在xml上指定自己实现的解析器，目前官方提供了两种解析器，分别是DefaultModelParser，WebDriverModelParser 
-     <before parser="xxx.xxx.xxx.YourModelParser">
-     或者
-     <model parser="xxx.YourModelParser">
-5. 其他一些零碎的更新、BUG修复等。
