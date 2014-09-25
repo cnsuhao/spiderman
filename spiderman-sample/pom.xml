@@ -15,21 +15,21 @@
 			<scope>test</scope>
 			<version>4.4</version>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>zweb</groupId>
 			<artifactId>zweb-plugins-druid</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.27</version>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<artifactId>zweb-core</artifactId>
 			<groupId>zweb</groupId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>org.eweb4j</groupId>
 			<artifactId>spiderman-plugin</artifactId>

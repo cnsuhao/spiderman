@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<site name="51auto" code="51auto_bmw" isDupRemovalStrict="1" enable="1" includeHttps="1" 
+		url="http://www.51auto.com/bmw/" 
+		reqDelay="1s" charset="gbk" schedule="1h" thread="2" waitQueue="10s">
+		<!--cookies>
+			<cookie name="Cookie" value="" path="/" />
+		</cookies-->
+		<!--validHosts>
+			<validHost value="" />
+		</validHosts-->
+		<!--options>
+			<option name="webdriver.chrome.driver" value="D:/Java/JEE/chromedriver.exe" />
+		</options-->
+		<queueRules policy="and">
+			<rule type="!regex" value="^.*\.(jpg|png|gif)$" />
+		</queueRules>
+		<targets>
+			<sourceRules policy="or">
+				<rule type="regex" value="^http://www\.51auto\.com/car_\d+/$" />
+				<rule type="regex" value="^http://www\.51auto\.com/bmw/($|list\d+$)">
+					<!--
+					  | 定义如何在来源页面上挖掘新的 URL
+					  | 这个节点跟 <model> 节点是一样的结构，只不过名称不叫model而是叫做digUrls而已
+					-->
+					<digUrls>
+						<!-- 分页URL -->
+						<field name="page_url" isArray="1"> 
+							<parsers>
+								<parser xpath="//div[@class='fenye tfen']//a[@href]" attribute="href" />
+								<parser exp="'http://www.51auto.com'+$this" />
+							</parsers>
+						</field>
+						<!-- 详情URL -->
+						<field name="target_url" isArray="1"> 
+							<parsers>
+								<parser xpath="//i[@class='czjz']//a[@href]" attribute="href" />
+								<!-- 将形如：http://www.51auto.com/car_2236708/ 转成 http://www.51auto.com/buycar/2236708.html -->
+								<parser regex="(?&lt;=http://www\.51auto\.com/car_)\d+" />
+								<parser exp="'http://www.51auto.com/buycar/'+$this+'.html'" />
+							</parsers>
+						</field>
+					</digUrls>
+				</rule>
+			</sourceRules>
+				
+			<!-- 目标：抓取车辆详细信息 -->
+			<target name="car" isSkip="0">
+				<urlRules policy="and">
+					<rule type="regex" value="^http://www\.51auto\.com/buycar/\d+\.html$" />
+				</urlRules>
+				<!-- 这个before标签本身也是一个Model类型，它会在model标签执行之前执行，
+				     这样当before解析成功之后返回的Map就可以在model标签的parser中使用
+				     $before.xxx 来使用了。 
+				 -->
+				<before>
+					<field name="car_id">
+						<parsers>
+							<parser xpath="//script[@type='text/javascript']/text()" regex="(?&lt;=\bcarId =)\d+" />
+						</parsers>
+					</field>
+					<!-- 额外信息，包括发布时间、浏览次数等 | 利用表达式里内置的$Fetcher对象进行HTTP GET请求获取字符串结果 -->
+					<field name="info" isTrim="1">
+						<parsers>
+							<parser exp="$Fetcher.get('http://www.51auto.com/dwr/exec/CarViewAJAX.getCarInfoNew?callCount=1&amp;c0-scriptName=CarViewAJAX&amp;c0-methodName=getCarInfoNew&amp;c0-param0=number:'+$fields.car_id+'&amp;xml=true')" />
+						</parsers>
+					</field>
+				</before>
+				<!-- 最终想要的数据模型 颜色 排量 价格 品牌 车系 说明 title等 联系人 联系地址 联系电话 -->
+				<model>
+					<!-- 标题 -->
+					<field name="title" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@class='otop_div']//h1/text()" />
+						</parsers>
+					</field>
+					<!-- 车身颜色 -->
+					<field name="color" isTrim="1">
+						<parsers>
+							<parser xpath="//dl[@class='or_dl']//dd[3]//p[@class='odd_left']/text()" />
+							<parser regex="(?&lt;=：).*" />
+						</parsers>
+					</field>
+					<!-- 排量 -->
+					<field name="cc" isTrim="1">
+						<parsers>
+							<parser xpath="//dl[@class='or_dl']//dd[2]//p[@class='odd_left']/text()" />
+							<parser regex="(?&lt;=：).*" />
+						</parsers>
+					</field>
+					<!-- 车主描述 -->
+					<field name="desc" isTrim="1">
+						<parsers>
+							<parser xpath="//p[@class='o_pmain']/text()" />
+						</parsers>
+					</field>
+					<!-- 发布时间-->
+					<field name="pub_time" isTrim="1">
+						<parsers>
+							<parser exp="$before.info" />
+							<parser regex="(?&lt;=\bvar s5=&quot;).[^&quot;]*" />
+						</parsers>
+					</field>
+					<!-- 浏览次数 -->
+					<field name="view_count" isTrim="1">
+						<parsers>
+							<parser exp="$before.info" />
+							<parser regex="(?&lt;=\bvar s1=&quot;).[^&quot;]*" />
+							<parser exp="$this.replace(',','')" />
+						</parsers>
+					</field>
+					<!-- 价格 -->
+					<field name="price" isTrim="1">
+						<parsers>
+							<parser xpath="//dt[@class='dtg']//span[@class='oyellow1'][1]/text()" />
+						</parsers>
+					</field>
+					<!-- 价格单位 -->
+					<field name="price_unit" isTrim="1">
+						<parsers>
+							<parser xpath="//dt[@class='dtg']//span[@class='oyellow1 f15']/text()" />
+						</parsers>
+					</field>
+					<!-- 联系地址 -->
+					<field name="contact_addr" isTrim="1">
+						<parsers>
+							<parser xpath="//p[@class='lookcar']//i/text()" />
+							<parser exp="$this.replace('【查看地图】','')" />
+						</parsers>
+					</field>
+					<field name="contact_phone" isTrim="1">
+						<parsers>
+							<parser xpath="//div[@class='ophone_height']//img[@src]" attribute="src" />
+						</parsers>
+					</field>
+					<!-- 小图 -->
+					<field name="micro_pics" isArray="1">
+						<parsers>
+							<parser xpath="//ul[@id='releate_img']//li//img[@src]" attribute="src" />
+						</parsers>
+					</field>
+					<!-- 中图 -->
+					<field name="mid_pics" isArray="1">
+						<parsers>
+							<parser xpath="//ul[@id='releate_img']//li//img[@midPic]" attribute="midPic" />
+						</parsers>
+					</field>
+					<!-- 大图 -->
+					<field name="big_pics" isArray="1">
+						<parsers>
+							<parser xpath="//ul[@class='bigpic_ul']//li//img[@data-original]" attribute="data-original" />
+						</parsers>
+					</field>
+				</model>
+			</target>
+		</targets>
+		<!--
+		  | 插件
+		-->
+		<plugins>
+			<!--
+			  | enable:是否开启
+			  | name:插件名
+			  | version:插件版本
+			  | desc:插件描述
+			-->
+			<plugin enable="1" name="spider_plugin" version="0.0.1" desc="这是一个官方实现的默认插件，实现了所有扩展点。">
+				<!--
+				  | 每个插件包含了对若干扩展点的实现
+				-->
+				<extensions>
+					<!--
+					  | point:扩展点名它们包括  task_poll, begin, fetch, dig, dup_removal, task_sort, task_push, target, parse, pojo, end
+					-->
+					<extension point="task_poll">
+						<!--
+						  | 扩展点实现类
+						  | type: 如何获取实现类 ,默认通过无参构造器实例化给定的类名，可以设置为ioc，这样就会从EWeb4J的IOC容器里获取
+						  | value: 当时type=ioc的时候填写IOC的bean_id，否则填写完整类名
+						  | sort: 排序，同一个扩展点有多个实现类，这些实现类会以责任链的方式进行执行，因此它们的执行顺序将变得很重要
+						-->
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPollPointImpl" sort="0"/>
+					</extension>
+					<extension point="begin">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.BeginPointImpl" sort="0"/>
+					</extension>
+					<extension point="fetch">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.FetchPointImpl" sort="0"/>
+					</extension>
+					<extension point="dig">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DigPointImpl" sort="0"/>
+					</extension>
+					<extension point="dup_removal">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.DupRemovalPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_sort">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskSortPointImpl" sort="0"/>
+					</extension>
+					<extension point="task_push">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TaskPushPointImpl" sort="0"/>
+					</extension>
+					<extension point="target">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.TargetPointImpl" sort="0"/>
+					</extension>
+					<extension point="parse">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.ParsePointImpl" sort="0"/>
+					</extension>
+					<extension point="end">
+						<impl type="" value="org.eweb4j.spiderman.plugin.impl.EndPointImpl" sort="0"/>
+					</extension>
+				</extensions>
+				<providers>
+					<provider>
+						<orgnization name="CFuture" website="http://lurencun.com" desc="Color your future">
+							<author name="weiwei" website="http://laiweiweihi.iteye.com | http://my.oschina.net/laiweiwei" email="l.weiwei@163.com" weibo="http://weibo.com/weiweimiss" desc="一个喜欢自由、音乐、绘画的IT老男孩" />
+						</orgnization>
+					</provider>
+				</providers>
+			</plugin>
+		</plugins>
+	</site>
+</beans>
