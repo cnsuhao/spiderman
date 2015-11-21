@@ -111,6 +111,8 @@ Spiderman Sample | 案例
     http.fetch.retry=3
     #http连接超时，支持单位 s秒 m分 h时 d天，不写单位则表示s秒
     http.fetch.timeout=5s
+    #加载容器模块组件配置
+    modules=site,db,file
 
 然后在#{ClassPath}/WebSites目录下有一份oschina.xml
 
@@ -126,6 +128,7 @@ Spiderman Sample | 案例
 	  | update: 2013-04-10 18:06
 	-->
 	<beans>
+            <container id="defaultContainer">
 		<!--
 		  | name:名称
 		  | url:种子链接
@@ -366,5 +369,6 @@ Spiderman Sample | 案例
 				</plugin>
 			</plugins>
 		</site>
+            </container>
 	</beans>
 ----
