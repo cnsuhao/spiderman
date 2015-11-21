@@ -24,7 +24,7 @@ Spiderman - Java开源Web数据抽取工具
 ----
 1.重构spiderman内核加入容器Container概念，容器中可自定义组件组件如site、db、file等；支持多数据源获取;
 
-2.该版本的升级需要在配置文件中的site节点外层加入conatainer节点,如<container id="container1"><site></site></container>;
+2.该版本的升级需要在配置文件中的site节点外层加入conatainer节点,如&lt;container id="container1"&rt;&lt;site&rt;&lt;/site&rt;&lt;/container&rt;
 
 3.改进内核处理链式流程，新插件开发如ftp-plugin、db-plugin等不需要实现所有的扩展点;
 
