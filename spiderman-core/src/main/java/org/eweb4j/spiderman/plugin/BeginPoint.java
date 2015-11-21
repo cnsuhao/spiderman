@@ -1,14 +1,16 @@
 package org.eweb4j.spiderman.plugin;
 
-import org.eweb4j.spiderman.task.Task;
+import org.eweb4j.spiderman.fetcher.FetchRequest;
+import org.eweb4j.spiderman.fetcher.FetchResult;
 
 /**
  * 扩展点：爬虫开始时
  * @author weiwei
+ * @author wchao
  *
  */
 public interface BeginPoint extends Point{
 
-	Task confirmTask(Task task) throws Exception;
+	FetchResult preProcess(FetchRequest request,FetchResult result) throws Exception;
 	
 }

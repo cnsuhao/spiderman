@@ -25,4 +25,13 @@ public class Settings {
 	public static long http_fetch_timeout(){
 		return CommonUtil.toSeconds(settings.get("http.fetch.timeout")).longValue();
 	}
+	
+	public static String[] modules(){
+		String modules = settings.get("modules");
+		if(modules == null || "".equals(modules))
+		{
+			return null;
+		}
+		return modules.split(",");
+	}
 }

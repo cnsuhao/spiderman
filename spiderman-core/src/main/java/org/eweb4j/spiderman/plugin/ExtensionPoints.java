@@ -6,6 +6,7 @@ import java.util.Collection;
 /**
  * 扩展点
  * @author weiwei
+ * @author wchao
  *
  */
 public class ExtensionPoints {
@@ -24,25 +25,27 @@ public class ExtensionPoints {
 	
 	public static String getPointImplClassName(String point){
 		if (task_poll.equals(point))
-			return "spiderman.plugin.impl.TaskPollPointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.TaskPollPointImpl";
 		if (begin.equals(point))
-			return "spiderman.plugin.impl.BeginPointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.BeginPointImpl";
 		if (fetch.equals(point))
-			return "spiderman.plugin.impl.FetchPointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.FetchPointImpl";
 		if (dig.equals(point))
-			return "spiderman.plugin.impl.DigPointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.DigPointImpl";
 		if (dup_removal.equals(point))
-			return "spiderman.plugin.impl.DupRemovalPointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.DupRemovalPointImpl";
 		if (task_sort.equals(point))
-			return "spiderman.plugin.impl.TaskSortPointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.TaskSortPointImpl";
 		if (task_push.equals(point))
-			return "spiderman.plugin.impl.TaskPushPointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.TaskPushPointImpl";
 		if (target.equals(point))
-			return "spiderman.plugin.impl.TargetPointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.TargetPointImpl";
 		if (parse.equals(point))
-			return "spiderman.plugin.impl.ParsePointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.ParsePointImpl";
+		if (pojo.equals(point))
+			return "org.eweb4j.spiderman.plugin.impl.PojoPointImpl";
 		if (end.equals(point))
-			return "spiderman.plugin.impl.EndPointImpl";
+			return "org.eweb4j.spiderman.plugin.impl.EndPointImpl";
 		
 		return null;
 	}

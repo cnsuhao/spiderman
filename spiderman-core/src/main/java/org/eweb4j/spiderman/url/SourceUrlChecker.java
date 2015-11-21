@@ -9,6 +9,7 @@ import org.eweb4j.spiderman.xml.Rules;
 /**
  * TODO
  * @author weiwei l.weiwei@163.com
+ * @author wchao wchaojava@163.com
  * @date 2013-2-28 下午08:34:54
  */
 public class SourceUrlChecker {

@@ -51,7 +51,7 @@ public class SpiderConfig {
 	 * Politeness delay in milliseconds (delay between sending two requests to
 	 * the same host).
 	 */
-	private int politenessDelay = 200;
+	private int politenessDelay = 60/*200*/;
 
 	/**
 	 * Should we also crawl https pages?

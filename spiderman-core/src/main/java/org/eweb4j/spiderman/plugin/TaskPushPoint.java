@@ -1,12 +1,11 @@
 package org.eweb4j.spiderman.plugin;
 
-import java.util.Collection;
 
-import org.eweb4j.spiderman.task.Task;
-
+import org.eweb4j.spiderman.fetcher.FetchRequest;
+import org.eweb4j.spiderman.fetcher.FetchResult;
 
 public interface TaskPushPoint extends Point{
 	
-	public Collection<Task> pushTask(Collection<Task> tasks) throws Exception;
+	public FetchResult pushTask(FetchRequest request,FetchResult result) throws Exception;
 	
 }

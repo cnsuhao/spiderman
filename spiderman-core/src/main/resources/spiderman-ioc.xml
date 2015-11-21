@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<beans>
-	<ioc id="" class="" scope="">
-		<inject ref="" name="" type="" value=""/>
-	</ioc>
-</beans>

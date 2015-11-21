@@ -10,6 +10,7 @@ import org.eweb4j.spiderman.xml.Rules;
 /**
  * 任务队列，阻塞+优先级排序
  * @author weiwei l.weiwei@163.com
+ * @author wchao wchaojava@163.com
  * @date 2013-1-15 上午10:53:24
  */
 public class TaskQueue {
@@ -51,15 +52,22 @@ public class TaskQueue {
 		
 		//检查是否匹配xml配置的url规则
 		Rules rules = task.site.getQueueRules();
-		Rule queueRule = UrlRuleChecker.check(task.url, rules.getRule(), rules.getPolicy()); 
-		if (queueRule == null)
-			return false;
-		
+		if(rules != null)
+		{
+			Rule queueRule = UrlRuleChecker.check(task.url, rules.getRule(), rules.getPolicy()); 
+			if (queueRule == null)
+				return false;
+		}
 		return queue.add(task);
 	}
 	
 	public synchronized void stop(){
 		this.queue.clear();
 		isStop = true;
+	}
+	
+	public int size()
+	{
+		return this.queue.size();
 	}
 }

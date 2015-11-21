@@ -2,6 +2,7 @@ package org.eweb4j.spiderman.xml;
 
 import org.eweb4j.util.xml.AttrTag;
 
+
 public class Field {
 
 	@AttrTag
@@ -36,9 +37,16 @@ public class Field {
 	 */
 	@AttrTag
 	private String isAlsoParseInNextPage;
-	
+	/**
+	 * 是否去掉前后的空格字符
+	 */
 	@AttrTag
-	private String isTrim;//是否去掉前后的空格字符
+	private String isTrim;
+	/**
+	 * 是否作为数字类型引用;
+	 */
+	@AttrTag
+	private String isNumber;
 	
 	private Parsers parsers;
 
@@ -114,4 +122,11 @@ public class Field {
 		this.isForDigNewUrl = isForDigNewUrl;
 	}
 
+	public String getIsNumber() {
+		return isNumber;
+	}
+
+	public void setIsNumber(String isNumber) {
+		this.isNumber = isNumber;
+	}
 }

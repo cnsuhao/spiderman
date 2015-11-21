@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<container id="ftp_Container" enable="0">
+		<site name="ftpSite" downloader="org.eweb4j.spiderman.plugin.ftp.util.FtpDownloader"  reqDelay="0s" includeHttps="1" enable="1"  thread="2" waitQueue="5s" >
+			<options>
+				<option name="user" value="admin"/>
+				<option name="pwd" value="123" />
+				<option name="host" value="192.168.25.106" />
+				<option name="localPath" value="E:/ftp123"></option>
+			</options>
+			<targets>
+				<target name="ftpFile">
+					<urlRules>
+						<rule type="regex" value=".*[.].*$" />
+					</urlRules>
+					<model>
+						<field name="title" isArray="1">
+							<parsers>
+								<parser xpath="//div[@id='content_left']//div[@id>0]//h3//a//text()"/>
+							</parsers>
+						</field>
+					</model>
+				</target>
+			</targets>
+			<plugins>
+				<plugin enable="1" name="spider_ftp_plugin" version="0.0.1" desc="这是小超自己实现的ftp插件!">
+					<extensions>
+						<extension point="task_poll">
+							<impl value="org.eweb4j.spiderman.plugin.ftp.impl.TaskPollPointImpl" sort="0"></impl>
+						</extension>
+						<extension point="begin">
+							<impl value="org.eweb4j.spiderman.plugin.ftp.impl.PreFechPointImpl" sort="0"></impl>
+						</extension>
+						<extension point="fetch">
+							<impl value="org.eweb4j.spiderman.plugin.ftp.impl.FetchPointImpl" sort="0"></impl>
+						</extension>
+						<extension point="dig">
+							<impl value="org.eweb4j.spiderman.plugin.ftp.impl.DigPointImpl" sort="0"></impl>
+						</extension>
+						<extension point="dup_removal">
+							<impl value="org.eweb4j.spiderman.plugin.ftp.impl.DupRemovalPointImpl" sort="0"></impl>
+						</extension>
+						<extension point="task_push">
+							<impl value="org.eweb4j.spiderman.plugin.ftp.impl.TaskPushPointImpl" sort="0"></impl>
+						</extension>
+						<extension point="target">
+							<impl value="org.eweb4j.spiderman.plugin.ftp.impl.TargetPointImpl" sort="0"></impl>
+						</extension>
+						<extension point="parse">
+							<impl value="org.eweb4j.spiderman.plugin.ftp.impl.ParsePointImpl" sort="0"></impl>
+						</extension>
+					</extensions>
+				</plugin>
+			</plugins>
+		</site>
+    </container>
+</beans>

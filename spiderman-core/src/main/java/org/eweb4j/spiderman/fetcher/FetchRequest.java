@@ -6,21 +6,30 @@ import java.util.List;
 import java.util.Map;
 
 import org.eweb4j.mvc.Http;
+import org.eweb4j.spiderman.task.Task;
 
 /**
  * TODO
  * @author weiwei l.weiwei@163.com
+ * @author wchao wchaojava@163.com
  * @date 2013-3-7 下午05:28:08
  */
 public class FetchRequest {
 
-	private String url;
+	public String url;
 	private String httpMethod = Http.Method.GET;
 	private Map<String, List<Object>> params = new HashMap<String, List<Object>>();
 	private Map<String, List<File>> files = new HashMap<String, List<File>>();
 	private Map<String, List<String>> headers = new HashMap<String, List<String>>();
 	private Map<String, List<String>> cookies = new HashMap<String, List<String>>();
-	
+	public Task task;
+	public FetchRequest(){}
+	public FetchRequest(Task task)
+	{
+		this.task = task;
+		this.url = task.url;
+		this.httpMethod = task.httpMethod;
+	}
 	public String getUrl() {
 		return this.url;
 	}
@@ -57,6 +66,13 @@ public class FetchRequest {
 	}
 	public void setFiles(Map<String, List<File>> files) {
 		this.files = files;
+	}
+	
+	public Task getTask() {
+		return task;
+	}
+	public void setTask(Task task) {
+		this.task = task;
 	}
 	@Override
 	public String toString() {

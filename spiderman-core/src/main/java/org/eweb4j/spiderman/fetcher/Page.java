@@ -4,8 +4,8 @@ package org.eweb4j.spiderman.fetcher;
 public class Page {
 
 	private String url;
-	private String content;
-//	private byte[] contentData;
+	private Object content;
+	private byte[] contentData;
 	private String contentType;
 	private String encoding;
 	private String charset;
@@ -17,12 +17,15 @@ public class Page {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	public String getContent() {
-		return this.content;
+	
+	public Object getContent() {
+		return content;
 	}
-	public void setContent(String content) {
+
+	public void setContent(Object content) {
 		this.content = content;
 	}
+
 	public String getContentType() {
 		return this.contentType;
 	}
@@ -42,12 +45,11 @@ public class Page {
 		this.charset = charset;
 	}
 
-//	public byte[] getContentData() {
-//		return this.contentData;
-//	}
-//
-//	public void setContentData(byte[] contentData) {
-//		this.contentData = contentData;
-//	}
-	
+	public byte[] getContentData() {
+		return this.contentData;
+	}
+
+	public void setContentData(byte[] contentData) {
+		this.contentData = contentData;
+	}
 }

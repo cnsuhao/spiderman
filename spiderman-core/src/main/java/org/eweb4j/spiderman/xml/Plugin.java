@@ -8,13 +8,13 @@ public class Plugin {
 	private String enable = "1";
 	
 	@AttrTag
-	private String name = "spider_plugin";
+	private String name = "spider_default_plugin";
 	
 	@AttrTag
 	private String version = "0.0.1";
 	
 	@AttrTag
-	private String desc = "这是官方实现的默认插件，实现了所有扩展点。";
+	private String desc = "这是实现的默认WEB插件，实现了所有扩展点!可以参考...";
 
 	private Providers providers ;
 

@@ -19,6 +19,7 @@ import org.eweb4j.spiderman.xml.Plugin;
 /**
  * 插件管理
  * @author weiwei l.weiwei@163.com
+ * @author wchao wchaojava@163.com
  * @date 2013-1-15 下午03:00:57
  */
 public class PluginManager {

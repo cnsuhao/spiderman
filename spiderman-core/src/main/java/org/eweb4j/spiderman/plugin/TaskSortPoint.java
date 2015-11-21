@@ -1,12 +1,10 @@
 package org.eweb4j.spiderman.plugin;
 
-import java.util.Collection;
 
-import org.eweb4j.spiderman.task.Task;
-
+import org.eweb4j.spiderman.fetcher.FetchResult;
 
 public interface TaskSortPoint extends Point{
 
-	Collection<Task> sortTasks(Collection<Task> tasks) throws Exception;
+	FetchResult sortTasks(FetchResult result) throws Exception;
 	
 }

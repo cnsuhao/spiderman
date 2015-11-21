@@ -45,6 +45,9 @@ public class Model {
 	@AttrTag
 	private String delay;
 	
+	@AttrTag
+	private String maxPage;//针对分页做的最大页数;
+	
 	private List<Field> field = new ArrayList<Field>();
 
 	public String getClazz() {
@@ -159,5 +162,21 @@ public class Model {
     public void setDelay(String delay) {
         this.delay = delay;
     }
+
+	public String getcType() {
+		return cType;
+	}
+
+	public void setcType(String cType) {
+		this.cType = cType;
+	}
+
+	public String getMaxPage() {
+		return maxPage;
+	}
+
+	public void setMaxPage(String maxPage) {
+		this.maxPage = maxPage;
+	}
 	
 }

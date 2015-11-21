@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<container id="third_site_Container" enable="0">
+		<site name="sinanews" url="http://slide.mil.news.sina.com.cn/l/slide_8_62085_38908.html#p=1" reqDelay="0s" includeHttps="1" enable="1" charset="gb2312"  thread="2" waitQueue="5s" >
+			<queueRules policy="and">
+				<rule type="!regex" value="^.*\.(jpg|png|gif).*$" />
+			</queueRules>
+			<options>
+				<option name="drivertype" value="chrome"/>
+				<option name="webdriver.chrome.driver" value="#{ClassPath}\chromedriver.exe" />
+			</options>
+			<headers>
+				<header name="User-Agent" value="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.89 Safari/537.36"></header>
+			</headers>
+			<targets>
+			    <sourceRules policy="and">
+					<rule type="regex" value="http://slide.mil.news.sina.com.cn.*[.]?.*$">
+						<!--
+						  | 递归从下一页抓取新URL
+						  | 这个节点跟 <model> 节点是一样的结构，只不过名称不叫model而是叫做nextPage而已
+						-->
+						<digUrls>
+							<!-- 当前页中下一页的链接，参数  -->
+							<field name="pageNum" isParam="1" isNumber="1">
+								<parsers>
+									<!-- 当前列表页中最后一个deal的更新时间 -->
+									<parser exp="$Task.url.substring($Task.url.lastIndexOf('#p=')+3)"/>
+									<parser exp="$this+1"/>
+								</parsers>
+							</field>
+							<!-- 拼凑出下一页URL，注意里面这里$fields.pageNum引用了上面那个变量 -->
+							<field name="nextUrl">
+								<parsers>
+									<parser exp="'http://slide.mil.news.sina.com.cn/l/slide_8_62085_38908.html#p='+$fields.pageNum" />
+								</parsers>
+							</field>
+						</digUrls>
+					</rule>
+				</sourceRules>
+				<target name="baiduTests">
+					<model delay="5s">
+						<field name="title" isArray="1">
+							<parsers>
+								<parser xpath="//div[@class='swpt-1013']/text()"/>
+							</parsers>
+						</field>
+						<!-- <field name="page">
+							<parsers>
+								<parser exp="$page_content"></parser>
+							</parsers>
+						</field> -->
+					</model>
+				</target>
+			</targets>
+		</site>
+    </container>
+</beans>

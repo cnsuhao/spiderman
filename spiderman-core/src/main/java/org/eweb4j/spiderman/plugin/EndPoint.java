@@ -1,15 +1,14 @@
 package org.eweb4j.spiderman.plugin;
 
-import java.util.List;
-import java.util.Map;
 
-import org.eweb4j.spiderman.task.Task;
+import org.eweb4j.spiderman.fetcher.FetchRequest;
+import org.eweb4j.spiderman.fetcher.FetchResult;
 
 
 public interface EndPoint extends Point{
 
 //	void context(Task task, List<Map<String, Object>> models) throws Exception;
 	
-	List<Map<String, Object>> complete(Task task, List<Map<String, Object>> models) throws Exception;
+	FetchResult complete(FetchRequest request,FetchResult result) throws Exception;
 
 }

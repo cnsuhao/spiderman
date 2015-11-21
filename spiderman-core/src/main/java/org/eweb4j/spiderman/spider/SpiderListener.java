@@ -5,44 +5,43 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.eweb4j.spiderman.container.Component;
+import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
 import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.task.Task;
-import org.eweb4j.spiderman.xml.Site;
-
-
 
 public interface SpiderListener {
 
-	void onDigUrls(Thread thread, Task task, String fieldName, Collection<String> urls);
+	void onDigUrls(Thread thread, Task task, String fieldName, Collection<Object> urls);
 	
-    void onNewUrls(Thread thread, Task task, Collection<String> newUrls);
+    void onNewUrls(Thread thread, FetchRequest request, Collection<Object> newUrls);
 	
-    void onFetch(Thread thread, Task task, FetchResult result);
+    void onFetch(Thread thread, FetchRequest request, FetchResult result);
     
-    void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks);
+    void onDupRemoval(Thread currentThread, FetchRequest request, Collection<Task> validTasks);
     
-    void onTaskSort(Thread currentThread, Task task, Collection<Task> afterSortTasks);
+    void onTaskSort(Thread currentThread, FetchRequest request, Collection<Task> afterSortTasks);
     
-	void onNewTasks(Thread thread, Task task, Collection<Task> newTasks);
+	void onNewTasks(Thread thread, FetchRequest request, Collection<Task> newTasks);
 	
-	void onTargetPage(Thread thread, Task task, Page page);
+	void onTargetPage(Thread thread, FetchRequest request, Page page);
 	
-	void onParseField(Thread thread, Task task, Object selector, String field, Object value);
+	void onParseField(Thread thread, FetchRequest request, Object selector, String field, Object value);
 	
-	void onParseOne(Thread thread, Task task, int size, int index, Map<String, Object> model);
+	void onParseOne(Thread thread, FetchRequest request, int size, int index, Map<String, Object> model);
 	
-	void onParse(Thread thread, Task task, List<Map<String, Object>> models);
+	void onParse(Thread thread, FetchRequest request, List<Map<String, Object>> models);
 	
-	void onPojo(Thread thread, Task task, List<Object> pojos);
+	void onPojo(Thread thread, FetchRequest request, List<Object> pojos);
 
-	void onInfo(Thread thread, Task task, String info);
+	void onInfo(Thread thread, FetchRequest request, String info);
 	
-	void onStartup(Site site);
+	void onStartup(Component component);
 	
 	void onError(Thread thread, Task task, String err, Throwable e);
 	
-	void onInitError(Site site, String err, Throwable e);
+	void onInitError(Component componen, String err, Throwable e);
 	
 	/**
 	 * 调度结束后回调此方法
@@ -75,11 +74,11 @@ public interface SpiderListener {
 	 * Spiderman.shutdown()被调用之前回调此方法
 	 * @date 2013-6-3 下午05:00:43
 	 */
-	void onBeforeShutdown(Site site, Object... args);
+	void onBeforeShutdown(Component component, Object... args);
 	
 	/**
 	 * Spiderman.shutdown()被调用之后回调此方法
 	 * @date 2013-6-3 下午05:01:02
 	 */
-	void onAfterShutdown(Site site, Object... args);
+	void onAfterShutdown(Component componen, Object... args);
 }
