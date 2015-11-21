@@ -23,15 +23,17 @@ Spiderman - Java开源Web数据抽取工具
 近期更新
 ----
 1.重构spiderman内核加入容器Container概念，容器中可自定义组件组件如site、db、file等；支持多数据源获取;
-2.该版本的升级需要在配置文件中的site节点外层加入conatainer节点； 如<container id="container1"><site></site></container>;
+
+2.该版本的升级需要在配置文件中的site节点外层加入conatainer节点;
+  如<container id="container1"><site></site></container>;
 
 3.改进内核处理链式流程，新插件开发如ftp-plugin、db-plugin等不需要实现所有的扩展点;
 
 4.优化配置文件如果不配置插件,默认采用官方实现的web-plugin插件。
 
-5.优化改进官方默认插件web-plugin；
+5.优化改进官方默认插件web-plugin;
 
-6. 其他一些零碎的更新、BUG修复等。
+6.其他一些零碎的更新、BUG修复等。
 
 XPath获取技巧？
 --------------
