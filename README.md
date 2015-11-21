@@ -63,38 +63,38 @@ Spiderman Sample | 案例
 			if (err != null)
 				throw new Exception(err);
 			
-			//实例化Spiderman
-        final Spiderman spiderman = Spiderman.me();
-        //爬虫监听适配器
-        SpiderListener listener = new SpiderListenerAdaptor(){
-        	@Override
-        	public void onDigUrls(Thread thread, Task task, String fieldName,Collection<Object> urls) {
-        		System.out.println("[DIG-URL] ~ "+urls);
-        	}
-        	@Override
-        	public void onInfo(Thread thread, FetchRequest request, String info) {
-        		 System.out.println(CommonUtil.getNowTime("HH:mm:ss")+"[INFO] ~ "+info);
-        	}
-        	@Override
-        	public void onTargetPage(Thread thread,FetchRequest request, Page page) {
-                System.out.println("[TARGET] ~ "+page.getUrl());
-            }
-        	@Override
-        	public void onParse(Thread thread,FetchRequest request, List<Map<String, Object>> models) {
-             	System.out.println("on_Parse->" + models);
-            }
-        };
+			            //实例化Spiderman
+                            final Spiderman spiderman = Spiderman.me();
+                           //爬虫监听适配器
+                            SpiderListener listener = new SpiderListenerAdaptor(){
+        	            @Override
+        	            public void onDigUrls(Thread thread, Task task, String fieldName,Collection<Object> urls) {
+        		            System.out.println("[DIG-URL] ~ "+urls);
+        	            }
+        	            @Override
+        	            public void onInfo(Thread thread, FetchRequest request, String info) {
+        		            System.out.println(CommonUtil.getNowTime("HH:mm:ss")+"[INFO] ~ "+info);
+        	            }
+        	            @Override
+        	            public void onTargetPage(Thread thread,FetchRequest request, Page page) {
+                                    System.out.println("[TARGET] ~ "+page.getUrl());
+                            }
+        	            @Override
+        	                public void onParse(Thread thread,FetchRequest request, List<Map<String, Object>> models) {
+             	                    System.out.println("on_Parse->" + models);
+                            }
+                        };
         
-        //启动爬虫|初始化|
-        //调度，爬虫运行10s
-        spiderman.init(listener).startup()/*.keep("10s")*/;//启动
-        //File file = new File("E:\\jukeyuan\\spiderman-sample\\target\\test-classes\\sites\\tianya site of site_sample.xml");
-        //spiderman.listen(listener).init(file).startup(file);
-        /*spiderman.init(listener)
-        .schedule("10s")
-        .startup()//启动
-        .times(3);//调度 3 次*/
-        Thread.currentThread().join();
+                        //启动爬虫|初始化|
+                        //调度，爬虫运行10s
+                        spiderman.init(listener).startup()/*.keep("10s")*/;//启动
+                        //File file = new File("E:\\jukeyuan\\spiderman-sample\\target\\test-classes\\sites\\tianya site of site_sample.xml");
+                        //spiderman.listen(listener).init(file).startup(file);
+                        /*spiderman.init(listener)
+                        .schedule("10s")
+                        .startup()//启动
+                        .times(3);//调度 3 次*/
+                        Thread.currentThread().join();
     	}
     }
 
