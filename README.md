@@ -63,120 +63,38 @@ Spiderman Sample | 案例
 			if (err != null)
 				throw new Exception(err);
 			
-			SpiderListener listener = new SpiderListenerAdaptor(){
-				public void afterScheduleCancel(){
-					//调度结束回调
-				}
-				/**
-				 * 每次调度执行前回调此方法
-				 * @date 2013-4-1 下午03:33:11
-				 * @param theLastTimeScheduledAt 上一次调度时间
-				 */
-				public void beforeEveryScheduleExecute(Date theLastTimeScheduledAt){
-					System.err.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [LAST_SCHEDULE_AT] ~ ");
-					System.err.println("at -> " + CommonUtil.formatTime(theLastTimeScheduledAt));
-				}
-				public void onFetch(Thread thread, Task task, FetchResult result) {
-					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [FETCH] ~ ");
-					System.out.println("fetch result ->" + result + " from -> " + task.sourceUrl);
-				}
-				public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {
-					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DIG] ~ ");
-					System.out.println(newUrls);
-				}
-				public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {
-	//				for (Task t : validTasks){
-	//					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [DUPREMOVE] ~ ");
-	//					System.out.println(t.url+" from->"+t.sourceUrl);
-	//				}
-				}
-				public void onTaskSort(Thread currentThread, Task task, Collection<Task> afterSortTasks) {
-	//				for (Task t : afterSortTasks){
-	//					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [SORT] ~ ");
-	//					System.out.println(t.url+" from->"+t.sourceUrl);
-	//				}
-				}
-				public void onNewTasks(Thread thread, Task task, Collection<Task> newTasks) {
-	//				for (Task t : newTasks){
-	//					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [NEWTASK] ~ ");
-	//					System.out.println(t.sort + ",,,," + t.url+" from->"+t.sourceUrl);
-	//				}
-				}
-				public void onTargetPage(Thread thread, Task task, Page page) {
-	//				System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [TARGET] ~ ");
-	//				System.out.println(page.getUrl());
-				}
-				public void onInfo(Thread thread, Task task, String info) {
-					System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
-					System.out.println(info);
-				}
-				
-				public void onError(Thread thread, Task task, String err, Throwable e) {
-					System.err.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [ERROR] ~ ");
-					e.printStackTrace();
-				}
-				
-				public void onParse(Thread thread, Task task, List<Map<String, Object>> models) {
-					final String projectRoot = FileUtil.getTopClassPath(TestSpider.class);
-					final File dir = new File(projectRoot+"/Data/"+task.site.getName()+"/"+task.target.getName());
-					try {
-						if (!dir.exists())
-							dir.mkdirs();
-						
-						for (int i = 0; i < models.size(); i++) {
-						    Map<String, Object> map = models.get(i);
-							String fileName = dir + "/count_" + task.site.counter.getCount() + i;
-							StringBuilder sb = new StringBuilder();
-							for (Iterator<Entry<String,Object>> it = map.entrySet().iterator(); it.hasNext();){
-								Entry<String,Object> e = it.next();
-								boolean isBlank = false;
-								
-								if (e.getValue() == null)
-									isBlank = true;
-								else if (e.getValue() instanceof String && ((String)e.getValue()).trim().length() == 0)
-									isBlank = true;
-								else if (e.getValue() instanceof List && ((ArrayList<?>)e.getValue()).isEmpty())
-									isBlank = true;
-								else if (e.getValue() instanceof List && !((ArrayList<?>)e.getValue()).isEmpty()) {
-									if (((ArrayList<?>)e.getValue()).size() == 1 && String.valueOf(((ArrayList<?>)e.getValue()).get(0)).trim().length() == 0)
-									isBlank = true;
-								}
-									
-								if (isBlank){
-									if (sb.length() > 0)
-										sb.append("_");
-									sb.append(e.getKey());
-								}
-							}
-							String content = CommonUtil.toJson(map);
-							if (sb.length() > 0)
-								fileName = fileName + "_no_"+sb.toString()+"_";
-							
-							File file = new File(fileName+".json");
-							FileUtil.writeFile(file, content);
-							System.out.print("[SPIDERMAN] "+CommonUtil.getNowTime("HH:mm:ss")+" [INFO] ~ ");
-							System.out.println(fileName + " create finished...");
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			};
-		
-			//启动爬虫
-			Spiderman.me()
-				.init(listener)//初始化
-				.startup()//启动
-				.keepStrict("2h");//存活时间，过了存活时间后马上关闭
-			
-			//启动爬虫 + 调度定时重启
-			//Spiderman.me()
-				//.listen(listener)//设置监听器
-				//.schedule("10s")//调度，爬虫运行10s
-				//.delay("2s")//每隔 10 + 2 秒后重启爬虫
-				//.times(3)//调度 3 次
-				//.startup()//启动
-				//.blocking();//阻塞直到所有调度完成
+			//实例化Spiderman
+        final Spiderman spiderman = Spiderman.me();
+        //爬虫监听适配器
+        SpiderListener listener = new SpiderListenerAdaptor(){
+        	@Override
+        	public void onDigUrls(Thread thread, Task task, String fieldName,Collection<Object> urls) {
+        		System.out.println("[DIG-URL] ~ "+urls);
+        	}
+        	@Override
+        	public void onInfo(Thread thread, FetchRequest request, String info) {
+        		 System.out.println(CommonUtil.getNowTime("HH:mm:ss")+"[INFO] ~ "+info);
+        	}
+        	@Override
+        	public void onTargetPage(Thread thread,FetchRequest request, Page page) {
+                System.out.println("[TARGET] ~ "+page.getUrl());
+            }
+        	@Override
+        	public void onParse(Thread thread,FetchRequest request, List<Map<String, Object>> models) {
+             	System.out.println("on_Parse->" + models);
+            }
+        };
+        
+        //启动爬虫|初始化|
+        //调度，爬虫运行10s
+        spiderman.init(listener).startup()/*.keep("10s")*/;//启动
+        //File file = new File("E:\\jukeyuan\\spiderman-sample\\target\\test-classes\\sites\\tianya site of site_sample.xml");
+        //spiderman.listen(listener).init(file).startup(file);
+        /*spiderman.init(listener)
+        .schedule("10s")
+        .startup()//启动
+        .times(3);//调度 3 次*/
+        Thread.currentThread().join();
     	}
     }
 
