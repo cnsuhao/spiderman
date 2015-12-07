@@ -47,6 +47,7 @@ public final class UrlUtils {
 		return urls;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static Collection<String> digUrls(Page pg, Task task, Rule r, Target tgt, SpiderListener lst, Map<String, Object> finalFields) throws Exception {
 		Collection<String> urls = new ArrayList<String>();
 		if (tgt.getModel() == null)

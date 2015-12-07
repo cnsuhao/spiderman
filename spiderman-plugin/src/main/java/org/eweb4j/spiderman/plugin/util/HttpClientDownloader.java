@@ -58,6 +58,7 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -334,7 +335,8 @@ public class HttpClientDownloader extends PageFetcher{
 				return fetchResult;
 			}
 		} catch (Throwable e) {
-			fetchResult.setFetchedUrl(e.toString());
+			e.printStackTrace();
+			fetchResult.setFetchedUrl("fetch url error::"+e.toString() + " " + toFetchURL);
 			fetchResult.setStatusCode(Status.INTERNAL_SERVER_ERROR.ordinal());
 			return fetchResult;
 		} finally {
@@ -523,8 +525,8 @@ public class HttpClientDownloader extends PageFetcher{
 		return fetchResult;
 	}
 	
-	private void assemPage(FetchResult fetchResult, HttpEntity entity)
-			throws Exception {
+	// TODO 需要设置一个回调，可以让开发者自定义解析响应的内容。特别是编码问题。
+	private void assemPage(FetchResult fetchResult, HttpEntity entity) throws Exception {
 		Page page = load(entity);
 		page.setUrl(fetchResult.getFetchedUrl());
 		fetchResult.setPage(page);
@@ -554,17 +556,28 @@ public class HttpClientDownloader extends PageFetcher{
 			contentEncoding = encoding.getValue();
 		page.setEncoding(contentEncoding);
 		
+		InputStream is = entity.getContent();
+		byte[] data = this.read(is);
+		page.setContentData(data);
+		
+		String content = null;
+		
 		//设置返回内容的字符集
-		String contentCharset = EntityUtils.getContentCharSet(entity);
-		page.setCharset(contentCharset);
-		//根据配置文件设置的字符集参数进行内容二进制话
-		String charset = config.getCharset();
-		String content = this.read(entity.getContent(), charset);
+		Charset c = ContentType.getOrDefault(entity).getCharset();
+		String charset = c != null ? c.name() : null;
+		if (CommonUtil.isBlank(charset) && !CommonUtil.isBlank(config.getCharset())) {
+			charset = config.getCharset();
+		} 
+		
+		if (CommonUtil.isBlank(charset)){
+			content = new String(data);
+			page.setCharset(null);
+		} else {
+			content = new String(data, charset);
+			page.setCharset(charset);
+		}
+		
 		page.setContent(content);
-//		if (charset == null || charset.trim().length() == 0)
-//			page.setContentData(content.getBytes());
-//		else
-//			page.setContentData(content.getBytes(charset));
 		
 		return page;
 	}

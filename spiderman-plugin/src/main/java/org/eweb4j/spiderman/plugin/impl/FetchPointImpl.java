@@ -3,6 +3,7 @@ package org.eweb4j.spiderman.plugin.impl;
 import org.eweb4j.mvc.Http;
 import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
+import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.fetcher.PageFetcher;
 import org.eweb4j.spiderman.fetcher.SpiderConfig;
 import org.eweb4j.spiderman.plugin.FetchPoint;
@@ -19,12 +20,12 @@ import org.eweb4j.util.CommonUtil;
  */
 public class FetchPointImpl implements FetchPoint{
 
-	private SpiderListener listener = null;
+//	private SpiderListener listener = null;
 	private Site site = null;
 	
 	public void init(Site site, SpiderListener listener) {
 		this.site = site;
-		this.listener = listener;
+//		this.listener = listener;
 	}
 
 	public void destroy() {
@@ -117,8 +118,8 @@ public class FetchPointImpl implements FetchPoint{
 			req.setUrl(url);
 			req.setHttpMethod(task.httpMethod);
 			
-			
-			return site.fetcher.fetch(req);
+			FetchResult fr = site.fetcher.fetch(req);
+			return fr;
 		}
 	}
 	

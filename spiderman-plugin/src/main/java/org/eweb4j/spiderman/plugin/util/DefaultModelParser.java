@@ -133,6 +133,7 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 		return parseXml(page, true);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private List<Map<String, Object>> parseJson(Page page) throws Exception {
 		String content = page.getContent();
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -150,6 +151,7 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 		return list;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private Map<String, Object> parseJsonMap(Map item, final List<Field> fields){
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (finalFields != null)
@@ -979,7 +981,7 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 		HtmlCleaner cleaner = new HtmlCleaner();
 		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
 		TagNode tagNode = cleaner.clean(new File("d:\\ion-orchard-447.html"));
-		String xml = ParserUtil.xml(tagNode, true);
+//		String xml = ParserUtil.xml(tagNode, true);
 //		System.out.println(xml);
 		Object[] nodes = tagNode.evaluateXPath("//table[@id='clearformat']//tr[1]//td[1]/text()");
 		for (Object n : nodes){

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.eweb4j.spiderman.xml.Field;
 import org.eweb4j.spiderman.xml.Target;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -21,11 +20,10 @@ public class XmlParseHandler extends DefaultHandler{
 
 	private Stack<String> stack = new Stack<String>();
 	private Map<String, List<String>> map = new HashMap<String, List<String>>();
-	private List<Field> fields = null;
+//	private List<Field> fields = null;
 	
 	public void init(Target target){
-		fields = target.getModel().getField();
-		
+//		fields = target.getModel().getField();
 	}
 	
 	@Override  

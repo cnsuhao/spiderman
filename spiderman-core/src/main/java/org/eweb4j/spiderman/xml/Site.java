@@ -84,7 +84,7 @@ public class Site {
 	@AttrTag
 	private String waitQueue = "1s";//当队列空的时候爬虫等待时间
 
-	private Seeds seeds ;
+	private Seeds seeds = new Seeds();
 	
 	private Headers headers = new Headers();//HTTP头
 	

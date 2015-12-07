@@ -1,5 +1,6 @@
 package org.eweb4j.spiderman.spider;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -72,12 +73,6 @@ public class Spider implements Runnable{
 			
 			listener.onFetch(Thread.currentThread(), task, result);
 			
-			if (result == null) 
-				return ;
-			
-			if (task.site.isStop)
-				return ;
-			
 			//扩展点：dig new url 发觉新URL
 			Collection<String> newUrls = null;
 			Collection<DigPoint> digPoints = task.site.digPointImpls;
@@ -88,21 +83,38 @@ public class Spider implements Runnable{
 				}
 			}
 			
-			if (task.site.isStop)
-				return ;
-			
 			handleNewUrls(newUrls);
-			
-			if (task.site.isStop)
-				return ;
 			
 			Page page = result.getPage();
 			if (page == null) {
 				return ;
 			}
 			
-			if (task.site.isStop)
-				return ;
+			if (CommonUtil.isBlank(page.getCharset())) {
+				String html = page.getContent();
+				if (!CommonUtil.isBlank(html)) {
+					html = html.trim().toLowerCase();
+					String s1 = CommonUtil.findOneByRegex(html, "(?=<meta ).*charset=.[^/]*");
+					if (!CommonUtil.isBlank(s1)) {
+						String s2 = CommonUtil.findOneByRegex(s1, "(?=charset\\=).[^;/\"']*");
+						if (!CommonUtil.isBlank(s2)) {
+							String charset = s2.replace("charset=", "");
+							page.setCharset(charset);
+							String html2 = null;
+							
+							try {
+								if (Charset.forName(charset) != null) {
+								 	html2 = new String(page.getContentData(), charset);
+								}
+							} catch (Throwable e) {
+							}
+							if (!CommonUtil.isBlank(html2)) {
+								page.setContent(html2);
+							}
+						}
+					}
+				}
+			}
 			
 			//扩展点：target 确认是否有目标配置匹配当前URL
 			Target target = null;
@@ -120,9 +132,6 @@ public class Spider implements Runnable{
 			
 			task.target = target;
 			this.listener.onTargetPage(Thread.currentThread(), task, page);
-			
-			if (task.site.isStop)
-				return ;
 			
 			//检查sourceUrl
 			Rules rules = task.site.getTargets().getSourceRules();
@@ -180,9 +189,6 @@ public class Spider implements Runnable{
 			
 			listener.onInfo(Thread.currentThread(), task, "site -> " + task.site.getName() + " task parse finished count ->" + task.site.counter.getCount());
 			
-			if (task.site.isStop)
-				return ;
-			
 			//扩展点：pojo 将Map数据映射为POJO
 			String modelCls = target.getModel().getClazz();
 			Class<?> cls = null;
@@ -199,9 +205,6 @@ public class Spider implements Runnable{
 			}
 			if (pojos != null) 
 				listener.onPojo(Thread.currentThread(), task, pojos);
-			
-			if (task.site.isStop)
-				return ;
 			
 			//扩展点：end 蜘蛛完成工作，该收尾了
 			Collection<EndPoint> endPoints = task.site.endPointImpls;
@@ -227,9 +230,6 @@ public class Spider implements Runnable{
 		else
 			newUrls = new ArrayList<String>();
 		
-		if (task.site.isStop)
-			return ;
-		
 		//扩展点：dup_removal URL去重,然后变成Task
 		Collection<Task> validTasks = null;
 		Collection<DupRemovalPoint> dupRemovalPoints = task.site.dupRemovalPointImpls;
@@ -246,9 +246,6 @@ public class Spider implements Runnable{
 		if (validTasks == null)
 			validTasks = new ArrayList<Task>();
 		
-		if (task.site.isStop)
-			return ;
-		
 		//扩展点：task_sort 给任务排序
 		Collection<TaskSortPoint> taskSortPoints = task.site.taskSortPointImpls;
 		if (taskSortPoints != null && !taskSortPoints.isEmpty()){
@@ -263,13 +260,16 @@ public class Spider implements Runnable{
 		if (validTasks == null)
 			validTasks = new ArrayList<Task>();
 		
-		if (task.site.isStop)
-			return ;
-		
 		//扩展点：task_push 将任务放入队列
 		validTasks = pushTask(validTasks);
-		if (validTasks != null && !validTasks.isEmpty())
+		if (validTasks != null && !validTasks.isEmpty()) {
+			//将种子信息放入新的任务对象中
+			for (Task vt : validTasks) {
+				vt.seed = task.seed;
+			}
+			
 			this.listener.onNewTasks(Thread.currentThread(), task, validTasks);
+		}
 	}
 
 	public Collection<Task> pushTask(Collection<Task> validTasks) throws Exception {

@@ -53,7 +53,7 @@ public class Spiderman {
 	public final SpiderIOC ioc = SpiderIOCs.create();
 	public Boolean isShutdownNow = false;
 	private ExecutorService pool = null;
-	private Collection<Site> sites = null;
+	private Collection<Site> sites = new ArrayList<Site>();;
 	private SpiderListener listener = null;
 	
 	private boolean isSchedule = false;
@@ -81,7 +81,7 @@ public class Spiderman {
         if (this.listener == null)
             this.listener = new SpiderListenerAdaptor();
         isShutdownNow = false;
-        sites = null;
+        sites = new ArrayList<Site>();
         pool = null;
         try {
             if (file == null)
@@ -108,10 +108,6 @@ public class Spiderman {
 	}
 	
 	public Spiderman startup() {
-	    return this.startup(null);
-	} 
-	
-	public Spiderman startup(final File file) {
 		if (isSchedule) {
 			final Spiderman _this = this;
 			timer.schedule(new TimerTask() {
@@ -190,7 +186,7 @@ public class Spiderman {
 							if (_this.scheduleTimes > 1)
 								_this.listener.onBeforeEveryScheduleExecute(_this.scheduleAt.get(_this.scheduleTimes-2));
 							
-							_this.init(file)._startup().keepStrict(scheduleTime);
+							_this.init()._startup().keepStrict(scheduleTime);
 						} catch (Throwable e) {
 							e.printStackTrace();
 							_this.listener.onError(Thread.currentThread(), null, e.toString(), e);
@@ -207,9 +203,10 @@ public class Spiderman {
 	
 	private Spiderman _startup(){
 		for (Site site : sites){
+			listener.onStartup(site);
 			pool.execute(new Spiderman._Executor(site));
 			listener.onInfo(Thread.currentThread(), null, "spider tasks of site[" + site.getName() + "] start... ");
-			listener.onStartup(site);
+			
 		}
 		return this;
 	}
@@ -362,10 +359,12 @@ public class Spiderman {
 	private void loadConfigFiles() throws Exception{
 		File siteFolder = new File(Settings.website_xml_folder());
 		if (!siteFolder.exists())
-			throw new Exception("can not found WebSites folder -> " + siteFolder.getAbsolutePath());
+			return;
+//			throw new Exception("can not found WebSites folder -> " + siteFolder.getAbsolutePath());
 		
 		if (!siteFolder.isDirectory())
-			throw new Exception("WebSites -> " + siteFolder.getAbsolutePath() + " must be folder !");
+			return;
+//			throw new Exception("WebSites -> " + siteFolder.getAbsolutePath() + " must be folder !");
 		
 		File[] files = siteFolder.listFiles();
 		if (files == null || files.length == 0){
@@ -383,40 +382,49 @@ public class Spiderman {
 			writer.write();
 		}
 		
-		sites = new ArrayList<Site>(files.length);
 		for (File file : files){
-			if (!file.exists())
-				continue;
-			if (!file.isFile())
-				continue;
-			if (!file.getName().endsWith(".xml"))
-				continue;
 			this.loadConfigFile(file);
 		}
 	}
 	
-	public void loadConfigFile(File file) throws Exception {
+	public Spiderman loadConfigFile(File file) {
+		if (file == null)
+			 throw new RuntimeException("config file can not be null");
 	    if (!file.exists())
-            return;
-        if (!file.isFile())
-            return;
-        if (!file.getName().endsWith(".xml"))
-            return;
+	    	 throw new RuntimeException("config file not exists -> " + file.getAbsolutePath());
+	    if (!file.isFile())
+	    	 throw new RuntimeException("config file is not a file -> " + file.getAbsolutePath()); 
+	    if (!file.getName().endsWith(".xml"))
+	    	 throw new RuntimeException("config file is not xml -> " + file.getAbsolutePath());
+	    
         XMLReader reader = BeanXMLUtil.getBeanXMLReader(file);
         reader.setBeanName("site");
         reader.setClass("site", Site.class);
-        Site site = reader.readOne();
-        if (site == null)
-            throw new Exception("site xml file error -> " + file.getAbsolutePath());
-        
-        if (!"1".equals(site.getEnable())) {
-//            String err = file.getAbsolutePath() + "'s site.enable != 1" ;
-//            this.listener.onInitError(site, err, new Exception(err));
-            return;
-//            throw new Exception(err);
+        try {
+	        Site site = reader.readOne();
+	        if (site == null)
+	            throw new RuntimeException("can not load the config file -> " + file.getAbsolutePath());
+	        
+	        if ("1".equals(site.getEnable())) {
+	        	sites.add(site);
+	        }
+        } catch (Throwable e) {
+        	throw new RuntimeException("can not load the config file -> " + file.getAbsolutePath(), e);
         }
-        sites = new ArrayList<Site>();
-        sites.add(site);
+        
+        return this;
+	}
+	
+	public static interface DynamicConfig{
+		public void config(Site site);
+	}
+	
+	public Spiderman config(DynamicConfig config) {
+		for (Site site : sites) {
+			config.config(site);
+		}
+		
+		return this;
 	}
 	
 	private void initSites() throws Exception{
@@ -424,13 +432,12 @@ public class Spiderman {
 			if (site.getName() == null || site.getName().trim().length() == 0)
 				throw new Exception("site name required");
 			if (site.getUrl() == null || site.getUrl().trim().length() == 0)
-				throw new Exception("site url required");
+				throw new Exception("site url required ->" + site.getName());
 			if (site.getTargets() == null || site.getTargets().getTarget().isEmpty())
-				throw new Exception("site target required");
-			
+				throw new Exception("site target required ->" + site.getName());
 			List<Target> targets = site.getTargets().getTarget();
 			if (targets == null || targets.isEmpty())
-				throw new Exception("can not get any url target of site -> " + site.getName());
+				throw new Exception("site target required ->" + site.getName());
 			
 			//---------------------插件初始化开始----------------------------
 			listener.onInfo(Thread.currentThread(), null, "plugins loading begin...");
@@ -591,11 +598,14 @@ public class Spiderman {
 			Seeds seeds = site.getSeeds();
 			Collection<Task> seedTasks = new ArrayList<Task>();
 			if (seeds == null || seeds.getSeed() == null || seeds.getSeed().isEmpty()) {
-				seedTasks.add(new Task(this.site.getUrl(), this.site.getHttpMethod(), null, this.site, 10));
+				Seed seed = new Seed();
+				seed.setName(this.site.getName());
+				seed.setUrl(this.site.getUrl());
+				seedTasks.add(new Task(seed, this.site.getUrl(), this.site.getHttpMethod(), null, this.site, 10));
 			}else{
 				for (Iterator<Seed> it = seeds.getSeed().iterator(); it.hasNext(); ){
-					Seed s = it.next();
-					seedTasks.add(new Task(s.getUrl(), s.getHttpMethod(), null, this.site, 10));
+					Seed seed = it.next();
+					seedTasks.add(new Task(seed, seed.getUrl(), seed.getHttpMethod(), null, this.site, 10));
 				}
 			}
 			
@@ -604,12 +614,9 @@ public class Spiderman {
 				Task seedTask = it.next();
 				Spider seedSpider = new Spider();
 				seedSpider.init(seedTask, listener);
-//				this.site.pool.execute(seedSpider);
 				seedSpider.run();
 			}
 			
-//			final float times = CommonUtil.toSeconds(this.site.getSchedule()) * 1000;
-//			long start = System.currentTimeMillis();
 			while(true){
 				if (site.isStop)
 					break;
@@ -648,23 +655,8 @@ public class Spiderman {
 				} catch (Exception e) {
 					listener.onError(Thread.currentThread(), null, e.toString(), e);
 				}finally{
-					if (site.isStop)
+					if (site.isStop || site.pool == null)
 						break;
-					if (site.pool == null)
-						break;
-					
-//					long cost = System.currentTimeMillis() - start;
-//					if (cost >= times){ 
-////						 运行种子任务
-//						for (Iterator<Task> it = seedTasks.iterator(); it.hasNext(); ) {
-//							Task seedTask = it.next();
-//							Spider seedSpider = new Spider();
-//							seedSpider.init(seedTask, listener);
-//							seedSpider.run();
-//						}
-//						listener.onInfo(Thread.currentThread(), null, " shcedule FeedSpider of Site->"+site.getName()+" per "+times+", now cost time ->"+cost);
-//						start = System.currentTimeMillis();//重新计时
-//					}
 				}
 			}
 		}

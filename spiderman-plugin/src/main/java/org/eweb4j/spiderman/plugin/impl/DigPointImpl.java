@@ -28,6 +28,7 @@ import org.eweb4j.spiderman.xml.Rule;
 import org.eweb4j.spiderman.xml.Rules;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.spiderman.xml.Target;
+import org.eweb4j.util.CommonUtil;
 
 public class DigPointImpl implements DigPoint{
 
@@ -129,6 +130,7 @@ public class DigPointImpl implements DigPoint{
 			
 		List<String> newUrls = new ArrayList<String>(urls.size());
 		for (String url : urls) {
+			if (CommonUtil.isBlank(url)) continue;
 			LinkNormalizer ln = new DefaultLinkNormalizer(hostUrl);
 			String newUrl = ln.normalize(url);
 //			String newUrl = URLCanonicalizer.getCanonicalURL(ln.normalize(url));
@@ -171,7 +173,7 @@ public class DigPointImpl implements DigPoint{
 		}
 
 		//解析nextPage,找出里面的目标URL
-		Task nextTask = new Task(nextUrl, task.httpMethod, task.url, task.site, 0);
+		Task nextTask = new Task(task.seed, nextUrl, task.httpMethod, task.url, task.site, 0);
 
 		FetchRequest req = new FetchRequest();
 		req.setUrl(nextUrl);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eweb4j.spiderman.fetcher.Page;
+import org.eweb4j.spiderman.xml.Seed;
 import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.spiderman.xml.Target;
 
@@ -11,8 +12,9 @@ import org.eweb4j.spiderman.xml.Target;
 
 public class Task {
 
-	public Task(String url, String httpMethod, String sourceUrl, Site site, int sort) {
+	public Task(Seed seed, String url, String httpMethod, String sourceUrl, Site site, int sort) {
 		super();
+		this.seed = seed;
 		this.url = url;
 		this.sourceUrl = sourceUrl;
 		this.site = site;
@@ -20,7 +22,8 @@ public class Task {
 		this.httpMethod = httpMethod;
 	}
 	
-	public Task(Site site) {
+	public Task(Seed seed, Site site) {
+		this.seed = seed;
 	    this.site = site;
 	}
 
@@ -32,6 +35,7 @@ public class Task {
 	public String sourceUrl;//task.url的来源
 	public List<String> digNewUrls = new ArrayList<String>();
 	public String httpMethod;
+	public Seed seed;
 //	public List<Header> headers = new ArrayList<Header>();
 //	public List<Cookie> cookies = new ArrayList<Cookie>();
 	

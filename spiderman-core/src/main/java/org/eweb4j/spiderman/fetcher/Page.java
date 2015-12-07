@@ -5,7 +5,7 @@ public class Page {
 
 	private String url;
 	private String content;
-//	private byte[] contentData;
+	private byte[] contentData;
 	private String contentType;
 	private String encoding;
 	private String charset;
@@ -42,12 +42,18 @@ public class Page {
 		this.charset = charset;
 	}
 
-//	public byte[] getContentData() {
-//		return this.contentData;
-//	}
-//
-//	public void setContentData(byte[] contentData) {
-//		this.contentData = contentData;
-//	}
+	@Override
+	public String toString() {
+		return "Page [url=" + url + ", contentType=" + contentType + ", encoding=" + encoding + ", charset=" + charset
+				+ "]";
+	}
+
+	public byte[] getContentData() {
+		return this.contentData;
+	}
+
+	public void setContentData(byte[] contentData) {
+		this.contentData = contentData;
+	}
 	
 }

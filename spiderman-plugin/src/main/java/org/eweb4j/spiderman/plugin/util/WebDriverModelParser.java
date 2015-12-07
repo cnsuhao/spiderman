@@ -87,6 +87,7 @@ public class WebDriverModelParser implements ModelParser{
 		init(task, target, listener);
 	}
 	
+	@SuppressWarnings("static-access")
 	public List<Map<String, Object>> parse(Page page) throws Exception {
 	    //允许设置延迟解析时间，这招对那些动态解析的网页非常有效！
 	    String delay = this.target.getModel().getDelay();
@@ -110,6 +111,7 @@ public class WebDriverModelParser implements ModelParser{
 		return parseContent(page);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private List<Map<String, Object>> parseJson(Page page) throws Exception {
 		String content = page.getContent();
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -127,6 +129,7 @@ public class WebDriverModelParser implements ModelParser{
 		return list;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private Map<String, Object> parseJsonMap(Map item, final List<Field> fields){
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (finalFields != null)
@@ -545,7 +548,7 @@ public class WebDriverModelParser implements ModelParser{
                 break;
             } catch (Throwable e) {
                 try {
-                    Thread.currentThread().sleep(1000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e1) {
                 }
                 continue;
@@ -562,7 +565,7 @@ public class WebDriverModelParser implements ModelParser{
                 break;
             } catch (Throwable e) {
                 try {
-                    Thread.currentThread().sleep(1000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e1) {
                 }
                 continue;

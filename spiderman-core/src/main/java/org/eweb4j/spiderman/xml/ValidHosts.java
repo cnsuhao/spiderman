@@ -8,7 +8,7 @@ import java.util.List;
  * @author weiwei l.weiwei@163.com
  * @date 2013-3-8 上午11:17:44
  */
-public class ValidHosts {
+public class ValidHosts{
 
 	private List<ValidHost> validHost = new ArrayList<ValidHost>();
 

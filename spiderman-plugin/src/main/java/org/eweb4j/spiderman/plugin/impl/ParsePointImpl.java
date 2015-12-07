@@ -99,6 +99,7 @@ public class ParsePointImpl implements ParsePoint{
 	}
 
 	//递归的关键是 Page
+	@SuppressWarnings("unchecked")
 	public void parseNextPage(Rule rule, Target target, Task task, Page page, List<Map<String, Object>> results, Set<String> visitedUrls, Map<String,Object> finalFields) throws Exception{
 		Model mdl = rule.getNextPage();
 		if (mdl == null)
@@ -135,7 +136,7 @@ public class ParsePointImpl implements ParsePoint{
 		if (isAlsoParseInNextPageFields == null || isAlsoParseInNextPageFields.isEmpty())
 			return ;
 
-		Task nextTask = new Task(nextUrl, rule.getHttpMethod(), task.url, task.site, 0);
+		Task nextTask = new Task(task.seed, nextUrl, rule.getHttpMethod(), task.url, task.site, 0);
 		//构造一个model
 		Model nextModel = new Model();
 		nextModel.getField().addAll(isAlsoParseInNextPageFields);

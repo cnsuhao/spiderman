@@ -6,7 +6,6 @@
 		<groupId>org.eweb4j</groupId>
 		<version>0.1.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.eweb4j</groupId>
 	<artifactId>spiderman-plugin</artifactId>
 	<dependencies>
 		<dependency>

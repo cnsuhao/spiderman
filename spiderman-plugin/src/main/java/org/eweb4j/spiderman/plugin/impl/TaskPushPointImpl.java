@@ -15,7 +15,6 @@ import org.eweb4j.spiderman.xml.Site;
 import org.eweb4j.spiderman.xml.Target;
 import org.eweb4j.spiderman.xml.ValidHost;
 import org.eweb4j.spiderman.xml.ValidHosts;
-import org.eweb4j.util.CommonUtil;
 
 public class TaskPushPointImpl implements TaskPushPoint{
 	
@@ -37,10 +36,11 @@ public class TaskPushPointImpl implements TaskPushPoint{
 				//如果不是在给定的合法host列表里则不给于抓取
 				ValidHosts vhs = task.site.getValidHosts();
 				if (vhs == null || vhs.getValidHost() == null || vhs.getValidHost().isEmpty()){
-					if (!CommonUtil.isSameHost(task.site.getUrl(), task.url)) {
-						listener.onInfo(Thread.currentThread(), task, "task.url->"+task.url+"'s host is not the same as site.host->" + task.site.getUrl());
-						continue;
-					}
+					// by vivi 如果没有设置validHosts，则所有链接都能作为任务
+//					if (!CommonUtil.isSameHost(task.site.getUrl(), task.url)) {
+//						listener.onInfo(Thread.currentThread(), task, "task.url->"+task.url+"'s host is not the same as site.host->" + task.site.getUrl());
+//						continue;
+//					}
 				}else{
 					boolean isOk = false;
 					String taskHost = new URL(task.url).getHost();
