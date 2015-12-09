@@ -20,7 +20,6 @@ public class DocIDServer implements TaskDbServer{
 	private String name = null;
 	public Environment env = null;
 	public Database db = null;
-//	private final Object mutex = new Object();
 	private int lastDocID = 0;
 	
 	public DocIDServer(String name, SpiderListener listener) {
@@ -36,16 +35,16 @@ public class DocIDServer implements TaskDbServer{
 		if (!dir.exists())
 			dir.mkdir();
 		
-		for (File f : dir.listFiles()){
-			boolean flag = FileUtil.deleteFile(f);
-			if (!flag) {
-				String error = "file -> " + f.getAbsolutePath() + " can not delete !";
-				RuntimeException e = new RuntimeException(error);
-				listener.onError(Thread.currentThread(), null, error, e);
-				throw e;
-			}
-			listener.onInfo(Thread.currentThread(), null, "file -> " + f.getAbsolutePath() + " delete success !");
-		}
+//		for (File f : dir.listFiles()){
+//			boolean flag = FileUtil.deleteFile(f);
+//			if (!flag) {
+//				String error = "file -> " + f.getAbsolutePath() + " can not delete !";
+//				RuntimeException e = new RuntimeException(error);
+//				listener.onError(Thread.currentThread(), null, error, e);
+//				throw e;
+//			}
+//			listener.onInfo(Thread.currentThread(), null, "file -> " + f.getAbsolutePath() + " delete success !");
+//		}
 		
 		DatabaseConfig dbConfig = new DatabaseConfig();
 		dbConfig.setAllowCreate(true);
@@ -140,7 +139,7 @@ public class DocIDServer implements TaskDbServer{
 	public void close() {
 		try {
 			db.close();
-			env.removeDatabase(null, name);
+			//env.removeDatabase(null, name);
 			env.cleanLog();
 			env.close();
 		} catch (DatabaseException e) {

@@ -64,7 +64,9 @@ public class ParsePointImpl implements ParsePoint{
 	}
 	
 	public List<Map<String, Object>> parse(Task task, Target target, Page page, List<Map<String, Object>> models) throws Exception {
-	    
+	    if (target.getModel() == null) {
+	    	return null;
+	    }
 	    //执行Before
         Map<String, Object> beforeModel =null;
         Model before = target.getBefore();

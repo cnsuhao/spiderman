@@ -19,8 +19,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import net.sf.saxon.xpath.XPathFactoryImpl;
-
 import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.spider.SpiderListener;
 import org.eweb4j.spiderman.task.Task;
@@ -44,6 +42,8 @@ import com.greenpineyu.fel.FelEngine;
 import com.greenpineyu.fel.FelEngineImpl;
 import com.greenpineyu.fel.function.CommonFunction;
 import com.greenpineyu.fel.function.Function;
+
+import net.sf.saxon.xpath.XPathFactoryImpl;
 
 public class DefaultModelParser extends DefaultHandler implements ModelParser{
 
@@ -77,12 +77,54 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 		}
 	};
 	
+	private final static Function fun3 = new CommonFunction() {
+		public String getName() {
+			return "$extractContent";
+		}
+
+		public Object call(Object[] arguments) {
+			String html = (String)(arguments[0]);
+			TextExtractor te = new TextExtractor();
+			te.extractHTML(html);
+			String text = te.getText();
+			return text;
+		}
+	};
+	
+	private final static Function fun2 = new CommonFunction() {
+		public String getName() {
+			return "$join";
+		}
+
+		public Object call(Object[] arguments) {
+			Object val = arguments[0];
+			Object d = ",";
+			if (arguments.length > 1) 
+				d = arguments[1];
+			if (val.getClass().isArray()) {
+				Object[] arr = (Object[]) val;
+				StringBuilder sb = new StringBuilder();
+				for (Object obj : arr) {
+					if (sb.length() > 0)
+						sb.append(d);
+					sb.append(obj);
+				}
+				return sb.toString();
+			}
+			
+			return val;
+		}
+	};
+	
 	public void init(Task task, Target target, SpiderListener listener){
 		this.task = task;
 		this.target = target;
 		this.listener = listener;
 		
     	fel.addFun(fun);
+    	fel.addFun(fun2);
+    	fel.addFun(fun3);
+    	
     	Tags $Tags = Tags.me();
     	Attrs $Attrs = Attrs.me();
     	fel.getContext().set("$Tags", $Tags);
@@ -327,6 +369,9 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
         DocumentBuilder builder = factory.newDocumentBuilder();
         String validXml = ParserUtil.checkUnicodeString(page.getContent());
         fel.getContext().set("$page_content", validXml);
+        fel.getContext().set("$page", page);
+        fel.getContext().set("$host", page.getHost());
+        
     	Document doc = builder.parse(new ByteArrayInputStream(validXml.getBytes("UTF-8")));
         XPathFactory xfactory = XPathFactoryImpl.newInstance();
         XPath xpathParser = xfactory.newXPath();
@@ -612,6 +657,9 @@ public class DefaultModelParser extends DefaultHandler implements ModelParser{
 		cleaner.getProperties().setTreatDeprecatedTagsAsContent(true);
 		String html = page.getContent();
 		fel.getContext().set("$page_content", html);
+	    fel.getContext().set("$page", page);
+	    fel.getContext().set("$host", page.getHost());
+	        
 		TagNode rootNode = cleaner.clean(html);
         final List<Field> fields = target.getModel().getField();
 		String isModelArray = target.getModel().getIsArray();

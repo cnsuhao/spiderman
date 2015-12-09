@@ -71,26 +71,8 @@ public class Spider implements Runnable{
 				}
 			}
 			
-			listener.onFetch(Thread.currentThread(), task, result);
-			
-			//扩展点：dig new url 发觉新URL
-			Collection<String> newUrls = null;
-			Collection<DigPoint> digPoints = task.site.digPointImpls;
-			if (digPoints != null && !digPoints.isEmpty()){
-				for (Iterator<DigPoint> it = digPoints.iterator(); it.hasNext(); ){
-					DigPoint point = it.next();
-					newUrls = point.digNewUrls(result, task, newUrls);
-				}
-			}
-			
-			handleNewUrls(newUrls);
-			
 			Page page = result.getPage();
-			if (page == null) {
-				return ;
-			}
-			
-			if (CommonUtil.isBlank(page.getCharset())) {
+			if (page != null && CommonUtil.isBlank(page.getCharset())) {
 				String html = page.getContent();
 				if (!CommonUtil.isBlank(html)) {
 					html = html.trim().toLowerCase();
@@ -116,6 +98,24 @@ public class Spider implements Runnable{
 				}
 			}
 			
+			listener.onFetch(Thread.currentThread(), task, result);
+			
+			//扩展点：dig new url 发觉新URL
+			Collection<String> newUrls = null;
+			Collection<DigPoint> digPoints = task.site.digPointImpls;
+			if (digPoints != null && !digPoints.isEmpty()){
+				for (Iterator<DigPoint> it = digPoints.iterator(); it.hasNext(); ){
+					DigPoint point = it.next();
+					newUrls = point.digNewUrls(result, task, newUrls);
+				}
+			}
+			
+			handleNewUrls(newUrls);
+			
+			if (page == null) {
+				return ;
+			}
+			
 			//扩展点：target 确认是否有目标配置匹配当前URL
 			Target target = null;
 			Collection<TargetPoint> targetPoints = task.site.targetPointImpls;
@@ -131,6 +131,7 @@ public class Spider implements Runnable{
 			}
 			
 			task.target = target;
+			task.page = page;
 			this.listener.onTargetPage(Thread.currentThread(), task, page);
 			
 			//检查sourceUrl

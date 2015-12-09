@@ -1,5 +1,9 @@
 package org.eweb4j.spiderman.fetcher;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.eweb4j.util.CommonUtil;
 
 public class Page {
 
@@ -9,6 +13,26 @@ public class Page {
 	private String contentType;
 	private String encoding;
 	private String charset;
+	
+	public String getHost() {
+		if (CommonUtil.isBlank(url)) return null;
+		try {
+			URL url = new URL(this.url);
+			String protocol = url.getProtocol();
+			String host = url.getHost();
+			int p = url.getPort();
+			String port = p > 0 ? ":"+p : "";
+			return protocol+"://"+host+port;
+		} catch (MalformedURLException e) {
+			return null;
+		}
+	}
+	
+	public static void main(String[] args) {
+		Page p = new Page();
+		p.setUrl("http://news.baidu.com:80/test");
+		System.out.println(p.getHost());
+	}
 	
 	public String getUrl() {
 		return this.url;

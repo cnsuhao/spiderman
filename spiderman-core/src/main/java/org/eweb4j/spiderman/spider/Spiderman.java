@@ -77,6 +77,7 @@ public class Spiderman {
 		return listen(listener).init();
 	}
 	
+	// TODO 抽象一个ConfigBuilder，可以支持从文件xml构建配置信息，从数据库表构建配置信息，从Java Class注解构建配置信息
 	public Spiderman init(File file){
         if (this.listener == null)
             this.listener = new SpiderListenerAdaptor();

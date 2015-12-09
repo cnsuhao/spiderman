@@ -17,17 +17,17 @@ import org.eweb4j.spiderman.xml.Site;
  */
 public class SpiderListenerAdaptor implements SpiderListener{
 	public void onInfo(Thread thread, Task task, String info) {System.out.println("\r\n[INFO]:::"+info);}
-	public void onDigUrls(Thread thread, Task task, String fieldName, Collection<String> urls) {System.out.println("\r\n[DIG]:::"+fieldName+", "+urls.size()+", "+" FROM " + task.url);}
+	public void onDigUrls(Thread thread, Task task, String fieldName, Collection<String> urls) {System.out.println("\r\n[DIG]:::"+fieldName+", "+urls.size()+", \r\n\t"+urls+"\r\n\t FROM " + task.url);}
 	public void onFetch(Thread thread, Task task, FetchResult result) {System.out.println("\r\n[FETCH]:::\r\n\turl:"+result.getFetchedUrl()+", \r\n\tstatusCode:"+result.getStatusCode()+", \r\n\tmove_to:"+result.getMovedToUrl());}
 	public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {}
 	public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {}
 	public void onTaskSort(Thread currentThread, Task task, Collection<Task> afterSortTasks) {}
 	public void onNewTasks(Thread thread, Task task, Collection<Task> newTasks) {}
 	public void onTargetPage(Thread thread, Task task, Page page){System.out.println("\r\n[TARGET]:::"+task.target.getName()+"\r\n\t:::"+page);}
-	public void onParse(Thread thread, Task task, List<Map<String, Object>> models){}
+	public void onParse(Thread thread, Task task, List<Map<String, Object>> models){System.out.println("\r\n[PARSE]:::"+task.target.getName()+"\r\n\t:::"+models+"\r\n\t from"+task.url);}
 	public void onPojo(Thread thread, Task task, List<Object> pojos) {}
 	public void onStartup(Site site) {}
-	public void onError(Thread thread, Task task, String err, Throwable e) {e.printStackTrace();}
+	public void onError(Thread thread, Task task, String err, Throwable e) {System.err.println("\r\n[ERROR]:::"+task.url+", " + err);}
 	public void onInitError(Site site, String err, Throwable e){e.printStackTrace();}
 	public void onAfterScheduleCancel() {}
 	public void onBeforeEveryScheduleExecute(Date theLastTimeScheduledAt){}
