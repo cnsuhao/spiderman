@@ -259,8 +259,10 @@ public class HttpClientDownloader extends PageFetcher{
 				//获取当前时间
 				long now = (new Date()).getTime();
 				//对同一个Host抓取时间间隔进行控制，若在设置的时限内则进行休眠
-				if (now - lastFetchTime < config.getPolitenessDelay()) 
-					Thread.sleep(config.getPolitenessDelay() - (now - lastFetchTime));
+				if (now - lastFetchTime < config.getPolitenessDelay()) {
+					long t = config.getPolitenessDelay() - (now - lastFetchTime);
+					Thread.sleep(t);
+				}
 				//不断更新最后的抓取时间，注意，是针对HOST的，不是针对某个URL的
 				lastFetchTime = (new Date()).getTime();
 			}

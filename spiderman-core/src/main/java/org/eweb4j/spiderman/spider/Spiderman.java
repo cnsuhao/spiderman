@@ -2,7 +2,6 @@ package org.eweb4j.spiderman.spider;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -10,9 +9,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -84,6 +82,7 @@ public class Spiderman {
         isShutdownNow = false;
         sites = new ArrayList<Site>();
         pool = null;
+        
         try {
             if (file == null)
                 loadConfigFiles();
@@ -548,7 +547,7 @@ public class Spiderman {
 			if (size == 0)
 				throw new RuntimeException("there is no website to fetch...");
 			pool = new ThreadPoolExecutor(size, size,
-                    60L, TimeUnit.SECONDS,
+                    60L, TimeUnit.MINUTES,
                     new LinkedBlockingQueue<Runnable>());
 			
 			listener.onInfo(Thread.currentThread(), null, "init thread pool size->"+size+" success ");
@@ -563,64 +562,93 @@ public class Spiderman {
 			String strSize = site.getThread();
 			int size = Integer.parseInt(strSize);
 			listener.onInfo(Thread.currentThread(), null, "site thread size -> " + size);
-			RejectedExecutionHandler rejectedHandler = new RejectedExecutionHandler() {
-				public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-					//拿到被弹出来的爬虫引用
-					Spider spider = (Spider)r;
-					try {
-						//将该爬虫的任务 task 放回队列
-						spider.pushTask(Arrays.asList(spider.task));
-						String info = "repush the task->"+spider.task+" to the Queue.";
-						spider.listener.onError(Thread.currentThread(), spider.task, info, new Exception(info));
-					} catch (Exception e) {
-						String err = "could not repush the task to the Queue. cause -> " + e.toString();
-						spider.listener.onError(Thread.currentThread(), spider.task, err, e);
-					}
-				}
-			};
+//			RejectedExecutionHandler rejectedHandler = new RejectedExecutionHandler() {
+//				public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+//					//拿到被弹出来的爬虫引用
+//					Spider spider = (Spider)r;
+//					try {
+//						//将该爬虫的任务 task 放回队列
+//						pushTask(Arrays.asList(spider.task));
+//						String info = "repush the task->"+spider.task+" to the Queue.";
+//						spider.listener.onError(Thread.currentThread(), spider.task, info, new Exception(info));
+//					} catch (Exception e) {
+//						String err = "could not repush the task to the Queue. cause -> " + e.toString();
+//						spider.listener.onError(Thread.currentThread(), spider.task, err, e);
+//					}
+//				}
+//			};
 			
-			if (size > 0)
-				this.site.pool = new ThreadPoolExecutor(size, size,
-						60L, TimeUnit.SECONDS,
-	                    new LinkedBlockingQueue<Runnable>(),
-	                    rejectedHandler);
-			else
-				this.site.pool = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
-	                    60L, TimeUnit.SECONDS,
-	                    new SynchronousQueue<Runnable>(),
-	                    rejectedHandler);
+			if (size > 0) {
+//				int s = size/3;
+//				int s2 = size-s;
+//				if (s <= 0) {
+//					s = 1;
+//				}
+//				if (s2 <= 0) {
+//					s2 = 1;
+//				}
+				this.site.pool = Executors.newFixedThreadPool(size);
+//				this.site.targetPool = new ThreadPoolExecutor(s2, s2,
+//						60L, TimeUnit.MINUTES,
+//	                    new LinkedBlockingQueue<Runnable>(),
+//	                    rejectedHandler);
+			} else {
+//				int s = Integer.MAX_VALUE/3;
+//				int s2 = Integer.MAX_VALUE-s;
+//				if (s <= 0) {
+//					s = 1;
+//				}
+//				if (s2 <= 0) {
+//					s2 = 1;
+//				}
+				
+				this.site.pool = Executors.newCachedThreadPool();
+//				this.site.targetPool = new ThreadPoolExecutor(0, s2,
+//	                    60L, TimeUnit.MINUTES,
+//	                    new SynchronousQueue<Runnable>(),
+//	                    rejectedHandler);
+			}
 		}
 		
 		public void run() {
 			if (site.isStop)
 				return ;
 			
+			Collection<Task> seedTasks = new ArrayList<Task>();
 			// 获取种子url
 			Seeds seeds = site.getSeeds();
-			Collection<Task> seedTasks = new ArrayList<Task>();
 			if (seeds == null || seeds.getSeed() == null || seeds.getSeed().isEmpty()) {
 				Seed seed = new Seed();
 				seed.setName(this.site.getName());
 				seed.setUrl(this.site.getUrl());
-				seedTasks.add(new Task(seed, this.site.getUrl(), this.site.getHttpMethod(), null, this.site, 10));
+				Task t = new Task(true, seed, this.site.getUrl(), this.site.getHttpMethod(), null, this.site, 5);
+				seedTasks.add(t);
 			}else{
 				for (Iterator<Seed> it = seeds.getSeed().iterator(); it.hasNext(); ){
 					Seed seed = it.next();
-					seedTasks.add(new Task(seed, seed.getUrl(), seed.getHttpMethod(), null, this.site, 10));
+					Task t = new Task(true, seed, seed.getUrl(), seed.getHttpMethod(), null, this.site, 5);
+					seedTasks.add(t);
 				}
 			}
 			
-			// 运行种子任务
-			for (Iterator<Task> it = seedTasks.iterator(); it.hasNext(); ) {
-				Task seedTask = it.next();
-				Spider seedSpider = new Spider();
-				seedSpider.init(seedTask, listener);
-				seedSpider.run();
-			}
+			//种子任务放入任务队列
+			pushTask(seedTasks);
 			
 			while(true){
 				if (site.isStop)
 					break;
+				ThreadPoolExecutor pool = (ThreadPoolExecutor) this.site.pool;
+				while (true) {
+					int cps = pool.getCorePoolSize();
+					long ctc = pool.getCompletedTaskCount();
+					long tc = pool.getTaskCount();
+					
+					if ((tc - ctc) < cps) {
+						break;
+					}
+					sleep("thread pool is too busy");
+				}
+//				ThreadPoolExecutor targetPool = (ThreadPoolExecutor) this.site.targetPool;
 				
 				try {
 					//扩展点：TaskPoll
@@ -634,22 +662,27 @@ public class Spiderman {
 					}
 					
 					if (task == null){
-						long wait = CommonUtil.toSeconds(site.getWaitQueue()).longValue();
-//						listener.onInfo(Thread.currentThread(), null, "queue empty wait for -> " + wait + " seconds");
-						if (wait > 0) {
-							try {
-								Thread.sleep(wait * 1000);
-							} catch (Exception e){
-								
-							}
-						}
+						sleep();
 						continue;
 					}
+					
+//					Target target = null;
+//					Collection<TargetPoint> targetPointImpls = site.targetPointImpls;
+//					if (targetPointImpls != null && !targetPointImpls.isEmpty()){
+//						for (Iterator<TargetPoint> it = targetPointImpls.iterator(); it.hasNext(); ){
+//							TargetPoint point = it.next();
+//							target = point.confirmTarget(task, target);
+//						}
+//					}
 					
 					Spider spider = new Spider();
 					spider.init(task, listener);
 					
-					this.site.pool.execute(spider);
+//					if (target != null) {
+//						targetPool.execute(spider);
+//					} else {
+						pool.execute(spider);
+//					}
 				}catch (DoneException e) {
 					listener.onInfo(Thread.currentThread(), null, e.toString());
 					return ;
@@ -658,6 +691,40 @@ public class Spiderman {
 				}finally{
 					if (site.isStop || site.pool == null)
 						break;
+				}
+			}
+		}
+
+		private void pushTask(Collection<Task> seedTasks) {
+			Collection<TaskPushPoint> taskPushPoints = site.taskPushPointImpls;
+			if (taskPushPoints != null && !taskPushPoints.isEmpty()){
+				for (TaskPushPoint tpp : taskPushPoints){
+					try {
+						tpp.pushTask(seedTasks);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		private void sleep() {
+			sleep(null, null);
+		}
+		private void sleep(String cause) {
+			sleep(null, cause);
+		}
+		private void sleep(String wait, String cause) {
+			if (wait == null)
+				wait = site.getWaitQueue();
+			if (cause == null)
+				cause = "queue empty";
+			long _wait = CommonUtil.toSeconds(wait).longValue();
+			listener.onInfo(Thread.currentThread(), null, cause+" wait for -> " + wait + " seconds");
+			if (_wait > 0) {
+				try {
+					Thread.sleep(_wait * 1000);
+				} catch (Exception e){
+					
 				}
 			}
 		}

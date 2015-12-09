@@ -67,7 +67,7 @@ public class Site {
 	private String timeout;//HTTP请求最大等待时间
 	
 	@AttrTag
-	private String reqDelay = "200";//每个请求的延迟时间
+	private String reqDelay = "0.2s";//每个请求的延迟时间
 	
 	@AttrTag 
 	private String charset;//网站内容字符集
@@ -104,6 +104,8 @@ public class Site {
 	public TaskDbServer db = null;//每个网站都有属于自己的一个任务去重DB服务
 	@Skip
 	public ExecutorService pool;//每个网站都有属于自己的一个线程池
+//	@Skip
+//	public ExecutorService targetPool;//专门执行target任务的线程池 暂时不用
 	@Skip
 	public Boolean isStop = false;//每个网站都有属于自己的一个停止信号，用来标识该网站的状态是否停止完全
 	@Skip
@@ -395,10 +397,13 @@ public class Site {
 		}
 		
 		try {
-			if (isShutdownNow)
+			if (isShutdownNow) {
 				this.pool.shutdownNow();
-			else
+//				this.targetPool.shutdownNow();
+			} else {
 				this.pool.shutdown();
+//				this.targetPool.shutdown();
+			}
 		}catch(Throwable e){
 			listener.onError(Thread.currentThread(), null, "Site.name->"+this.getName()+".ThreadPool shutdown failed.", e);
 		}

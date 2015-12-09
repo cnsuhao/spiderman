@@ -32,6 +32,13 @@ public class TaskPushPointImpl implements TaskPushPoint{
 	public synchronized Collection<Task> pushTask(Collection<Task> validTasks) throws Exception{
 		Collection<Task> newTasks = new ArrayList<Task>();
 		for (Task task : validTasks){
+			// 若任务是种子，直接进入队列
+			if (task.isSeed()) {
+				boolean isOk = task.site.queue.pushTask(task);
+				if (isOk)
+					newTasks.add(task);
+				continue;
+			}
 			try{
 				//如果不是在给定的合法host列表里则不给于抓取
 				ValidHosts vhs = task.site.getValidHosts();

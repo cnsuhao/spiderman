@@ -22,6 +22,17 @@ public class Task {
 		this.httpMethod = httpMethod;
 	}
 	
+	public Task(boolean isSeed, Seed seed, String url, String httpMethod, String sourceUrl, Site site, int sort) {
+		super();
+		this.isSeed = isSeed;
+		this.seed = seed;
+		this.url = url;
+		this.sourceUrl = sourceUrl;
+		this.site = site;
+		this.sort = sort;
+		this.httpMethod = httpMethod;
+	}
+	
 	public Task(Seed seed, Site site) {
 		this.seed = seed;
 	    this.site = site;
@@ -36,6 +47,10 @@ public class Task {
 	public List<String> digNewUrls = new ArrayList<String>();
 	public String httpMethod;
 	public Seed seed;
+	private boolean isSeed = false;
+	public boolean isSeed() {
+		return this.isSeed;
+	}
 //	public List<Header> headers = new ArrayList<Header>();
 //	public List<Cookie> cookies = new ArrayList<Cookie>();
 	

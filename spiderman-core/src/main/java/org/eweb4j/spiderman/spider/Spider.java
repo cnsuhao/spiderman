@@ -47,6 +47,8 @@ public class Spider implements Runnable{
 	}
 	
 	public void run() {
+		long start = System.currentTimeMillis();
+		this.listener.onInfo(Thread.currentThread(), task, "spider task begin " + task.url);
 		try {
 			//扩展点：begin 蜘蛛开始
 			Collection<BeginPoint> beginPoints = task.site.beginPointImpls;
@@ -222,6 +224,8 @@ public class Spider implements Runnable{
 		} catch(Throwable e){
 			if (this.listener != null)
 				this.listener.onError(Thread.currentThread(), task, CommonUtil.getExceptionString(e), e);
+		} finally {
+			this.listener.onInfo(Thread.currentThread(), task, "spider task done ("+(System.currentTimeMillis()-start)+"ms) \r\n\t" + task.url);
 		}
 	}
 

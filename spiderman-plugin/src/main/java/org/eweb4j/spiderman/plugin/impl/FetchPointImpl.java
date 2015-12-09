@@ -3,7 +3,6 @@ package org.eweb4j.spiderman.plugin.impl;
 import org.eweb4j.mvc.Http;
 import org.eweb4j.spiderman.fetcher.FetchRequest;
 import org.eweb4j.spiderman.fetcher.FetchResult;
-import org.eweb4j.spiderman.fetcher.Page;
 import org.eweb4j.spiderman.fetcher.PageFetcher;
 import org.eweb4j.spiderman.fetcher.SpiderConfig;
 import org.eweb4j.spiderman.plugin.FetchPoint;
@@ -26,6 +25,60 @@ public class FetchPointImpl implements FetchPoint{
 	public void init(Site site, SpiderListener listener) {
 		this.site = site;
 //		this.listener = listener;
+		if (site.fetcher == null){
+			SpiderConfig config = new SpiderConfig();
+			if (site.getCharset() != null && site.getCharset().trim().length() > 0)
+				config.setCharset(site.getCharset());
+			if (site.getUserAgent() != null && site.getUserAgent().trim().length() > 0)
+				config.setUserAgentString(site.getUserAgent());
+			if ("1".equals(site.getIncludeHttps()) || "true".equals(site.getIncludeHttps()))
+				config.setIncludeHttpsPages(true);
+			if ("1".equals(site.getIsFollowRedirects()) || "true".equals(site.getIsFollowRedirects()))
+				config.setFollowRedirects(true);
+			String sdelay = site.getReqDelay();
+			if (sdelay == null || sdelay.trim().length() == 0)
+				sdelay = "0.2s";
+			
+			int delay = CommonUtil.toSeconds(sdelay).intValue()*1000;
+			if (delay < 0)
+				delay = 200;
+			
+			config.setPolitenessDelay(delay);
+			
+			String timeout = site.getTimeout();
+			if (timeout == null) {
+				timeout = "10s";
+			}
+			if (!timeout.equals("0")){
+				int to = CommonUtil.toSeconds(sdelay).intValue()*1000;
+				if (to > 0)
+					config.setConnectionTimeout(to);
+			}
+			
+			PageFetcher fetcher = null;
+			String downloader = site.getDownloader();
+			if (!CommonUtil.isBlank(downloader)) {
+				try {
+				    Class<?> cls = Class.forName(downloader);
+				    fetcher = (PageFetcher) cls.newInstance();
+				} catch (Throwable e) {
+				    e.printStackTrace();
+				}
+			}
+			
+			//默认是HttpClient下载器
+			if (fetcher == null) {
+			    fetcher = new HttpClientDownloader();
+			}
+			
+			try {
+				fetcher.init(config, site);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			site.fetcher = fetcher;
+		}
 	}
 
 	public void destroy() {
@@ -64,63 +117,13 @@ public class FetchPointImpl implements FetchPoint{
 	}
 	
 	public FetchResult fetch(Task task, FetchResult result) throws Exception {
-		synchronized (site) {
-			if (site.fetcher == null){
-				SpiderConfig config = new SpiderConfig();
-				if (task.site.getCharset() != null && task.site.getCharset().trim().length() > 0)
-					config.setCharset(task.site.getCharset());
-				if (task.site.getUserAgent() != null && task.site.getUserAgent().trim().length() > 0)
-					config.setUserAgentString(task.site.getUserAgent());
-				if ("1".equals(task.site.getIncludeHttps()) || "true".equals(task.site.getIncludeHttps()))
-					config.setIncludeHttpsPages(true);
-				if ("1".equals(task.site.getIsFollowRedirects()) || "true".equals(task.site.getIsFollowRedirects()))
-					config.setFollowRedirects(true);
-				String sdelay = task.site.getReqDelay();
-				if (sdelay == null || sdelay.trim().length() == 0)
-					sdelay = "200";
-				
-				int delay = CommonUtil.toSeconds(sdelay).intValue()*1000;
-				if (delay < 0)
-					delay = 200;
-				
-				config.setPolitenessDelay(delay);
-				
-				String timeout = task.site.getTimeout();
-				if (timeout != null && timeout.trim().length() > 0){
-					int to = CommonUtil.toSeconds(sdelay).intValue()*1000;
-					if (to > 0)
-						config.setConnectionTimeout(to);
-				}
-				
-				PageFetcher fetcher = null;
-				String downloader = site.getDownloader();
-				if (!CommonUtil.isBlank(downloader)) {
-    				try {
-    				    Class<?> cls = Class.forName(downloader);
-    				    fetcher = (PageFetcher) cls.newInstance();
-    				} catch (Throwable e) {
-    				    e.printStackTrace();
-    				}
-				}
-				
-				//默认是HttpClient下载器
-				if (fetcher == null) {
-				    fetcher = new HttpClientDownloader();
-				}
-				
-				fetcher.init(config, site);
-				site.fetcher = fetcher;
-			}
-			
-			String url = task.url.replace(" ", "%20");
-			
-			FetchRequest req = new FetchRequest();
-			req.setUrl(url);
-			req.setHttpMethod(task.httpMethod);
-			
-			FetchResult fr = site.fetcher.fetch(req);
-			return fr;
-		}
+		String url = task.url.replace(" ", "%20");
+		FetchRequest req = new FetchRequest();
+		req.setUrl(url);
+		req.setHttpMethod(task.httpMethod);
+		
+		FetchResult fr = site.fetcher.fetch(req);
+		return fr;
 	}
 	
 //	private FetchResult fetch(){

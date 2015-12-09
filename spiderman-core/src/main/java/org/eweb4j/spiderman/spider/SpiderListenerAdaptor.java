@@ -22,7 +22,7 @@ public class SpiderListenerAdaptor implements SpiderListener{
 	public void onNewUrls(Thread thread, Task task, Collection<String> newUrls) {}
 	public void onDupRemoval(Thread currentThread, Task task, Collection<Task> validTasks) {}
 	public void onTaskSort(Thread currentThread, Task task, Collection<Task> afterSortTasks) {}
-	public void onNewTasks(Thread thread, Task task, Collection<Task> newTasks) {}
+	public void onNewTasks(Thread thread, Task task, Collection<Task> newTasks) {System.out.println("\r\n[NEW-TASK]:::"+newTasks.size());}
 	public void onTargetPage(Thread thread, Task task, Page page){System.out.println("\r\n[TARGET]:::"+task.target.getName()+"\r\n\t:::"+page);}
 	public void onParse(Thread thread, Task task, List<Map<String, Object>> models){System.out.println("\r\n[PARSE]:::"+task.target.getName()+"\r\n\t:::"+models+"\r\n\t from"+task.url);}
 	public void onPojo(Thread thread, Task task, List<Object> pojos) {}
