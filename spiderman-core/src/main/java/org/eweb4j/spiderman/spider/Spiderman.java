@@ -646,7 +646,7 @@ public class Spiderman {
 					if ((tc - ctc) < cps) {
 						break;
 					}
-					sleep("thread pool is too busy");
+					sleep("1s", "thread pool is too busy");
 				}
 //				ThreadPoolExecutor targetPool = (ThreadPoolExecutor) this.site.targetPool;
 				
